@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet author="vmargiev" id="2021-12-24-create-user-tables">
+        <createTable tableName="celebrity">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="celebrity_pkey"/>
+            </column>
+            <column name="image_url" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="name" type="varchar(1024)">
+                <constraints nullable="false"
+                             unique="true"/>
+            </column>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <createTable tableName="user_profile">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_profile_pkey"/>
+            </column>
+            <column name="image_url" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="keycloak_user_id" type="UUID">
+                <constraints nullable="false"
+                             unique="true"/>
+            </column>
+            <column name="phone" type="varchar(13)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="is_verified_phone" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_invisible_name" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_two_factor_auth" type="boolean">
+                <constraints nullable="false"/>
+            </column>
+            <column name="google_id" type="varchar(128)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="facebook_id" type="varchar(128)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="twitter_id" type="varchar(128)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="description" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="site" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="celebrity_id" type="UUID">
+                <constraints nullable="true"
+                             foreignKeyName="celebrity_fkey"
+                             references="celebrity(id)"/>
+            </column>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <createIndex tableName="user_profile" indexName="user_profile_celebrity_id_idx">
+            <column name="celebrity_id"/>
+        </createIndex>
+
+        <createTable tableName="profile_wallet">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="profile_wallet_pkey"/>
+            </column>
+            <column name="experience_count" type="int" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activity_balance" type="numeric" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coin_balance" type="numeric" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_profile_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="user_profile_fkey"
+                             references="user_profile(id)"/>
+            </column>
+            <column name="celebrity_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="celebrity_fkey"
+                             references="celebrity(id)"/>
+            </column>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <createIndex tableName="profile_wallet" indexName="profile_wallet_user_profile_id_idx">
+            <column name="user_profile_id"/>
+        </createIndex>
+        <createIndex tableName="profile_wallet" indexName="profile_wallet_celebrity_id_idx">
+            <column name="celebrity_id"/>
+        </createIndex>
+
+        <createTable tableName="crypto_wallet">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="crypto_wallet_pkey"/>
+            </column>
+            <column name="external_crypto_wallet_id" type="varchar(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_profile_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="user_profile_fkey"
+                             references="user_profile(id)"/>
+            </column>
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <createIndex tableName="crypto_wallet" indexName="crypto_wallet_user_profile_id_idx">
+            <column name="user_profile_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

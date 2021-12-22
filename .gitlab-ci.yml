@@ -1,0 +1,25 @@
+####№№#
+include:
+  - project: 'nft-platform/devops/ci-box'
+    file: 'variables.yaml'
+  - project: 'nft-platform/devops/ci-box'
+    file: 'build-variables.yaml'
+  - project: 'nft-platform/devops/ci-box'
+    file: 'maven-build.yaml'
+  - project: 'nft-platform/devops/ci-box'
+    file: 'docker-build.yaml'
+  - project: 'nft-platform/devops/ci-box'
+    file: 'helm-lint.yaml'
+  - project: 'nft-platform/devops/ci-box'
+    file: 'helm-build-deploy.yaml'
+
+variables:
+  CI_PROJECT_NAME: user-service
+  PROJECT_PREFIX: nft-platform
+
+stages:
+  - variables
+  - maven:build
+  - docker:build
+  - helm:lint
+  - helm:package-push-deploy
