@@ -31,7 +31,7 @@ security:
 rest:
   security:
     enabled: true
-    issuer-uri: https://nft-platform.dcloud.tech/auth/realms/nftplatform
+    issuer-uri: https://develop.nft-platform.dcloud.tech/auth/realms/nftplatform
 
 server:
   port: 8080
