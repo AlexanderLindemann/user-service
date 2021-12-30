@@ -45,6 +45,7 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
                 .permitAll()
                 .antMatchers(AUTH_WHITELIST)
                 .permitAll()
-                .anyRequest().authenticated();
+                .antMatchers(HttpMethod.POST, "/**").permitAll();
+                //.anyRequest().authenticated();
     }
 }
