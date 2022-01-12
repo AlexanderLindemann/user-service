@@ -1,0 +1,5 @@
+nft:
+  logging:
+    logstash:
+      enabled: false
+    useJsonFormat: false

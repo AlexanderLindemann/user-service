@@ -2,7 +2,6 @@ package com.nft.platform.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-public class AbstractUserProfileDto {
+public abstract class AbstractUserProfileDto {
 
     @Schema(required = true, description = "User UUID from Keycloak")
     @NotNull

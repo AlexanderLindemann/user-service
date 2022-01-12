@@ -1,6 +1,6 @@
 package com.nft.platform.dto.response;
 
-import com.nft.platform.dto.AbstractUserProfileDto;
+import com.nft.platform.dto.AbstractCelebrityDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
@@ -16,12 +15,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Schema(description = "User Response DTO")
-public class UserProfileResponseDto extends AbstractUserProfileDto {
+@Schema(description = "Celebrity Response DTO")
+public class CelebrityResponseDto extends AbstractCelebrityDto {
 
-    @Schema(description = "User Id", required = true)
+    @Schema(description = "Celebrity Id", required = true)
     private UUID id;
-
-    @Schema(description = "User Registration Date", required = true)
-    private LocalDateTime createdAt;
 }

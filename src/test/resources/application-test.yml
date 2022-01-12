@@ -1,0 +1,11 @@
+feign:
+  some-sample-service:
+    # The automatically generated (for now by wiremock) url
+    url: ${nft.tests.mock.url}
+    path: /service-context-path
+
+nft:
+  logging:
+    logstash:
+      enabled: false
+    useJsonFormat: false

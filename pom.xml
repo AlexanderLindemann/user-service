@@ -15,30 +15,31 @@
 	<description>Nft platform project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
-		<org.liquibase.version>4.6.2</org.liquibase.version>
-		<org.testcontainers.postgresql.version>1.16.2</org.testcontainers.postgresql.version>
-		<io.swagger.core.v3.swagger-annotations.version>2.1.11</io.swagger.core.v3.swagger-annotations.version>
 		<org.springdoc.springdoc-openapi-ui.version>1.6.2</org.springdoc.springdoc-openapi-ui.version>
 		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
 		<lombok.version>1.18.22</lombok.version>
 		<spring.security.oauth.version>2.6.1</spring.security.oauth.version>
+		<spring.cloud.feign.version>3.1.0</spring.cloud.feign.version>
+		<logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
+		<hibernate-types.version>2.12.1</hibernate-types.version>
+		<test-containers-postgres.version>1.15.1</test-containers-postgres.version>
+		<wiremock.version>2.27.2</wiremock.version>
 	</properties>
 	<dependencies>
 		<!-- DB -->
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>${org.liquibase.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-maven-plugin</artifactId>
-			<version>${org.liquibase.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.vladmihalcea</groupId>
+			<artifactId>hibernate-types-55</artifactId>
+			<version>${hibernate-types.version}</version>
 		</dependency>
 
 		<!-- Spring -->
@@ -63,6 +64,15 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>${spring.cloud.feign.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 
 		<!-- Test -->
 		<dependency>
@@ -71,22 +81,30 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.github.tomakehurst</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>${wiremock.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>${org.testcontainers.postgresql.version}</version>
+			<version>${test-containers-postgres.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<!-- Swagger -->
 		<dependency>
-			<groupId>io.swagger.core.v3</groupId>
-			<artifactId>swagger-annotations</artifactId>
-			<version>${io.swagger.core.v3.swagger-annotations.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>${org.springdoc.springdoc-openapi-ui.version}</version>
+		</dependency>
+
+		<!-- Log -->
+		<dependency>
+			<groupId>net.logstash.logback</groupId>
+			<artifactId>logstash-logback-encoder</artifactId>
+			<version>${logstash-logback-encoder.version}</version>
 		</dependency>
 
 		<!-- Util -->

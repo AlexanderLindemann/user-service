@@ -35,7 +35,7 @@ public class UserProfileController {
     private final UserProfileService userProfileService;
 
     @GetMapping("/{id}")
-    @Operation(description = "Get User Profile by Id")
+    @Operation(summary = "Get User Profile by Id")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<UserProfileResponseDto> findUserById(
             @Parameter(name = "id", description = "User Profile Id")
@@ -46,7 +46,7 @@ public class UserProfileController {
     }
 
     @GetMapping
-    @Operation(description = "Get Page of User Profiles by Page number and Page size")
+    @Operation(summary = "Get Page of User Profiles by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)
     public Page<UserProfileResponseDto> getUserPage(
             @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable
@@ -55,7 +55,7 @@ public class UserProfileController {
     }
 
     @PutMapping("/{id}")
-    @Operation(description = "Update User Profile")
+    @Operation(summary = "Update User Profile")
     @ResponseStatus(HttpStatus.OK)
     public UserProfileResponseDto updateUserProfile(
             @Parameter(name = "id", description = "User Profile Id")
@@ -67,7 +67,7 @@ public class UserProfileController {
     }
 
     @PostMapping
-    @Operation(description = "Create User Profile")
+    @Operation(summary = "Create User Profile")
     @ResponseStatus(HttpStatus.CREATED)
     public UserProfileResponseDto createUserProfile(
             @Parameter(name = "userProfileRequestDto", description = "User Profile Request Dto")

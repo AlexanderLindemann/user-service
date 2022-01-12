@@ -64,13 +64,10 @@ public class UserProfileService {
                 .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, TEST_CELEBRITY_NAME));
         UserProfile userProfile = new UserProfile();
         userProfile = mapper.toEntity(requestDto, userProfile);
-        //TODO set createBy from auth token
-        userProfile.setCreatedBy("keycloakListener");
 
         ProfileWallet profileWallet = new ProfileWallet();
         profileWallet.setUserProfile(userProfile);
         profileWallet.setCelebrity(celebrity);
-        profileWallet.setCreatedBy("keycloakListener");
 
         profileWalletRepository.save(profileWallet);
         return mapper.toDto(userProfile);

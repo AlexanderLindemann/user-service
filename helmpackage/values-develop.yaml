@@ -15,7 +15,10 @@ nameOverride: ""
 fullnameOverride: ""
 
 env:
-  STAND_NFT_BASEURL: "https://develop.nft-platform.dcloud.tech"
+  NFT_LOGGING_LOGSTASH_ENABLED: false
+  NFT_STAND_BASE-URL: "https://develop.nft-platform.dcloud.tech"
+  NFT_TECH_USER_AUTH_USERNAME: "nftbackend@no.no"
+  NFT_TECH_USER_AUTH_PASSWORD: "8yfz537z3yr7h99w"
   SERVER_SERVLET_CONTEXTPATH: "/user-service"
   SERVER_PORT: 8080
   TZ: "Europe/Moscow"
