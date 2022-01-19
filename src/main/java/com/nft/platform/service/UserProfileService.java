@@ -3,8 +3,10 @@ package com.nft.platform.service;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
+import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
+import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.repository.CelebrityRepository;
@@ -60,8 +62,8 @@ public class UserProfileService {
     @NonNull
     @Transactional
     public UserProfileResponseDto createUserProfile(@NonNull UserProfileRequestDto requestDto) {
-        Celebrity celebrity = celebrityRepository.findByName(TEST_CELEBRITY_NAME)
-                .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, TEST_CELEBRITY_NAME));
+        Celebrity celebrity = celebrityRepository.findById(requestDto.getCelebrityId())
+                .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, requestDto.getCelebrityId()));
         UserProfile userProfile = new UserProfile();
         userProfile = mapper.toEntity(requestDto, userProfile);
 
@@ -71,5 +73,25 @@ public class UserProfileService {
 
         profileWalletRepository.save(profileWallet);
         return mapper.toDto(userProfile);
+    }
+
+    @Transactional
+    public void addProfileWallet(@NonNull ProfileWalletRequestDto profileWalletRequestDto) {
+        Optional<ProfileWallet> profileWalletO = profileWalletRepository.findByUserProfileIdAndCelebrityId(
+                profileWalletRequestDto.getUserProfileId(),
+                profileWalletRequestDto.getCelebrityId()
+        );
+        if (profileWalletO.isPresent()) {
+            throw new ItemConflictException(ProfileWallet.class, profileWalletO.get().getId());
+        }
+        UserProfile userProfile = userProfileRepository.findById(profileWalletRequestDto.getUserProfileId())
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, profileWalletRequestDto.getUserProfileId()));
+        Celebrity celebrity = celebrityRepository.findById(profileWalletRequestDto.getCelebrityId())
+                .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, profileWalletRequestDto.getCelebrityId()));
+        ProfileWallet profileWallet = new ProfileWallet();
+        profileWallet.setUserProfile(userProfile);
+        profileWallet.setCelebrity(celebrity);
+
+        profileWalletRepository.save(profileWallet);
     }
 }

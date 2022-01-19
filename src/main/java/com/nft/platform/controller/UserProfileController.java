@@ -1,5 +1,6 @@
 package com.nft.platform.controller;
 
+import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.service.UserProfileService;
@@ -74,5 +75,12 @@ public class UserProfileController {
             @Valid @RequestBody UserProfileRequestDto userProfileRequestDto
     ) {
         return userProfileService.createUserProfile(userProfileRequestDto);
+    }
+
+    @PutMapping("/add-profile-wallet")
+    @Operation(summary = "Add Celebrity to User Profile")
+    @ResponseStatus(HttpStatus.OK)
+    public void addProfileWallet(@Valid @RequestBody ProfileWalletRequestDto celebrityForUserDto) {
+        userProfileService.addProfileWallet(celebrityForUserDto);
     }
 }

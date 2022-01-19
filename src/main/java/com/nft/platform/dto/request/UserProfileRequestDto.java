@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -15,5 +17,8 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @Schema(description = "User Request DTO")
 public class UserProfileRequestDto extends AbstractUserProfileDto {
+
+    @Schema(description = "Celebrity Id")
+    private UUID celebrityId;
 
 }
