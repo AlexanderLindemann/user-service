@@ -5,26 +5,26 @@
 replicaCount: 3
 
 image:
-  repository: "container.nexus.dcloud.tech/nft-platform/user-service"
+  repository: "container.nexus.nnmdev.ru/nft-platform/user-service"
   tag: #default "SNAPSHOT"
   pullPolicy: Always
 
-imagePullSecrets:
-  - name: dcloudnexus
+#imagePullSecrets:
+#  - name: dcloudnexus
 nameOverride: ""
 fullnameOverride: ""
 
 env:
   NFT_LOGGING_LOGSTASH_ENABLED: false
-  NFT_STAND_BASE-URL: "https://develop.nft-platform.dcloud.tech"
+  NFT_STAND_BASE-URL: "https://nftdev.nnmdev.ru"
   NFT_TECH_USER_AUTH_USERNAME: "nftbackend@no.no"
   NFT_TECH_USER_AUTH_PASSWORD: "8yfz537z3yr7h99w"
   SERVER_SERVLET_CONTEXTPATH: "/user-service"
   SERVER_PORT: 8080
   TZ: "Europe/Moscow"
-  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-postgresql.nft-platform-dev.svc.cluster.local/users
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdev.cwol7reviywm.eu-central-1.rds.amazonaws.com/users
   SPRING_DATASOURCE_USERNAME: postgres
-  SPRING_DATASOURCE_PASSWORD: Blablabla123
+  SPRING_DATASOURCE_PASSWORD: postgres
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -82,14 +82,14 @@ ingress:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
 
   hosts:
-    - host: develop.nft-platform.dcloud.tech
+    - host: nftdev.nnmdev.ru
       paths:
         - /user-service
       pathType: ImplementationSpecific
   tls:
-    - secretName: develop.nft-platform.dcloud.tech-tls
+    - secretName: nftdev.nnmdev.ru-tls
       hosts:
-        - develop.nft-platform.dcloud.tech
+        - nftdev.nnmdev.ru
 
 
 resources: {}
