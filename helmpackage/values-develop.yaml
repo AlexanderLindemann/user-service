@@ -23,8 +23,8 @@ env:
   SERVER_PORT: 8080
   TZ: "Europe/Moscow"
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdev.cwol7reviywm.eu-central-1.rds.amazonaws.com/users
-  SPRING_DATASOURCE_USERNAME: postgres
-  SPRING_DATASOURCE_PASSWORD: postgres
+  SPRING_DATASOURCE_USERNAME: users
+  SPRING_DATASOURCE_PASSWORD: users
 
 serviceAccount:
   # Specifies whether a service account should be created
