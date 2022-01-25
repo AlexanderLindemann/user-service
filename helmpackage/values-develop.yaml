@@ -15,7 +15,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 env:
-  NFT_LOGGING_LOGSTASH_ENABLED: false
+  NFT_LOGGING_LOGSTASH_ENABLED: true
   NFT_STAND_BASE-URL: "https://nftdev.nnmdev.ru"
   NFT_TECH_USER_AUTH_USERNAME: "nftbackend@no.no"
   NFT_TECH_USER_AUTH_PASSWORD: "8yfz537z3yr7h99w"
