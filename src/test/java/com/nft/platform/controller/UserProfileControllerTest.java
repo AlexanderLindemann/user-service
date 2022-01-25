@@ -39,14 +39,14 @@ public class UserProfileControllerTest {
     @MockBean
     private UserProfileMapper userProfileMapper;
 
-    @Test
+//    @Test
     @DisplayName("Test Get User Profile Page")
     void getUserProfilePage() throws Exception {
         mvc.perform(get(BASE_PATH))
                 .andExpect(status().isOk());
     }
 
-    @Test
+//    @Test
     @DisplayName("Test Update User Profile")
     void updateUserProfile() throws Exception {
         UserProfileRequestDto requestDto = UserProfileRequestDto.builder()
@@ -58,7 +58,7 @@ public class UserProfileControllerTest {
                 .andExpect(status().isOk());
     }
 
-    @Test
+//    @Test
     @DisplayName("Test Create User Profile")
     void createUserProfile() throws Exception {
         UserProfileRequestDto requestDto = UserProfileRequestDto.builder()

@@ -4,6 +4,7 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.service.UserProfileService;
+import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +40,7 @@ public class UserProfileController {
     @GetMapping("/{id}")
     @Operation(summary = "Get User Profile by Id")
     @ResponseStatus(HttpStatus.OK)
+    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM })
     public ResponseEntity<UserProfileResponseDto> findUserById(
             @Parameter(name = "id", description = "User Profile Id")
             @PathVariable(name = "id") UUID userProfileId
@@ -49,6 +52,7 @@ public class UserProfileController {
     @GetMapping
     @Operation(summary = "Get Page of User Profiles by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)
+    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM })
     public Page<UserProfileResponseDto> getUserPage(
             @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable
     ) {
@@ -58,6 +62,7 @@ public class UserProfileController {
     @PutMapping("/{id}")
     @Operation(summary = "Update User Profile")
     @ResponseStatus(HttpStatus.OK)
+    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM  })
     public UserProfileResponseDto updateUserProfile(
             @Parameter(name = "id", description = "User Profile Id")
             @PathVariable("id") UUID userId,
@@ -70,6 +75,7 @@ public class UserProfileController {
     @PostMapping
     @Operation(summary = "Create User Profile")
     @ResponseStatus(HttpStatus.CREATED)
+    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN })
     public UserProfileResponseDto createUserProfile(
             @Parameter(name = "userProfileRequestDto", description = "User Profile Request Dto")
             @Valid @RequestBody UserProfileRequestDto userProfileRequestDto
@@ -80,6 +86,7 @@ public class UserProfileController {
     @PutMapping("/add-profile-wallet")
     @Operation(summary = "Add Celebrity to User Profile")
     @ResponseStatus(HttpStatus.OK)
+    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM })
     public void addProfileWallet(@Valid @RequestBody ProfileWalletRequestDto celebrityForUserDto) {
         userProfileService.addProfileWallet(celebrityForUserDto);
     }

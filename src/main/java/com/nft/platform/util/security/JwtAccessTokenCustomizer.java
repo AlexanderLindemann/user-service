@@ -17,7 +17,9 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
     public static final String USER_PROFILE = "user_profile";
 
     private static final String CLIENT_NAME_ELEMENT_IN_JWT = "resource_access";
+    private static final String ROLE_BLOCK_NAME_ELEMENT_IN_JWT = "realm_access";
 
     private static final String ROLE_ELEMENT_IN_JWT = "roles";
 
@@ -57,7 +60,14 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
                 .setEmail((String) tokenMap.get("email"))
                 .setFirstName((String) tokenMap.get("given_name"))
                 .setLastName((String) tokenMap.get("family_name"))
-                .setPreferredUsername((String) tokenMap.get("preferred_username"));
+                .setPreferredUsername((String) tokenMap.get("preferred_username"))
+                .setRoles(
+                        authorities.stream()
+                             .map(GrantedAuthority::getAuthority)
+                             .filter(Objects::nonNull)
+                             .collect(Collectors.toList())
+                )
+        ;
 
         OAuth2Request request =
                 new OAuth2Request(oAuth2Request.getRequestParameters(), oAuth2Request.getClientId(), authorities, true, oAuth2Request.getScope(),
@@ -72,11 +82,11 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
         log.debug("Begin extractRoles: jwt = {}", jwt);
         Set<String> rolesWithPrefix = new HashSet<>();
 
-        jwt.path(CLIENT_NAME_ELEMENT_IN_JWT)
-                .elements()
-                .forEachRemaining(e -> e.path(ROLE_ELEMENT_IN_JWT)
-                        .elements()
-                        .forEachRemaining(r -> rolesWithPrefix.add("ROLE_" + r.asText())));
+        jwt.path(ROLE_BLOCK_NAME_ELEMENT_IN_JWT)
+                .path(ROLE_ELEMENT_IN_JWT)
+                    .elements()
+                    .forEachRemaining(r -> rolesWithPrefix.add("ROLE_" + r.asText()))
+        ;
 
         final List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(rolesWithPrefix.toArray(new String[0]));
         log.debug("End extractRoles: roles = {}", authorityList);

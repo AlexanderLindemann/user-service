@@ -3,9 +3,9 @@ spring:
     name: user-service
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/nft-platform
-    username: user
-    password: password
+    url: jdbc:postgresql://localhost:9999/users
+    username: users
+    password: users
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
     properties:
@@ -59,7 +59,7 @@ nft:
       address: localhost:5000
 
   stand:
-    base-url: https://develop.nft-platform.dcloud.tech
+    base-url: https://nftdev.nnmdev.ru
   tech:
     user:
       auth:
