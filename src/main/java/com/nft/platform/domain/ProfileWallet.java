@@ -55,4 +55,8 @@ public class ProfileWallet extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_profile_id", nullable = false)
     private UserProfile userProfile;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "period_id")
+    private Period period;
 }

@@ -11,7 +11,7 @@ public class ItemNotFoundException extends RestException {
         super(itemClass.getSimpleName() + " with Id=" + id + " not found", HttpStatus.NOT_FOUND);
     }
 
-    public ItemNotFoundException(@NonNull Class<?> itemClass, @NonNull String name) {
-        super(itemClass.getSimpleName() + " with name=" + name + " not found", HttpStatus.NOT_FOUND);
+    public ItemNotFoundException(@NonNull Class<?> itemClass, @NonNull String params) {
+        super(itemClass.getSimpleName() + " with params [" + params + "] not found", HttpStatus.NOT_FOUND);
     }
 }

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd
+      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+
+    <changeSet author="vmargiev" id="2022-02-07-create-poe-settings-and-period-tables">
+        <createTable tableName="poe_settings">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="poe_settings_pkey"/>
+            </column>
+
+            <column name="name" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="group" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="type" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="comment" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="activity_reward_type" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="activity_reward_fix" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="activity_reward_formula" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="coin_reward_type" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="coin_reward_fix" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="coin_reward_formula" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="activity_reward_to_sub_type" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="activity_reward_to_sub_fix" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="activity_reward_to_sub_formula" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="coin_reward_to_sub_type" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="coin_reward_to_sub_fix" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="coin_reward_to_sub_formula" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="price_in_usd" type="numeric">
+                <constraints nullable="true"/>
+            </column>
+            <column name="price_in_coins" type="numeric">
+                <constraints nullable="true"/>
+            </column>
+            <column name="free_amount_on_period_type" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="free_amount_on_period" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="free_amount_on_period_sub_type" type="varchar(1024)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="free_amount_on_period_sub" type="int">
+                <constraints nullable="true"/>
+            </column>
+            <column name="free_amount_on_onboarding" type="int">
+                <constraints nullable="true"/>
+            </column>
+
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <createTable tableName="period">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="period_pkey"/>
+            </column>
+            <column name="start_time" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addColumn tableName="profile_wallet">
+            <column name="period_id" type="uuid">
+                <constraints foreignKeyName="profile_wallet_period_fk" references="period(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

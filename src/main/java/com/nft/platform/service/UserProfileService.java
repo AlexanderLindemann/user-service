@@ -13,13 +13,16 @@ import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.mapper.UserProfileWithCelebrityIdsMapper;
+import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
+import com.nft.platform.util.RLockKeys;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -39,6 +42,7 @@ public class UserProfileService {
     private final UserProfileMapper mapper;
     private final UserProfileWithCelebrityIdsMapper mapperWithCelebrityIds;
     private final SecurityUtil securityUtil;
+    private final SyncService syncService;
 
     @NonNull
     @Transactional(readOnly = true)
@@ -61,20 +65,24 @@ public class UserProfileService {
 
     @Transactional
     public int decrementUserVotes(KeycloakUserIdWithCelebrityIdDto requestDto) {
-        Optional<Integer> voteBalance = profileWalletRepository
-                .findVoteBalance(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
-        if (voteBalance.isEmpty()) {
-            throw new RestException("ProfileWaller does not exists userId=" + requestDto.getKeycloakUserId() +
-                    " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
-        }
-        if (voteBalance.get() == 0) {
-            throw new RestException("User has 0 votes userId=" + requestDto.getKeycloakUserId() +
-                    " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
-        }
-        return profileWalletRepository.decrementUserVotes(
-                requestDto.getKeycloakUserId(),
-                requestDto.getCelebrityId()
-        );
+        String lockKey = RLockKeys.createVoteUpdateKey(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
+        RLock rLock = syncService.getNamedLock(lockKey);
+        return syncService.doSynchronized(rLock).run(() -> {
+            Optional<Integer> voteBalance = profileWalletRepository
+                    .findVoteBalance(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
+            if (voteBalance.isEmpty()) {
+                throw new RestException("ProfileWaller does not exists userId=" + requestDto.getKeycloakUserId() +
+                        " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
+            }
+            if (voteBalance.get() == 0) {
+                throw new RestException("User has 0 votes userId=" + requestDto.getKeycloakUserId() +
+                        " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
+            }
+            return profileWalletRepository.decrementUserVotes(
+                    requestDto.getKeycloakUserId(),
+                    requestDto.getCelebrityId()
+            );
+        });
     }
 
     @NonNull

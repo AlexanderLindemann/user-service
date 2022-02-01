@@ -27,6 +27,8 @@ env:
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdev.cwol7reviywm.eu-central-1.rds.amazonaws.com/users
   SPRING_DATASOURCE_USERNAME: users
   SPRING_DATASOURCE_PASSWORD: users
+  REDIS_ENABLED: true
+  REDIS_ADDRESS: nftdevredis.elesif.clustercfg.memorydb.eu-central-1.amazonaws.com:6379
 
 serviceAccount:
   # Specifies whether a service account should be created

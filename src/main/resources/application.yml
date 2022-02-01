@@ -16,6 +16,18 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog.xml
 
+redis:
+  enabled: true
+  address: 127.0.0.1:6379
+  password: ""
+  connectionTimeout: 15
+  prefix: "nft-platform-app-caches-sync-"
+  database: 0
+  sentinel:
+    enabled: false # set to true if sentinel needs to use
+    nodes: 127.0.0.1:26379
+    master: "mymaster"
+
 swagger:
   display:
     module-name: user-service
@@ -66,6 +78,9 @@ nft:
         clientId: account
         username: nftbackend@no.no
         password: 8yfz537z3yr7h99w
+  period:
+    durationSeconds: 28800
+    cronExpression: "0 0 */8 * * *"
 
 management:
   endpoints:

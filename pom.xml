@@ -24,6 +24,8 @@
 		<hibernate-types.version>2.12.1</hibernate-types.version>
 		<test-containers-postgres.version>1.15.1</test-containers-postgres.version>
 		<wiremock.version>2.27.2</wiremock.version>
+		<redis-starter.version>1.0-SNAPSHOT</redis-starter.version>
+		<shedlock.version>4.33.0</shedlock.version>
 	</properties>
 	<dependencies>
 		<!-- DB -->
@@ -74,6 +76,13 @@
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
+		<!-- Redis -->
+		<dependency>
+			<groupId>nft.platform</groupId>
+			<artifactId>redis-starter</artifactId>
+			<version>${redis-starter.version}</version>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -118,6 +127,16 @@
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>${org.mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-spring</artifactId>
+			<version>${shedlock.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-provider-jdbc-template</artifactId>
+			<version>${shedlock.version}</version>
 		</dependency>
 
 	</dependencies>
