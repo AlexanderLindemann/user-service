@@ -3,3 +3,6 @@ nft:
     logstash:
       enabled: false
     useJsonFormat: false
+spring:
+  jpa:
+    show-sql: true

@@ -39,6 +39,9 @@ public class ProfileWallet extends BaseEntity {
     @Column(name = "experience_count", nullable = false)
     private int experienceCount;
 
+    @Column(name = "vote_balance", nullable = false)
+    private int voteBalance;
+
     @Column(name = "activity_balance", nullable = false)
     private BigDecimal activityBalance;
 

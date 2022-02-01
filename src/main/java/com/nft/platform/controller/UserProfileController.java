@@ -1,5 +1,6 @@
 package com.nft.platform.controller;
 
+import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,7 +42,7 @@ public class UserProfileController {
     @GetMapping("/{id}")
     @Operation(summary = "Get User Profile by Id")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM })
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
     public ResponseEntity<UserProfileResponseDto> findUserById(
             @Parameter(name = "id", description = "User Profile Id")
             @PathVariable(name = "id") UUID userProfileId
@@ -52,17 +54,39 @@ public class UserProfileController {
     @GetMapping
     @Operation(summary = "Get Page of User Profiles by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM })
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
     public Page<UserProfileResponseDto> getUserPage(
             @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return userProfileService.getUserProfilePage(pageable);
     }
 
+    @GetMapping("/votes")
+    @Operation(summary = "Find User Vote Balance by Celebrity")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
+    public ResponseEntity<Integer> findUserVotes(
+            @RequestParam("keycloakUserId") UUID keycloakUserId,
+            @RequestParam("celebrityId") UUID celebrityId
+    ) {
+        Optional<Integer> userVotesO = userProfileService.findUserVotes(keycloakUserId, celebrityId);
+        return ResponseEntity.of(userVotesO);
+    }
+
+    @PutMapping("/decrement-votes")
+    @Operation(summary = "Decrement User Votes")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
+    public int decrementUserVotes(
+            @Valid @RequestBody KeycloakUserIdWithCelebrityIdDto requestDto
+    ) {
+        return userProfileService.decrementUserVotes(requestDto);
+    }
+
     @PutMapping("/{id}")
     @Operation(summary = "Update User Profile")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM  })
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
     public UserProfileResponseDto updateUserProfile(
             @Parameter(name = "id", description = "User Profile Id")
             @PathVariable("id") UUID userId,
@@ -75,7 +99,7 @@ public class UserProfileController {
     @PostMapping
     @Operation(summary = "Create User Profile")
     @ResponseStatus(HttpStatus.CREATED)
-    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN })
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
     public UserProfileResponseDto createUserProfile(
             @Parameter(name = "userProfileRequestDto", description = "User Profile Request Dto")
             @Valid @RequestBody UserProfileRequestDto userProfileRequestDto
@@ -86,7 +110,7 @@ public class UserProfileController {
     @PutMapping("/add-profile-wallet")
     @Operation(summary = "Add Celebrity to User Profile")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM })
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
     public void addProfileWallet(@Valid @RequestBody ProfileWalletRequestDto celebrityForUserDto) {
         userProfileService.addProfileWallet(celebrityForUserDto);
     }

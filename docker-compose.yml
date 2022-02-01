@@ -4,13 +4,13 @@ services:
   postgres:
     image: "postgres:11-alpine"
     volumes:
-      - postgres-data:/var/lib/postgresql/nft-platform/data
+      - postgres-data:/var/lib/postgresql/users/data
     ports:
       - "${POSTGRES_CUSTOM_PORT}:5432"
     environment:
-      - POSTGRES_DB=nft-platform
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=users
+      - POSTGRES_USER=users
+      - POSTGRES_PASSWORD=users
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user"]
       interval: 10s

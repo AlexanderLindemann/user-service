@@ -3,11 +3,13 @@ package com.nft.platform.service;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
+import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
+import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +30,6 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class UserProfileService {
-
-    private static final String TEST_CELEBRITY_NAME = "test-celebrity";
-
     private final UserProfileRepository userProfileRepository;
     private final CelebrityRepository celebrityRepository;
     private final ProfileWalletRepository profileWalletRepository;
@@ -47,6 +47,29 @@ public class UserProfileService {
     public Page<UserProfileResponseDto> getUserProfilePage(@NonNull Pageable pageable) {
         Page<UserProfile> userProfilePage = userProfileRepository.findAll(pageable);
         return userProfilePage.map(mapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Integer> findUserVotes(UUID keycloakUserId, UUID celebrityId) {
+        return profileWalletRepository.findVoteBalance(keycloakUserId, celebrityId);
+    }
+
+    @Transactional
+    public int decrementUserVotes(KeycloakUserIdWithCelebrityIdDto requestDto) {
+        Optional<Integer> voteBalance = profileWalletRepository
+                .findVoteBalance(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
+        if (voteBalance.isEmpty()) {
+            throw new RestException("ProfileWaller does not exists userId=" + requestDto.getKeycloakUserId() +
+                    " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
+        }
+        if (voteBalance.get() == 0) {
+            throw new RestException("User has 0 votes userId=" + requestDto.getKeycloakUserId() +
+                    " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
+        }
+        return profileWalletRepository.decrementUserVotes(
+                requestDto.getKeycloakUserId(),
+                requestDto.getCelebrityId()
+        );
     }
 
     @NonNull
