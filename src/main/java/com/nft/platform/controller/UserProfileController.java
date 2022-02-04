@@ -51,6 +51,15 @@ public class UserProfileController {
         return ResponseEntity.of(userProfileResponseDtoO);
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "Get Current User Profile")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_USER })
+    public ResponseEntity<UserProfileResponseDto> findUserByKeycloakId() {
+        Optional<UserProfileResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile();
+        return ResponseEntity.of(userProfileResponseDtoO);
+    }
+
     @GetMapping
     @Operation(summary = "Get Page of User Profiles by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)

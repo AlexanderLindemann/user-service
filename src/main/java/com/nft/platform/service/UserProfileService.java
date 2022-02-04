@@ -14,6 +14,7 @@ import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
+import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class UserProfileService {
     private final CelebrityRepository celebrityRepository;
     private final ProfileWalletRepository profileWalletRepository;
     private final UserProfileMapper mapper;
+    private final SecurityUtil securityUtil;
 
     @NonNull
     @Transactional(readOnly = true)
@@ -116,5 +118,11 @@ public class UserProfileService {
         profileWallet.setCelebrity(celebrity);
 
         profileWalletRepository.save(profileWallet);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserProfileResponseDto> findCurrentUserProfile() {
+        return userProfileRepository.findByKeycloakUserId(securityUtil.getCurrentUserId())
+                .map(mapper::toDto);
     }
 }
