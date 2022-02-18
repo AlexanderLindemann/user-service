@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -131,5 +132,12 @@ public class UserProfileController {
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
     public void addProfileWallet(@Valid @RequestBody ProfileWalletRequestDto celebrityForUserDto) {
         userProfileService.addProfileWallet(celebrityForUserDto);
+    }
+
+    @GetMapping("/is-admin")
+    @Operation(summary = "Check that User is admin of Celebrity")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean isAdminOfCelebrity(@Valid @ParameterObject KeycloakUserIdWithCelebrityIdDto requestDto) {
+        return userProfileService.isAdminOfCelebrity(requestDto);
     }
 }

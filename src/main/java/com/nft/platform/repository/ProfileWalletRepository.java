@@ -16,6 +16,8 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
 
     Optional<ProfileWallet> findByUserProfileIdAndCelebrityId(@NonNull UUID userId, @NonNull UUID celebrityId);
 
+    boolean existsByUserProfileIdAndCelebrityId(@NonNull UUID userId, @NonNull UUID celebrityId);
+
     @Query(value = "select voteBalance"
             + " from ProfileWallet pW"
             + " where pW.userProfile.keycloakUserId = :keycloakUserId"

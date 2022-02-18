@@ -20,7 +20,6 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -161,5 +160,12 @@ public class UserProfileService {
     public Optional<UserProfileWithCelebrityIdsResponseDto> findUserProfileByKeycloakId(UUID keycloakId) {
         return userProfileRepository.findByKeycloakUserIdWithCelebrities(keycloakId)
                 .map(mapperWithCelebrityIds::toDto);
+    }
+
+    public boolean isAdminOfCelebrity(KeycloakUserIdWithCelebrityIdDto requestDto) {
+        UserProfile userProfile = userProfileRepository.findByKeycloakUserId(requestDto.getKeycloakUserId())
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, requestDto.getKeycloakUserId()));
+        Celebrity celebrity = userProfile.getCelebrity();
+        return celebrity != null && celebrity.getId().equals(requestDto.getCelebrityId());
     }
 }
