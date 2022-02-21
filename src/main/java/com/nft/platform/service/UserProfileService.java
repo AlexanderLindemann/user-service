@@ -7,10 +7,12 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
+import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
+import com.nft.platform.mapper.UserProfileWithCelebrityIdsMapper;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
@@ -18,6 +20,7 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,6 +38,7 @@ public class UserProfileService {
     private final CelebrityRepository celebrityRepository;
     private final ProfileWalletRepository profileWalletRepository;
     private final UserProfileMapper mapper;
+    private final UserProfileWithCelebrityIdsMapper mapperWithCelebrityIds;
     private final SecurityUtil securityUtil;
 
     @NonNull
@@ -86,17 +90,44 @@ public class UserProfileService {
 
     @NonNull
     @Transactional
-    public UserProfileResponseDto createUserProfile(@NonNull UserProfileRequestDto requestDto) {
+    public UserProfileResponseDto createUpdateUserProfile(@NonNull UserProfileRequestDto requestDto) {
+        log.info("createUpdateUserProfile request = {}", requestDto);
+
+        UserProfile userProfile;
+        Optional<UserProfile> existed = userProfileRepository.findByKeycloakUserId(requestDto.getKeycloakUserId());
+
+        if (existed.isPresent()) {
+            userProfile = mapper.toEntity(requestDto, existed.get());
+            log.info("updating existed UserProfile with id = {}", userProfile.getId());
+        } else {
+            log.info("creating new UserProfile from request = {}", requestDto);
+            userProfile = new UserProfile();
+            userProfile = mapper.toEntity(requestDto, userProfile);
+        }
+
+        userProfile = userProfileRepository.save(userProfile);
+
         Celebrity celebrity = celebrityRepository.findById(requestDto.getCelebrityId())
-                .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, requestDto.getCelebrityId()));
-        UserProfile userProfile = new UserProfile();
-        userProfile = mapper.toEntity(requestDto, userProfile);
+                .orElseGet(() -> {
+                    log.error("Celebrity with ID = {} not found!", requestDto.getCelebrityId());
+                    return null;
+                });
 
-        ProfileWallet profileWallet = new ProfileWallet();
-        profileWallet.setUserProfile(userProfile);
-        profileWallet.setCelebrity(celebrity);
+        if (celebrity != null) {
+            ProfileWallet profileWallet;
+            Optional<ProfileWallet> existedProfileWallet = profileWalletRepository.findByUserProfileIdAndCelebrityId(userProfile.getId(), requestDto.getCelebrityId());
+            // add new profileWallet if not exists
+            if (existedProfileWallet.isEmpty()) {
+                log.info("adding new connection with CELEBRITY_ID = {} for USER = {} with userProfileId = {}", requestDto.getCelebrityId(), userProfile.getUsername(), userProfile.getId());
+                profileWallet = new ProfileWallet();
+                profileWallet.setUserProfile(userProfile);
+                profileWallet.setCelebrity(celebrity);
+                profileWalletRepository.save(profileWallet);
+            } else {
+                log.info("ProfileWallet for CELEBRITY_ID = {} and USER = {} with userProfileId = {} existed", requestDto.getCelebrityId(), userProfile.getUsername(), userProfile.getId());
+            }
+        }
 
-        profileWalletRepository.save(profileWallet);
         return mapper.toDto(userProfile);
     }
 
@@ -124,5 +155,11 @@ public class UserProfileService {
     public Optional<UserProfileResponseDto> findCurrentUserProfile() {
         return userProfileRepository.findByKeycloakUserId(securityUtil.getCurrentUserId())
                 .map(mapper::toDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserProfileWithCelebrityIdsResponseDto> findUserProfileByKeycloakId(UUID keycloakId) {
+        return userProfileRepository.findByKeycloakUserIdWithCelebrities(keycloakId)
+                .map(mapperWithCelebrityIds::toDto);
     }
 }

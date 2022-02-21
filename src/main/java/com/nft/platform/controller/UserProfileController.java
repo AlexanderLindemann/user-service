@@ -4,6 +4,7 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
+import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.service.UserProfileService;
 import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,10 +55,20 @@ public class UserProfileController {
     @GetMapping("/me")
     @Operation(summary = "Get Current User Profile")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({ RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_USER })
-    public ResponseEntity<UserProfileResponseDto> findUserByKeycloakId() {
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_USER})
+    public ResponseEntity<UserProfileResponseDto> findMeByKeycloakId() {
         Optional<UserProfileResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile();
         return ResponseEntity.of(userProfileResponseDtoO);
+    }
+
+    @GetMapping("/by-kk-id/{id}")
+    @Operation(summary = "Get Current User Profile")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
+    public ResponseEntity<UserProfileWithCelebrityIdsResponseDto> findUserByKeycloakId(@Parameter(name = "id", description = "Keycloak User Id")
+                                                                                       @PathVariable(name = "id") UUID keycloakId) {
+        Optional<UserProfileWithCelebrityIdsResponseDto> dto = userProfileService.findUserProfileByKeycloakId(keycloakId);
+        return ResponseEntity.of(dto);
     }
 
     @GetMapping
@@ -106,14 +117,12 @@ public class UserProfileController {
     }
 
     @PostMapping
-    @Operation(summary = "Create User Profile")
+    @Operation(summary = "Create/Update User Profile")
     @ResponseStatus(HttpStatus.CREATED)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
-    public UserProfileResponseDto createUserProfile(
-            @Parameter(name = "userProfileRequestDto", description = "User Profile Request Dto")
-            @Valid @RequestBody UserProfileRequestDto userProfileRequestDto
-    ) {
-        return userProfileService.createUserProfile(userProfileRequestDto);
+    public UserProfileResponseDto createUpdateUserProfile(@Parameter(name = "userProfileRequestDto", description = "User Profile Request Dto")
+                                                          @Valid @RequestBody UserProfileRequestDto userProfileRequestDto) {
+        return userProfileService.createUpdateUserProfile(userProfileRequestDto);
     }
 
     @PutMapping("/add-profile-wallet")

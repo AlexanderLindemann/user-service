@@ -36,6 +36,13 @@ public class UserProfile extends BaseEntity {
     @Column(name = "keycloak_user_id")
     private UUID keycloakUserId;
 
+    // updated from keycloak
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "image_url")
     private String imageUrl;
 

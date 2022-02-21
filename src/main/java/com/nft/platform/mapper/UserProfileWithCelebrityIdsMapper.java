@@ -1,19 +1,18 @@
 package com.nft.platform.mapper;
 
 import com.nft.platform.domain.UserProfile;
-import com.nft.platform.dto.request.UserProfileRequestDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
+import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring",
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface UserProfileMapper {
+@DecoratedWith(UserProfileWithCelebrityIdsDecorator.class)
+public interface UserProfileWithCelebrityIdsMapper {
 
-    UserProfile toEntity(UserProfileRequestDto requestDto, @MappingTarget UserProfile userProfile);
+    UserProfileWithCelebrityIdsResponseDto toDto(UserProfile userProfile);
 
-    UserProfileResponseDto toDto(UserProfile userProfile);
 }

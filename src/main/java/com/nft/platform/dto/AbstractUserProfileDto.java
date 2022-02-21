@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @SuperBuilder
+@ToString
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,6 +26,13 @@ public abstract class AbstractUserProfileDto {
     @NotNull
     private UUID keycloakUserId;
 
+    // updated from keycloak
+    @Schema(description = "Username")
+    private String username;
+
+    @Schema(description = "Email")
+    private String email;
+
     @Schema(description = "Image Url")
     @Size(max = 1024)
     private String imageUrl;
@@ -33,13 +42,13 @@ public abstract class AbstractUserProfileDto {
     private String phone;
 
     @Schema(description = "Is Phone Verified")
-    private boolean verifiedPhone;
+    private Boolean verifiedPhone;
 
     @Schema(description = "Is Invisible Name")
-    private boolean invisibleName;
+    private Boolean invisibleName;
 
     @Schema(description = "Is Two-Factor Authentication")
-    private boolean twoFactoAuth;
+    private Boolean twoFactoAuth;
 
     @Schema(name = "Google Id")
     @Size(max = 128)

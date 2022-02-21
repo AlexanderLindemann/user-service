@@ -31,9 +31,9 @@ public class UserProfileMapperTest {
         userProfile = userProfileMapper.toEntity(userProfileRequestDto, userProfile);
         assertEquals(userProfileRequestDto.getImageUrl(), userProfile.getImageUrl());
         assertEquals(userProfileRequestDto.getPhone(), userProfile.getPhone());
-        assertEquals(userProfileRequestDto.isVerifiedPhone(), userProfile.isVerifiedPhone());
-        assertEquals(userProfileRequestDto.isInvisibleName(), userProfile.isInvisibleName());
-        assertEquals(userProfileRequestDto.isTwoFactoAuth(), userProfile.isTwoFactoAuth());
+        assertEquals(userProfileRequestDto.getVerifiedPhone(), userProfile.isVerifiedPhone());
+        assertEquals(userProfileRequestDto.getInvisibleName(), userProfile.isInvisibleName());
+        assertEquals(userProfileRequestDto.getTwoFactoAuth(), userProfile.isTwoFactoAuth());
         assertEquals(userProfileRequestDto.getGoogleId(), userProfile.getGoogleId());
         assertEquals(userProfileRequestDto.getFacebookId(), userProfile.getFacebookId());
         assertEquals(userProfileRequestDto.getTwitterId(), userProfile.getTwitterId());
@@ -48,9 +48,9 @@ public class UserProfileMapperTest {
         UserProfileResponseDto dto = userProfileMapper.toDto(userProfile);
         assertEquals(userProfile.getImageUrl(), dto.getImageUrl());
         assertEquals(userProfile.getPhone(), dto.getPhone());
-        assertEquals(userProfile.isVerifiedPhone(), dto.isVerifiedPhone());
-        assertEquals(userProfile.isInvisibleName(), dto.isInvisibleName());
-        assertEquals(userProfile.isTwoFactoAuth(), dto.isTwoFactoAuth());
+        assertEquals(userProfile.isVerifiedPhone(), dto.getVerifiedPhone());
+        assertEquals(userProfile.isInvisibleName(), dto.getInvisibleName());
+        assertEquals(userProfile.isTwoFactoAuth(), dto.getTwoFactoAuth());
         assertEquals(userProfile.getGoogleId(), dto.getGoogleId());
         assertEquals(userProfile.getFacebookId(), dto.getFacebookId());
         assertEquals(userProfile.getTwitterId(), dto.getTwitterId());
