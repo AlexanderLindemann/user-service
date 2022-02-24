@@ -64,7 +64,7 @@ public class UserProfileController {
     @GetMapping("/by-kk-id/{id}")
     @Operation(summary = "Get Current User Profile")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
     public ResponseEntity<UserProfileWithCelebrityIdsResponseDto> findUserByKeycloakId(@Parameter(name = "id", description = "Keycloak User Id")
                                                                                        @PathVariable(name = "id") UUID keycloakId) {
         Optional<UserProfileWithCelebrityIdsResponseDto> dto = userProfileService.findUserProfileByKeycloakId(keycloakId);
