@@ -13,6 +13,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> 
 
     Optional<UserProfile> findByKeycloakUserId(UUID keycloakUserId);
 
-    @Query("select up from UserProfile up join fetch up.profileWallets pw join fetch pw.celebrity")
+    @Query("select distinct up from UserProfile up join fetch up.profileWallets pw join fetch pw.celebrity")
     Optional<UserProfile> findByKeycloakUserIdWithCelebrities(UUID keycloakUserId);
 }
