@@ -70,6 +70,18 @@ public abstract class AbstractUserProfileDto {
     @Size(max = 1024)
     private String site;
 
+    @Schema(description = "First Name")
+    @Size(max = 128)
+    private String firstName;
+
+    @Schema(description = "Last Name")
+    @Size(max = 128)
+    private String lastName;
+
+    @Schema(description = "Nickname")
+    @Size(max = 128)
+    private String nickname;
+
     public void setVerifiedPhone(Boolean verifiedPhone) {
         this.verifiedPhone = Boolean.TRUE.equals(verifiedPhone);
     }

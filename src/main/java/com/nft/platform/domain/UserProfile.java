@@ -73,6 +73,15 @@ public class UserProfile extends BaseEntity {
     @Column(name = "site")
     private String site;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "nickname")
+    private String nickname;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "celebrity_id")
     private Celebrity celebrity;

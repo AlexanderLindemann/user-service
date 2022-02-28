@@ -9,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -24,4 +25,7 @@ public class UserProfileResponseDto extends AbstractUserProfileDto {
 
     @Schema(description = "User Registration Date", required = true)
     private LocalDateTime createdAt;
+
+    @Schema(description = "Current user roles", required = true)
+    private List<String> roles;
 }

@@ -152,8 +152,15 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public Optional<UserProfileResponseDto> findCurrentUserProfile() {
-        return userProfileRepository.findByKeycloakUserId(securityUtil.getCurrentUserId())
-                .map(mapper::toDto);
+        var currentUser = securityUtil.getCurrentUser();
+        var resultDto = userProfileRepository.findByKeycloakUserId(UUID.fromString(currentUser.getId()))
+                .stream()
+                    .map(mapper::toDto)
+                    .peek((e) -> e.setRoles(currentUser.getRoles()))
+                    .findAny()
+        ;
+
+        return resultDto;
     }
 
     @Transactional(readOnly = true)
