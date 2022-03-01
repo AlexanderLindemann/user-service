@@ -9,3 +9,6 @@ nft:
     logstash:
       enabled: false
     useJsonFormat: false
+
+redis:
+  enabled: false
