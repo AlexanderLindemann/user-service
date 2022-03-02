@@ -15,5 +15,6 @@
     <include file="create/2022-02-07-create-poe-settings-and-period-tables.xml" relativeToChangelogFile="true"/>
     <include file="sql/2022-02-07-insert-poe-settings.sql" relativeToChangelogFile="true"/>
     <include file="create/2022-02-25-create-shedlock-table.xml" relativeToChangelogFile="true"/>
+    <include file="update/2022-03-02-change-user-balance-column-type.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
