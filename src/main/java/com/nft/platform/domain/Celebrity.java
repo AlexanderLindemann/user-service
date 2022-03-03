@@ -34,7 +34,4 @@ public class Celebrity extends BaseEntity {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
-
-    @OneToMany(mappedBy = "celebrity", fetch = FetchType.LAZY)
-    private List<UserProfile> admins;
 }

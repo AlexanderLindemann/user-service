@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="esenkovskaya" id="2022-03-03-drop-column-celebrity-from-user-profile">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="user_profile" columnName="celebrity_id"/>
+        </preConditions>
+        <dropColumn tableName="user_profile" columnName="celebrity_id"/>
+    </changeSet>
+
+</databaseChangeLog>

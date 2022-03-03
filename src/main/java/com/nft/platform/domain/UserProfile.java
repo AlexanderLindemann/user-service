@@ -82,10 +82,6 @@ public class UserProfile extends BaseEntity {
     @Column(name = "nickname")
     private String nickname;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "celebrity_id")
-    private Celebrity celebrity;
-
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ProfileWallet> profileWallets;
 

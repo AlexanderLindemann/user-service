@@ -134,10 +134,10 @@ public class UserProfileController {
         userProfileService.addProfileWallet(celebrityForUserDto);
     }
 
-    @GetMapping("/is-admin")
-    @Operation(summary = "Check that User is admin of Celebrity")
+    @GetMapping("/is-connected-with-celebrity")
+    @Operation(summary = "Check that User is connected with Celebrity")
     @ResponseStatus(HttpStatus.OK)
-    public boolean isAdminOfCelebrity(@Valid @ParameterObject KeycloakUserIdWithCelebrityIdDto requestDto) {
-        return userProfileService.isAdminOfCelebrity(requestDto);
+    public boolean isConnectedWithCelebrity(@Valid @ParameterObject KeycloakUserIdWithCelebrityIdDto requestDto) {
+        return userProfileService.isConnectedWithCelebrity(requestDto);
     }
 }

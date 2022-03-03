@@ -163,10 +163,9 @@ public class UserProfileService {
         var currentUser = securityUtil.getCurrentUser();
         var resultDto = userProfileRepository.findByKeycloakUserId(UUID.fromString(currentUser.getId()))
                 .stream()
-                    .map(mapper::toDto)
-                    .peek((e) -> e.setRoles(currentUser.getRoles()))
-                    .findAny()
-        ;
+                .map(mapper::toDto)
+                .peek((e) -> e.setRoles(currentUser.getRoles()))
+                .findAny();
 
         return resultDto;
     }
@@ -177,10 +176,9 @@ public class UserProfileService {
                 .map(mapperWithCelebrityIds::toDto);
     }
 
-    public boolean isAdminOfCelebrity(KeycloakUserIdWithCelebrityIdDto requestDto) {
-        UserProfile userProfile = userProfileRepository.findByKeycloakUserId(requestDto.getKeycloakUserId())
-                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, requestDto.getKeycloakUserId()));
-        Celebrity celebrity = userProfile.getCelebrity();
-        return celebrity != null && celebrity.getId().equals(requestDto.getCelebrityId());
+    @Transactional(readOnly = true)
+    public boolean isConnectedWithCelebrity(KeycloakUserIdWithCelebrityIdDto requestDto) {
+        return userProfileRepository.findByKeycloakUserIdAndCelebrityId(
+                requestDto.getKeycloakUserId(), requestDto.getCelebrityId()).isPresent();
     }
 }
