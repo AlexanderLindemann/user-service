@@ -50,23 +50,23 @@ public abstract class AbstractUserProfileDto {
     @Schema(description = "Is Two-Factor Authentication")
     private Boolean twoFactoAuth;
 
-    @Schema(name = "Google Id")
+    @Schema(description = "Google Id")
     @Size(max = 128)
     private String googleId;
 
-    @Schema(name = "Facebook Id")
+    @Schema(description = "Facebook Id")
     @Size(max = 128)
     private String facebookId;
 
-    @Schema(name = "Twitter Id")
+    @Schema(description = "Twitter Id")
     @Size(max = 128)
     private String twitterId;
 
-    @Schema(name = "Description")
+    @Schema(description = "Description")
     @Size(max = 1024)
     private String description;
 
-    @Schema(name = "Site")
+    @Schema(description = "Site")
     @Size(max = 1024)
     private String site;
 
