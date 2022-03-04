@@ -34,4 +34,16 @@ public class Celebrity extends BaseEntity {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "android_link")
+    private String androidLink;
+
+    @Column(name = "ios_link")
+    private String iosLink;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<CelebrityCategory> category;
 }

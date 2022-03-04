@@ -45,7 +45,7 @@ public class CelebrityService {
     public CelebrityResponseDto updateCelebrity(@NonNull UUID id, @NonNull CelebrityRequestDto requestDto) {
         Celebrity celebrity = celebrityRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, id));
-        if (!celebrity.getName().equals(requestDto.getName())) {
+        if (!celebrity.getName().equalsIgnoreCase(requestDto.getName())) {
             log.info("Try update Celebrity name from {} to {}", celebrity.getName(), requestDto.getName());
             throwIfCelebrityNameExists(requestDto);
         }

@@ -13,3 +13,6 @@ server:
 logging:
   level:
     com.nft: DEBUG
+
+redis:
+  enabled: false

@@ -22,6 +22,7 @@ env:
   NFT_TECH_USER_AUTH_USERNAME: "nftbackend@no.no"
   NFT_TECH_USER_AUTH_PASSWORD: "8yfz537z3yr7h99w"
   SERVER_SERVLET_CONTEXTPATH: "/user-service"
+  SPRING_LIQUIBASE_CONTEXTS: "dev"
   SERVER_PORT: 8080
   TZ: "Europe/Moscow"
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdev.cwol7reviywm.eu-central-1.rds.amazonaws.com/users
