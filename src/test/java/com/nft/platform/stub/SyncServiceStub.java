@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.redisson.api.RLock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.Callable;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
         name = {"enabled"},
         havingValue = "false"
 )
+@Primary
 @Service
 public class SyncServiceStub implements SyncService {
 
