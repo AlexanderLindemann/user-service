@@ -8,11 +8,13 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
+import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.mapper.UserProfileWithCelebrityIdsMapper;
+import com.nft.platform.mapper.UserProfileWithWalletsMapper;
 import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
@@ -41,14 +43,15 @@ public class UserProfileService {
     private final ProfileWalletRepository profileWalletRepository;
     private final UserProfileMapper mapper;
     private final UserProfileWithCelebrityIdsMapper mapperWithCelebrityIds;
+    private final UserProfileWithWalletsMapper userProfileWithWalletsMapper;
     private final SecurityUtil securityUtil;
     private final SyncService syncService;
 
     @NonNull
     @Transactional(readOnly = true)
-    public Optional<UserProfileResponseDto> findUserProfileById(@NonNull UUID id) {
-        return userProfileRepository.findById(id)
-                .map(mapper::toDto);
+    public Optional<UserProfileWithWalletsResponseDto> findUserProfileById(@NonNull UUID id) {
+        return userProfileRepository.findByIdWithWallets(id)
+                .map(userProfileWithWalletsMapper::toDto);
     }
 
     @NonNull

@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -83,8 +84,8 @@ public class UserProfile extends BaseEntity {
     private String nickname;
 
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<ProfileWallet> profileWallets;
+    private Set<ProfileWallet> profileWallets;
 
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<CryptoWallet> cryptoWallets;
+    private Set<CryptoWallet> cryptoWallets;
 }

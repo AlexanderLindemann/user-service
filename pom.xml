@@ -26,8 +26,15 @@
 		<wiremock.version>2.27.2</wiremock.version>
 		<redis-starter.version>1.0-SNAPSHOT</redis-starter.version>
 		<shedlock.version>4.33.0</shedlock.version>
+		<common-lib.version>1.0-SNAPSHOT</common-lib.version>
 	</properties>
 	<dependencies>
+		<!-- NFT -->
+		<dependency>
+			<groupId>nft.platform</groupId>
+			<artifactId>common-lib</artifactId>
+			<version>${common-lib.version}</version>
+		</dependency>
 		<!-- DB -->
 		<dependency>
 			<groupId>org.liquibase</groupId>

@@ -14,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.math.BigDecimal;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -27,8 +26,8 @@ public class ProfileWallet extends BaseEntity {
 
     public ProfileWallet() {
         this.experienceCount = 0;
-        this.activityBalance = BigDecimal.ZERO;
-        this.coinBalance = BigDecimal.ZERO;
+        this.activityBalance = 0L;
+        this.coinBalance = 0L;
     }
 
     @Id
@@ -43,10 +42,10 @@ public class ProfileWallet extends BaseEntity {
     private int voteBalance;
 
     @Column(name = "activity_balance", nullable = false)
-    private BigDecimal activityBalance;
+    private long activityBalance;
 
     @Column(name = "coin_balance", nullable = false)
-    private BigDecimal coinBalance;
+    private long coinBalance;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "celebrity_id", nullable = false)

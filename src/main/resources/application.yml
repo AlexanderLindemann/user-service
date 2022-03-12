@@ -62,6 +62,8 @@ feign:
   nft-admin-auth:
     url: ${nft.stand.base-url}
     path: /auth/realms/nftplatform/protocol/openid-connect/token
+  nft-solana-adapter:
+    url: ${nft.stand.base-url}/solana-adapter
 
 nft:
   logging:

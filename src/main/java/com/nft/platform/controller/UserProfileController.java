@@ -5,6 +5,7 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
+import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.service.UserProfileService;
 import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,11 +46,9 @@ public class UserProfileController {
     @Operation(summary = "Get User Profile by Id")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
-    public ResponseEntity<UserProfileResponseDto> findUserById(
-            @Parameter(name = "id", description = "User Profile Id")
-            @PathVariable(name = "id") UUID userProfileId
-    ) {
-        Optional<UserProfileResponseDto> userProfileResponseDtoO = userProfileService.findUserProfileById(userProfileId);
+    public ResponseEntity<UserProfileWithWalletsResponseDto> findUserById(@Parameter(name = "id", description = "User Profile Id")
+                                                                          @PathVariable(name = "id") UUID userProfileId) {
+        Optional<UserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findUserProfileById(userProfileId);
         return ResponseEntity.of(userProfileResponseDtoO);
     }
 
