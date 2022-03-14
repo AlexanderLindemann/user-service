@@ -2,6 +2,7 @@ package com.nft.platform.controller;
 
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
+import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
@@ -69,6 +70,17 @@ public class UserProfileController {
                                                                                        @PathVariable(name = "id") UUID keycloakId) {
         Optional<UserProfileWithCelebrityIdsResponseDto> dto = userProfileService.findUserProfileByKeycloakId(keycloakId);
         return ResponseEntity.of(dto);
+    }
+
+    @GetMapping("/base")
+    @Operation(summary = "Get Page of User Profiles with base fields by Page number and Page size")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public Page<UserProfileResponseDto> getUserBaseFieldsPage(
+            @ParameterObject @Valid UserProfileFilterDto filterDto,
+            @PageableDefault(sort = {"keycloakUserId"}, direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        return userProfileService.getUserProfileBaseFieldsPage(filterDto, pageable);
     }
 
     @GetMapping

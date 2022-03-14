@@ -5,6 +5,7 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
+import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
@@ -19,6 +20,7 @@ import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
+import com.nft.platform.repository.spec.UserProfileSpecifications;
 import com.nft.platform.util.RLockKeys;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
@@ -27,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +62,17 @@ public class UserProfileService {
     public Page<UserProfileResponseDto> getUserProfilePage(@NonNull Pageable pageable) {
         Page<UserProfile> userProfilePage = userProfileRepository.findAll(pageable);
         return userProfilePage.map(mapper::toDto);
+    }
+
+    @NonNull
+    @Transactional(readOnly = true)
+    public Page<UserProfileResponseDto> getUserProfileBaseFieldsPage(
+            UserProfileFilterDto filterDto,
+            @NonNull Pageable pageable
+    ) {
+        Specification<UserProfile> spec = UserProfileSpecifications.fromUserProfileFilter(filterDto);
+        Page<UserProfile> userProfilePage = userProfileRepository.findAll(spec, pageable);
+        return userProfilePage.map(mapper::toDtoWithBaseFields);
     }
 
     @Transactional(readOnly = true)
