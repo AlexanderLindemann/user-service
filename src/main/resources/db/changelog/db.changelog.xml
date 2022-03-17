@@ -21,4 +21,6 @@
     <include file="update/2022-03-01-added-new-celebrity-columns.xml" relativeToChangelogFile="true"/>
     <include file="sql/data/2022-03-05-celebrity-categories.sql" relativeToChangelogFile="true" context="dev"/>
     <include file="update/2022-03-11-added-crypto-wallet-column.xml" relativeToChangelogFile="true"/>
+    <include file="update/2022-03-17-added-celebrity-promo-image.xml" relativeToChangelogFile="true"/>
+    <include file="create/2022-03-17-added-celebrity-to-category-map-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

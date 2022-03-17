@@ -25,12 +25,12 @@ import java.util.stream.Collectors;
 public class CelebrityCategoryService {
 
     private final CelebrityCategoryRepository celebrityCategoryRepository;
-    private final CelebrityCategoryMapper mapper;
+    private final CelebrityCategoryMapper celebrityCategoryMapper;
 
     @NonNull
     @Transactional(readOnly = true)
     public List<CelebrityCategoryResponseDto> getList() {
-        return celebrityCategoryRepository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
+        return celebrityCategoryRepository.findAll().stream().map(celebrityCategoryMapper::toDto).collect(Collectors.toList());
     }
 
     @NonNull
@@ -38,9 +38,9 @@ public class CelebrityCategoryService {
     public CelebrityCategoryResponseDto createCelebrityCategory(@NonNull CelebrityCategoryRequestDto requestDto) {
         throwIfCelebrityCategoryNameExists(requestDto);
         CelebrityCategory category = new CelebrityCategory();
-        category = mapper.toEntity(requestDto, category);
+        category = celebrityCategoryMapper.toEntity(requestDto, category);
         celebrityCategoryRepository.save(category);
-        return mapper.toDto(category);
+        return celebrityCategoryMapper.toDto(category);
     }
 
     @NonNull
@@ -52,9 +52,9 @@ public class CelebrityCategoryService {
             log.info("Try update Celebrity Category name from {} to {}", celebrityCategory.getName(), requestDto.getName());
             throwIfCelebrityCategoryNameExists(requestDto);
         }
-        celebrityCategory = mapper.toEntity(requestDto, celebrityCategory);
+        celebrityCategory = celebrityCategoryMapper.toEntity(requestDto, celebrityCategory);
         celebrityCategoryRepository.save(celebrityCategory);
-        return mapper.toDto(celebrityCategory);
+        return celebrityCategoryMapper.toDto(celebrityCategory);
     }
 
     @Valid

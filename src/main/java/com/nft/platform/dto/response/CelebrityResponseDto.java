@@ -18,6 +18,6 @@ import java.util.UUID;
 @Schema(description = "Celebrity Response DTO")
 public class CelebrityResponseDto extends AbstractCelebrityDto {
 
-    @Schema(description = "Celebrity Id", required = true)
+    @Schema(description = "Celebrity id", required = true)
     private UUID id;
 }

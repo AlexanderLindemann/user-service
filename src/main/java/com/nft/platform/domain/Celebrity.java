@@ -11,6 +11,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
@@ -44,6 +48,14 @@ public class Celebrity extends BaseEntity {
     @Column(name = "ios_link")
     private String iosLink;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @Column(name = "image_promo_url")
+    private String imagePromoUrl;
+
+    @ManyToMany
+    @JoinTable(
+            name = "celebrity_celebrity_category_map",
+            joinColumns = { @JoinColumn(name = "id") },
+            inverseJoinColumns = { @JoinColumn(name = "category_id") }
+    )
     private List<CelebrityCategory> category;
 }

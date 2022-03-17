@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="amorozov" id="2022-03-17-added-celebrity-to-category-map-table">
+        <createTable tableName="celebrity_celebrity_category_map">
+            <column name="id" type="uuid">
+                <constraints referencedColumnNames="id" referencedTableName="celebrity" foreignKeyName="celebrity_celebrity_category_map_celebrity_FK" nullable="false"/>
+            </column>
+            <column name="category_id" type="uuid">
+                <constraints referencedColumnNames="category_id" referencedTableName="celebrity_category" foreignKeyName="celebrity_celebrity_category_map_celebrity_category_FK" nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
