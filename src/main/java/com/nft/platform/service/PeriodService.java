@@ -1,6 +1,8 @@
 package com.nft.platform.service;
 
 import com.nft.platform.domain.Period;
+import com.nft.platform.dto.response.PeriodResponseDto;
+import com.nft.platform.mapper.PeriodMapper;
 import com.nft.platform.properties.PeriodProperties;
 import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.PeriodRepository;
@@ -18,9 +20,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PeriodService {
 
+    private final PeriodMapper periodMapper;
     private final PeriodRepository periodRepository;
     private final PeriodProperties periodProperties;
     private final SyncService syncService;
+
+    @Transactional(readOnly = true)
+    public Optional<PeriodResponseDto> findCurrentPeriod() {
+        log.info("Try to find current Period");
+        return periodRepository.findFirst1ByOrderByStartTimeDesc()
+                .map(periodMapper::toDto);
+    }
 
     @Transactional
     public void createNewPeriodIfNeeded() {
