@@ -9,6 +9,7 @@ import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
+import com.nft.platform.dto.response.UserProfileWithWalletResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
@@ -176,11 +177,23 @@ public class UserProfileService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<UserProfileResponseDto> findCurrentUserProfile() {
+    public Optional<UserProfileWithWalletResponseDto> findCurrentUserProfile() {
         var currentUser = securityUtil.getCurrentUser();
+        Optional<UserProfile> userProfileO = userProfileRepository.findByKeycloakUserId(UUID.fromString(currentUser.getId()));
+        if (userProfileO.isEmpty()) {
+            return Optional.empty();
+        }
+        UserProfile userProfile = userProfileO.get();
+        //TODO hardcode celebrityId = b5ecb411-a2a8-4a72-b9ab-3a64d8c70120
+        UUID celebrityId = UUID.fromString("b5ecb411-a2a8-4a72-b9ab-3a64d8c70120");
+        Optional<ProfileWallet> profileWalletO = profileWalletRepository.findByUserProfileIdAndCelebrityId(userProfile.getId(), celebrityId);
+        if (profileWalletO.isEmpty()) {
+            return Optional.empty();
+        }
+        ProfileWallet profileWallet = profileWalletO.get();
         var resultDto = userProfileRepository.findByKeycloakUserId(UUID.fromString(currentUser.getId()))
                 .stream()
-                .map(mapper::toDto)
+                .map(profile -> mapper.toDtoWithWallet(profile, profileWallet))
                 .peek((e) -> e.setRoles(currentUser.getRoles()))
                 .findAny();
 

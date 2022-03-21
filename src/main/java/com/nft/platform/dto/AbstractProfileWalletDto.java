@@ -26,4 +26,7 @@ public abstract class AbstractProfileWalletDto {
 
     @Schema(description = "Coins")
     private long coinBalance;
+
+    @Schema(description = "Vote balance")
+    private int voteBalance;
 }
