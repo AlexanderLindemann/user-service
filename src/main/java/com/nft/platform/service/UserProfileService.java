@@ -7,6 +7,7 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
+import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletResponseDto;
@@ -82,24 +83,23 @@ public class UserProfileService {
     }
 
     @Transactional
-    public int decrementUserVotes(KeycloakUserIdWithCelebrityIdDto requestDto) {
+    public void decrementUserVotes(UserVoteReductionDto requestDto) {
         String lockKey = RLockKeys.createVoteUpdateKey(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
         RLock rLock = syncService.getNamedLock(lockKey);
-        return syncService.doSynchronized(rLock).run(() -> {
-            Optional<Integer> voteBalance = profileWalletRepository
-                    .findVoteBalance(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
-            if (voteBalance.isEmpty()) {
-                throw new RestException("ProfileWaller does not exists userId=" + requestDto.getKeycloakUserId() +
+        syncService.doSynchronized(rLock).run(() -> {
+            ProfileWallet profileWallet = profileWalletRepository
+                    .findByKeycloakUserIdAndCelebrityId(requestDto.getKeycloakUserId(), requestDto.getCelebrityId())
+                    .orElseThrow(() ->
+                            new RestException("ProfileWaller does not exists userId=" + requestDto.getKeycloakUserId() +
+                                    " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT)
+                    );
+            int voteBalance = profileWallet.getVoteBalance();
+            if (voteBalance < requestDto.getAmount()) {
+                throw new RestException("Not enough votes for decrement. userId=" + requestDto.getKeycloakUserId() +
                         " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
             }
-            if (voteBalance.get() == 0) {
-                throw new RestException("User has 0 votes userId=" + requestDto.getKeycloakUserId() +
-                        " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
-            }
-            return profileWalletRepository.decrementUserVotes(
-                    requestDto.getKeycloakUserId(),
-                    requestDto.getCelebrityId()
-            );
+            profileWallet.setVoteBalance(voteBalance - requestDto.getAmount());
+            profileWalletRepository.save(profileWallet);
         });
     }
 

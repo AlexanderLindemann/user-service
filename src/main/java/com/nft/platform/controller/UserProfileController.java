@@ -4,6 +4,7 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
+import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletResponseDto;
@@ -110,10 +111,10 @@ public class UserProfileController {
     @Operation(summary = "Decrement User Votes")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
-    public int decrementUserVotes(
-            @Valid @RequestBody KeycloakUserIdWithCelebrityIdDto requestDto
+    public void decrementUserVotes(
+            @Valid @RequestBody UserVoteReductionDto requestDto
     ) {
-        return userProfileService.decrementUserVotes(requestDto);
+        userProfileService.decrementUserVotes(requestDto);
     }
 
     @PutMapping("/{id}")
