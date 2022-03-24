@@ -19,6 +19,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 @Configuration
 public class SecurityConfig extends ResourceServerConfigurerAdapter {
 
+    private static final String UUID_PATTERN = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+
     @Autowired
     private ResourceServerProperties resourceServerProperties;
 
@@ -33,6 +35,7 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/celebrity-category/**").permitAll().and()
                 .authorizeRequests().antMatchers("/", "/api").permitAll().and()
+                .authorizeRequests().regexMatchers(HttpMethod.GET, "/api/v1/celebrity/" + UUID_PATTERN).permitAll().and()
                 .authorizeRequests().antMatchers("/api/**").authenticated();
     }
 
