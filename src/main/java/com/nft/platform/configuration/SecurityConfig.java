@@ -35,7 +35,7 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/celebrity-category/**").permitAll().and()
                 .authorizeRequests().antMatchers("/", "/api").permitAll().and()
-                .authorizeRequests().regexMatchers(HttpMethod.GET, "/api/v1/celebrity/" + UUID_PATTERN).permitAll().and()
+                .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/celebrity/**").permitAll().and()
                 .authorizeRequests().antMatchers("/api/**").authenticated();
     }
 

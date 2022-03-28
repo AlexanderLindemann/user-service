@@ -11,19 +11,19 @@ import org.testcontainers.utility.DockerImageName;
 @Slf4j
 public class PostgresInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    private static DockerImageName postgres = TestUtil.getTesContainersDockerImage("postgres:11-alpine").asCompatibleSubstituteFor("postgres");
+    private static final String NAME = "users";
+    private static final DockerImageName IMAGE_NAME = TestUtil.getTesContainersDockerImage("postgres:11-alpine").asCompatibleSubstituteFor("postgres");
 
-    public static final PostgreSQLContainer<?> dbContainer = new PostgreSQLContainer<>(postgres)
-            .withDatabaseName("template")
-            .withUsername("template")
-            .withPassword("template")
-            .withReuse(false)
-            ;
+    public static final PostgreSQLContainer<?> PG_CONTAINER = new PostgreSQLContainer<>(IMAGE_NAME)
+            .withDatabaseName(NAME)
+            .withUsername(NAME)
+            .withPassword(NAME)
+            .withReuse(false);
 
     static {
         log.info("Starting postgres testcontainers initializer...");
         try {
-            dbContainer.start();
+            PG_CONTAINER.start();
         } catch (Throwable e) {
             throw new TestInitializationException("Exception occurred while initialization postgres test container!", e);
         }
@@ -32,9 +32,9 @@ public class PostgresInitializer implements ApplicationContextInitializer<Config
     @Override
     public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
         TestPropertyValues.of(
-                "spring.datasource.url=" + dbContainer.getJdbcUrl(),
-                "spring.datasource.username=" + dbContainer.getUsername(),
-                "spring.datasource.password=" + dbContainer.getPassword()
+                "spring.datasource.url=" + PG_CONTAINER.getJdbcUrl(),
+                "spring.datasource.username=" + PG_CONTAINER.getUsername(),
+                "spring.datasource.password=" + PG_CONTAINER.getPassword()
         ).applyTo(configurableApplicationContext.getEnvironment());
     }
 }
