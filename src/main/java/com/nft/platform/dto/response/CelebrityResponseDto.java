@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -20,4 +21,7 @@ public class CelebrityResponseDto extends AbstractCelebrityDto {
 
     @Schema(description = "Celebrity id", required = true)
     private UUID id;
+
+    @Schema(description = "Celebrity categories", required = true)
+    private List<CelebrityCategoryResponseDto> category;
 }

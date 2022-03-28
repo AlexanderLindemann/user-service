@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+import java.util.UUID;
+
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -15,4 +18,7 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true)
 @Schema(description = "Celebrity Request DTO")
 public class CelebrityRequestDto extends AbstractCelebrityDto {
+
+    @Schema(description = "Celebrity categories", required = true)
+    private List<UUID> category;
 }

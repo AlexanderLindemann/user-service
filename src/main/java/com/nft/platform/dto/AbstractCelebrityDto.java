@@ -44,8 +44,4 @@ public abstract class AbstractCelebrityDto {
 
     @Schema(description = "Celebrity banner image direct url", required = true)
     private String imagePromoUrl;
-
-    @Schema(description = "Celebrity categories", required = true)
-    private List<UUID> category;
-
 }

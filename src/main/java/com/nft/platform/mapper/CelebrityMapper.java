@@ -25,10 +25,6 @@ public abstract class CelebrityMapper {
         return celebrityCategoryRepository.findById(categoryId).orElseThrow(() -> new RestException("Celebrity category '" + categoryId + "' not found!", HttpStatus.NOT_FOUND));
     }
 
-    public UUID celebrityCategoryToСategoryId(CelebrityCategory category) {
-        return category.getId();
-    }
-
     public abstract Celebrity toEntity(CelebrityRequestDto requestDto, @MappingTarget Celebrity celebrity);
 
     public abstract CelebrityResponseDto toDto(Celebrity celebrity);
