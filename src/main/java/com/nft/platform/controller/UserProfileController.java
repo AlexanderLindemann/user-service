@@ -7,7 +7,6 @@ import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
-import com.nft.platform.dto.response.UserProfileWithWalletResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.service.UserProfileService;
 import com.nft.platform.util.security.RoleConstants;
@@ -59,8 +58,8 @@ public class UserProfileController {
     @Operation(summary = "Get Current User Profile")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_USER})
-    public ResponseEntity<UserProfileWithWalletResponseDto> findMeByKeycloakId() {
-        Optional<UserProfileWithWalletResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile();
+    public ResponseEntity<UserProfileWithWalletsResponseDto> findMeByKeycloakId() {
+        Optional<UserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile();
         return ResponseEntity.of(userProfileResponseDtoO);
     }
 

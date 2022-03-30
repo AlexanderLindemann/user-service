@@ -28,7 +28,9 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -43,6 +45,10 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class UserProfileService {
+
+    @Value("${nft.celebrity.default-uuid}")
+    private String defaultCelebrity;
+
     private final UserProfileRepository userProfileRepository;
     private final CelebrityRepository celebrityRepository;
     private final ProfileWalletRepository profileWalletRepository;
@@ -177,23 +183,19 @@ public class UserProfileService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<UserProfileWithWalletResponseDto> findCurrentUserProfile() {
+    public Optional<UserProfileWithWalletsResponseDto> findCurrentUserProfile() {
         var currentUser = securityUtil.getCurrentUser();
-        Optional<UserProfile> userProfileO = userProfileRepository.findByKeycloakUserId(UUID.fromString(currentUser.getId()));
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
+        //TODO hardcoded celebrityId, need to take celebrityId from token
+        UUID celebrityId = UUID.fromString(!StringUtils.isEmpty(defaultCelebrity) ? defaultCelebrity : "b5ecb411-a2a8-4a72-b9ab-3a64d8c70120");
+        Optional<UserProfile> userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, celebrityId);
         if (userProfileO.isEmpty()) {
             return Optional.empty();
         }
-        UserProfile userProfile = userProfileO.get();
-        //TODO hardcode celebrityId = b5ecb411-a2a8-4a72-b9ab-3a64d8c70120
-        UUID celebrityId = UUID.fromString("b5ecb411-a2a8-4a72-b9ab-3a64d8c70120");
-        Optional<ProfileWallet> profileWalletO = profileWalletRepository.findByUserProfileIdAndCelebrityId(userProfile.getId(), celebrityId);
-        if (profileWalletO.isEmpty()) {
-            return Optional.empty();
-        }
-        ProfileWallet profileWallet = profileWalletO.get();
-        var resultDto = userProfileRepository.findByKeycloakUserId(UUID.fromString(currentUser.getId()))
+
+        var resultDto = userProfileO
                 .stream()
-                .map(profile -> mapper.toDtoWithWallet(profile, profileWallet))
+                .map(userProfileWithWalletsMapper::toDto)
                 .peek((e) -> e.setRoles(currentUser.getRoles()))
                 .findAny();
 
