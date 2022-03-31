@@ -2,6 +2,7 @@ package com.nft.platform.mapper;
 
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
+import com.nft.platform.dto.poe.response.UserLeaderboardResponseDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.ProfileWalletResponseDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
@@ -30,12 +31,20 @@ public interface UserProfileMapper {
     UserProfileResponseDto toDtoWithBaseFields(UserProfile userProfile);
 
     @Mapping(source = "userProfile", target = "profileWalletDto", qualifiedByName = "setProfileWallet")
-    UserProfileWithWalletResponseDto toDtoWithWallet(UserProfile userProfile, @Context ProfileWallet profileWallet);
+    UserProfileWithWalletResponseDto toDtoWithWallet(UserProfile userProfile,
+                                                     @Context ProfileWallet profileWallet,
+                                                     @Context Integer activityBalance);
 
     @Named("setProfileWallet")
-    default ProfileWalletResponseDto setProfileWallet(UserProfile userProfile, @Context ProfileWallet profileWallet) {
-        return toDto(profileWallet);
+    default ProfileWalletResponseDto setProfileWallet(UserProfile userProfile,
+                                                      @Context ProfileWallet profileWallet,
+                                                      @Context Integer activityBalance) {
+        ProfileWalletResponseDto profileWalletResponseDto = toDto(profileWallet);
+        profileWalletResponseDto.setActivityBalance(activityBalance);
+        return profileWalletResponseDto;
     }
 
     ProfileWalletResponseDto toDto(ProfileWallet profileWallet);
+
+    UserLeaderboardResponseDto toUserLeaderboardDto(UserProfile userProfile);
 }

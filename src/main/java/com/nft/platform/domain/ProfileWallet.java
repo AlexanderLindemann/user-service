@@ -26,7 +26,6 @@ public class ProfileWallet extends BaseEntity {
 
     public ProfileWallet() {
         this.experienceCount = 0;
-        this.activityBalance = 0L;
         this.coinBalance = 0L;
     }
 
@@ -40,9 +39,6 @@ public class ProfileWallet extends BaseEntity {
 
     @Column(name = "vote_balance", nullable = false)
     private int voteBalance;
-
-    @Column(name = "activity_balance", nullable = false)
-    private long activityBalance;
 
     @Column(name = "coin_balance", nullable = false)
     private long coinBalance;

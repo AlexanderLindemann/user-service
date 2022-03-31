@@ -1,16 +1,16 @@
 package com.nft.platform.service;
 
 import com.nft.platform.domain.Period;
-import com.nft.platform.domain.PoeSettings;
 import com.nft.platform.domain.ProfileWallet;
+import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
-import com.nft.platform.enums.Poe;
+import com.nft.platform.enums.PoeAction;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.PeriodRepository;
-import com.nft.platform.repository.PoeSettingsRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
+import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.util.RLockKeys;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class ProfileWalletService {
 
     private final SecurityUtil securityUtil;
     private final PeriodRepository periodRepository;
-    private final PoeSettingsRepository poeSettingsRepository;
+    private final PoeRepository poeRepository;
     private final ProfileWalletRepository profileWalletRepository;
     private final SyncService syncService;
 
@@ -55,8 +55,8 @@ public class ProfileWalletService {
                 log.info("ProfileWallet updated for period = {}", currentPeriod);
                 return false;
             }
-            int freeAmountVoteOnPeriod = poeSettingsRepository.findByName(Poe.VOTE.getName())
-                    .orElseThrow(() -> new ItemNotFoundException(PoeSettings.class, "poeName: " + Poe.VOTE.getName()))
+            Integer freeAmountVoteOnPeriod = poeRepository.findByCode(PoeAction.VOTE)
+                    .orElseThrow(() -> new ItemNotFoundException(Poe.class, "code: " + PoeAction.VOTE.getActionCode()))
                     .getFreeAmountOnPeriod();
             profileWallet.setVoteBalance(profileWallet.getVoteBalance() + freeAmountVoteOnPeriod);
             profileWallet.setPeriod(currentPeriod);

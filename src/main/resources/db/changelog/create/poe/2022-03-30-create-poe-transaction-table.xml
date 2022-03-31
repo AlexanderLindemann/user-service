@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd
+      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+
+    <changeSet author="vmargiev" id="2022-03-30-create-poe-transaction-table">
+        <createTable tableName="poe_transaction">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="poe_transaction_pkey"/>
+            </column>
+            <column name="celebrity_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="celebrity_fkey"
+                             references="celebrity(id)"/>
+            </column>
+            <column name="user_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="user_profile_fkey"
+                             references="user_profile(keycloak_user_id)"/>
+            </column>
+            <column name="period_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="period_fkey"
+                             references="period(id)"/>
+            </column>
+            <column name="poe_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="poe_fkey"
+                             references="poe(id)"/>
+            </column>
+            <column name="points_reward" type="int"/>
+            <column name="coins_reward" type="int"/>
+
+            <!--base entity columns-->
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

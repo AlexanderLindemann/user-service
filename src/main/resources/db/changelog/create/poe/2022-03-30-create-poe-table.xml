@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.6.xsd">
+
+    <changeSet id="2022-03-30-create-poe-table" author="iershov">
+        <createTable tableName="poe">
+            <column name="id" type="UUID" defaultValueComputed="uuid_generate_v4()" >
+                <constraints nullable="false" primaryKey="true" primaryKeyName="poe_pkey"/>
+            </column>
+
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="group_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="comment" type="VARCHAR(1024)"/>
+            <column name="points_reward" type="INT"/>
+            <column name="coins_reward" type="INT"/>
+            <column name="coins_reward_sub" type="INT"/>
+            <column name="points_reward_sub" type="INT"/>
+            <column name="usd_price" type="DECIMAL"/>
+            <column name="coins_price" type="DECIMAL"/>
+            <column name="free_amount_on_period" type="INT"/>
+            <column name="free_amount_on_period_sub" type="INT"/>
+
+            <!--base entity columns-->
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <sql>
+            ALTER  TABLE  poe  ADD  CONSTRAINT  positive_or_zero_constraint  CHECK  (
+                usd_price >= 0 and
+                coins_price >= 0
+            );
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

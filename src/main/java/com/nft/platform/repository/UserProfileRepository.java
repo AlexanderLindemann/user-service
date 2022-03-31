@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -23,6 +24,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
     Optional<UserProfile> findByKeycloakIdAndCelebrityIdWithWallets(UUID keycloakUserId, UUID celebrityId);
 
     Optional<UserProfile> findByKeycloakUserId(UUID keycloakUserId);
+
+    Optional<UserProfile> findByKeycloakUserIdIn(Set<UUID> keycloakUserIds);
 
     @Query("select distinct up from UserProfile up join fetch up.profileWallets pw join fetch pw.celebrity c " +
             " where up.keycloakUserId = :keycloakUserId and c.id = :celebrityId")
