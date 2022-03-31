@@ -15,6 +15,12 @@ spring:
     open-in-view: false
   liquibase:
     change-log: classpath:db/changelog/db.changelog.xml
+  kafka:
+    consumer:
+      poll:
+        enabled: false
+        bootstrap-servers: tswf.io:9092
+        topic: poll-service
 
 redis:
   enabled: true

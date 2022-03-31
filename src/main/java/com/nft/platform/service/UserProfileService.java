@@ -64,6 +64,7 @@ public class UserProfileService {
     private final CurrentUserProfileWithWalletsMapper currentUserProfileWithWalletsMapper;
     private final SecurityUtil securityUtil;
     private final SyncService syncService;
+    private final ProfileWalletService profileWalletService;
 
     private final FileServiceClient fileServiceClient;
 
@@ -155,15 +156,11 @@ public class UserProfileService {
                     });
 
             if (celebrity != null) {
-                ProfileWallet profileWallet;
                 Optional<ProfileWallet> existedProfileWallet = profileWalletRepository.findByUserProfileIdAndCelebrityId(userProfile.getId(), requestDto.getCelebrityId());
                 // add new profileWallet if not exists
                 if (existedProfileWallet.isEmpty()) {
                     log.info("adding new connection with CELEBRITY_ID = {} for USER = {} with userProfileId = {}", requestDto.getCelebrityId(), userProfile.getUsername(), userProfile.getId());
-                    profileWallet = new ProfileWallet();
-                    profileWallet.setUserProfile(userProfile);
-                    profileWallet.setCelebrity(celebrity);
-                    profileWalletRepository.save(profileWallet);
+                    profileWalletService.createAndSaveProfileWallet(userProfile, celebrity);
                 } else {
                     log.info("ProfileWallet for CELEBRITY_ID = {} and USER = {} with userProfileId = {} existed", requestDto.getCelebrityId(), userProfile.getUsername(), userProfile.getId());
                 }
@@ -186,11 +183,8 @@ public class UserProfileService {
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, profileWalletRequestDto.getUserProfileId()));
         Celebrity celebrity = celebrityRepository.findById(profileWalletRequestDto.getCelebrityId())
                 .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, profileWalletRequestDto.getCelebrityId()));
-        ProfileWallet profileWallet = new ProfileWallet();
-        profileWallet.setUserProfile(userProfile);
-        profileWallet.setCelebrity(celebrity);
 
-        profileWalletRepository.save(profileWallet);
+        profileWalletService.createAndSaveProfileWallet(userProfile, celebrity);
     }
 
     @Transactional(readOnly = true)
@@ -203,14 +197,11 @@ public class UserProfileService {
         if (userProfileO.isEmpty()) {
             return Optional.empty();
         }
-
-        var resultDto = userProfileO
+        return userProfileRepository.findByKeycloakUserId(keycloakUserId)
                 .stream()
                 .map(currentUserProfileWithWalletsMapper::toDto)
                 .peek((e) -> e.setRoles(currentUser.getRoles()))
                 .findAny();
-
-        return resultDto;
     }
 
     @Transactional(readOnly = true)

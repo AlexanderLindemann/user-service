@@ -1,5 +1,6 @@
 package com.nft.platform.configuration;
 
+import com.nft.platform.util.security.KeycloakUserProfile;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,10 @@ public class JpaAuditingConfiguration {
 
     @Bean
     public AuditorAware<String> securityAuditor() {
-        return () -> Optional.ofNullable(securityUtil.getCurrentUserId().toString());
+        return () -> {
+            KeycloakUserProfile keycloakUserProfile = securityUtil.getCurrentUserOrNull();
+            return Optional.of(keycloakUserProfile == null ? "system" : keycloakUserProfile.getId());
+        };
     }
 
 }

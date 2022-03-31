@@ -1,7 +1,9 @@
 package com.nft.platform.service;
 
+import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.Period;
 import com.nft.platform.domain.ProfileWallet;
+import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
 import com.nft.platform.enums.PoeAction;
@@ -63,6 +65,14 @@ public class ProfileWalletService {
             profileWalletRepository.save(profileWallet);
             return true;
         });
+    }
+
+    @Transactional
+    public ProfileWallet createAndSaveProfileWallet(UserProfile userProfile, Celebrity celebrity) {
+        ProfileWallet profileWallet = new ProfileWallet();
+        profileWallet.setUserProfile(userProfile);
+        profileWallet.setCelebrity(celebrity);
+        return profileWalletRepository.save(profileWallet);
     }
 
 }

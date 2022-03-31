@@ -1,5 +1,6 @@
 package com.nft.platform.service.poe;
 
+import com.nft.platform.common.enums.EventType;
 import com.nft.platform.domain.Period;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
@@ -10,6 +11,7 @@ import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
+import com.nft.platform.enums.PoeAction;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
@@ -48,15 +50,23 @@ public class PoeTransactionService {
     @Transactional
     public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto requestDto) {
         log.info("Try to create PoeTransaction from dto={}", requestDto);
-        Poe poe = poeRepository.findById(requestDto.getPoeId())
-                .orElseThrow(() -> new ItemNotFoundException(Poe.class, requestDto.getPoeId()));
-        PoeTransaction poeTransaction = poeTransactionMapper.toEntity(requestDto, new PoeTransaction());
-        if (requestDto.getPeriodId() == null) {
-            poeTransaction.setPeriodId(periodRepository.findFirst1ByOrderByStartTimeDesc().get().getId());
+        PoeAction poeAction;
+        if (requestDto.getEventType() == EventType.VOTE_CREATED) {
+            poeAction = PoeAction.VOTE;
+        } else {
+            throw new ItemNotFoundException(Poe.class, "can not find poe for event=" + requestDto.getEventType());
         }
-        //TODO логика начисления пое подписчику
-        poeTransaction.setPointsReward(poe.getPointsReward());
-        poeTransaction.setCoinsReward(poe.getCoinsReward());
+        Poe poe = poeRepository.findByCode(poeAction)
+                .orElseThrow(() -> new ItemNotFoundException(Poe.class, "code=" + poeAction.getActionCode()));
+        PoeTransaction poeTransaction = poeTransactionMapper.toEntity(requestDto, new PoeTransaction());
+        poeTransaction.setPeriodId(periodRepository.findFirst1ByOrderByStartTimeDesc().get().getId());
+        poeTransaction.setPoeId(poe.getId());
+        if (poe.getCoinsReward() != null) {
+            poeTransaction.setCoinsReward(poe.getCoinsReward() * requestDto.getAmount());
+        }
+        if (poe.getPointsReward() != null) {
+            poeTransaction.setPointsReward(poe.getPointsReward() * requestDto.getAmount());
+        }
 
         poeTransactionRepository.save(poeTransaction);
         return poeTransactionMapper.toDto(poeTransaction);

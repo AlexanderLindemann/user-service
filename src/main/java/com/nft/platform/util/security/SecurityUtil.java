@@ -11,13 +11,22 @@ import java.util.UUID;
 public class SecurityUtil {
 
     public KeycloakUserProfile getCurrentUser() {
+        KeycloakUserProfile currentUser = getCurrentUserOrNull();
+        if (currentUser == null) {
+            throw new InsufficientAuthenticationException("Can't get userId from securityContext");
+        }
+        return currentUser;
+    }
+
+    public KeycloakUserProfile getCurrentUserOrNull() {
         var securityContext = SecurityContextHolder.getContext();
         if (securityContext != null) {
             var authentication = (OAuth2Authentication) securityContext.getAuthentication();
-            return (KeycloakUserProfile) authentication.getOAuth2Request().getExtensions().get(JwtAccessTokenCustomizer.USER_PROFILE);
+            if (authentication != null) {
+                return (KeycloakUserProfile) authentication.getOAuth2Request().getExtensions().get(JwtAccessTokenCustomizer.USER_PROFILE);
+            }
         }
-
-        throw new InsufficientAuthenticationException("Can't get userId from securityContext");
+        return null;
     }
 
     public UUID getCurrentUserId() {

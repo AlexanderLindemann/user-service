@@ -28,4 +28,12 @@ public class PoeTransactionResponseDto extends AbstractPoeTransactionDto {
 
     @Schema(description = "Coin Reward")
     private Integer coinsReward;
+
+    @Schema(description = "Poe Id", required = true)
+    @NotNull
+    private UUID poeId;
+
+    @Schema(description = "Period Id", required = true)
+    @NotNull
+    private UUID periodId;
 }
