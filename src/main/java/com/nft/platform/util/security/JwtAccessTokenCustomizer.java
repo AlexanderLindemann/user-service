@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,10 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
 
     private static final String CLIENT_NAME_ELEMENT_IN_JWT = "resource_access";
     private static final String ROLE_BLOCK_NAME_ELEMENT_IN_JWT = "realm_access";
+
+    private static final String CLIENT_ID_ELEMENT_IN_JWT = "azp";
+
+    private static final String MOBILE_CLIENT_ID_PREFIX = "mobile_";
 
     private static final String ROLE_ELEMENT_IN_JWT = "roles";
 
@@ -49,7 +54,6 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
     public OAuth2Authentication extractAuthentication(Map<String, ?> tokenMap) {
         log.debug("Begin extractAuthentication: tokenMap = {}", tokenMap);
         JsonNode token = mapper.convertValue(tokenMap, JsonNode.class);
-        Set<String> audienceList = extractClients(token); // extracting client names
         List<GrantedAuthority> authorities = extractRoles(token); // extracting client roles
 
         OAuth2Authentication authentication = super.extractAuthentication(tokenMap);
@@ -63,15 +67,16 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
                 .setPreferredUsername((String) tokenMap.get("preferred_username"))
                 .setRoles(
                         authorities.stream()
-                             .map(GrantedAuthority::getAuthority)
-                             .filter(Objects::nonNull)
-                             .collect(Collectors.toList())
-                )
-        ;
+                                .map(GrantedAuthority::getAuthority)
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList())
+                );
+        String clientId = token.get(CLIENT_ID_ELEMENT_IN_JWT).asText();
+        userProfile.setCurrentCelebrityId(fillCurrentCelebrityIdIfMobile(userProfile.getRoles(), clientId));
 
         OAuth2Request request =
                 new OAuth2Request(oAuth2Request.getRequestParameters(), oAuth2Request.getClientId(), authorities, true, oAuth2Request.getScope(),
-                        audienceList, null, null, Map.of(USER_PROFILE, userProfile));
+                        oAuth2Request.getResourceIds(), null, null, Map.of(USER_PROFILE, userProfile));
 
         Authentication usernamePasswordAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), "N/A", authorities);
         log.debug("End extractAuthentication");
@@ -84,8 +89,8 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
 
         jwt.path(ROLE_BLOCK_NAME_ELEMENT_IN_JWT)
                 .path(ROLE_ELEMENT_IN_JWT)
-                    .elements()
-                    .forEachRemaining(r -> rolesWithPrefix.add("ROLE_" + r.asText()))
+                .elements()
+                .forEachRemaining(r -> rolesWithPrefix.add("ROLE_" + r.asText()))
         ;
 
         final List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(rolesWithPrefix.toArray(new String[0]));
@@ -107,5 +112,21 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
         } else {
             throw new IllegalArgumentException("Expected element " + CLIENT_NAME_ELEMENT_IN_JWT + " not found in token");
         }
+    }
+
+    private String fillCurrentCelebrityIdIfMobile(List<String> roles, String clientId) {
+        String currentCelebrityId = null;
+
+        if (CollectionUtils.isEmpty(roles)) {
+            return null;
+        }
+        clientId = clientId.trim();
+        if (roles.stream().anyMatch(r -> r.equals(RoleConstants.ROLE_USER))) {
+            currentCelebrityId = clientId.startsWith(MOBILE_CLIENT_ID_PREFIX)
+                    ? clientId.replaceFirst(MOBILE_CLIENT_ID_PREFIX, "")
+                    : null;
+        }
+
+        return currentCelebrityId;
     }
 }

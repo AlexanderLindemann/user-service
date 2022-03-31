@@ -8,6 +8,8 @@ import com.nft.platform.dto.response.CryptoWalletResponseDto;
 import com.nft.platform.exception.BadRequestException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
+import com.nft.platform.feign.client.SolanaAdapterClient;
+import com.nft.platform.feign.client.dto.WalletBalanceResponse;
 import com.nft.platform.mapper.CryptoWalletMapper;
 import com.nft.platform.repository.CryptoWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
@@ -15,12 +17,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -34,6 +38,7 @@ public class CryptoWalletService {
     private final CryptoWalletRepository cryptoWalletRepository;
     private final UserProfileRepository userProfileRepository;
     private final CryptoWalletMapper mapper;
+    private final SolanaAdapterClient solanaAdapterClient;
 
     @NonNull
     @Transactional(readOnly = true)
@@ -107,6 +112,20 @@ public class CryptoWalletService {
             throw new ItemNotFoundException(CryptoWallet.class, walletId);
         }
         cryptoWalletRepository.deleteById(walletId);
+    }
+
+    @Valid
+    @Transactional
+    public BigDecimal getCryptoWalletBalance(@NotNull String walletId) {
+        BigDecimal balance = null;
+        try {
+            // TODO now only for SOLANA
+            ResponseEntity<WalletBalanceResponse> balanceResponse = solanaAdapterClient.getWalletBalance(walletId);
+            balance = balanceResponse.getBody().getBalance();
+        } catch (Exception e) {
+            log.error("CAN'T get Crypto Balance for Wallet = {} \n Error = {}", walletId, e.getMessage());
+        }
+        return balance;
     }
 
 }

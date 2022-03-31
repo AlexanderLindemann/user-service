@@ -17,7 +17,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -88,4 +90,11 @@ public class UserProfile extends BaseEntity {
 
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<CryptoWallet> cryptoWallets;
+
+    @Transient
+    public Optional<CryptoWallet> getDefaultCryptoWallet() {
+        return cryptoWallets != null && !cryptoWallets.isEmpty()
+                ? cryptoWallets.stream().filter(CryptoWallet::isDefaultWallet).findFirst()
+                : Optional.empty();
+    }
 }

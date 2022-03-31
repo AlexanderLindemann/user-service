@@ -13,12 +13,12 @@ import java.util.UUID;
 public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>, JpaSpecificationExecutor<UserProfile> {
 
     // many join fetch - it is not good for performance, but for one UserProfile it's ok
-    @Query("select distinct up from UserProfile up join fetch up.profileWallets pw join fetch pw.celebrity left join fetch up.cryptoWallets cw " +
+    @Query("select distinct up from UserProfile up left join fetch up.profileWallets pw left join fetch pw.celebrity left join fetch up.cryptoWallets cw " +
             " where up.id = :id")
     Optional<UserProfile> findByIdWithWallets(UUID id);
 
     // many join fetch - it is not good for performance, but for one UserProfile it's ok
-    @Query("select distinct up from UserProfile up join fetch up.profileWallets pw join fetch pw.celebrity c left join fetch up.cryptoWallets cw " +
+    @Query("select distinct up from UserProfile up left join fetch up.profileWallets pw left join fetch pw.celebrity c left join fetch up.cryptoWallets cw " +
             " where up.keycloakUserId = :keycloakUserId and c.id = :celebrityId")
     Optional<UserProfile> findByKeycloakIdAndCelebrityIdWithWallets(UUID keycloakUserId, UUID celebrityId);
 
@@ -28,6 +28,6 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
             " where up.keycloakUserId = :keycloakUserId and c.id = :celebrityId")
     Optional<UserProfile> findByKeycloakUserIdAndCelebrityId(UUID keycloakUserId, UUID celebrityId);
 
-    @Query("select distinct up from UserProfile up join fetch up.profileWallets pw join fetch pw.celebrity where up.keycloakUserId = :keycloakUserId")
+    @Query("select distinct up from UserProfile up left join fetch up.profileWallets pw left join fetch pw.celebrity where up.keycloakUserId = :keycloakUserId")
     Optional<UserProfile> findByKeycloakUserIdWithCelebrities(UUID keycloakUserId);
 }

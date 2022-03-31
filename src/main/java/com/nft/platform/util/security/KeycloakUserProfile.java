@@ -15,4 +15,5 @@ public class KeycloakUserProfile implements Serializable {
     private String lastName;
     private String preferredUsername;
     private List<String> roles;
+    private String currentCelebrityId;
 }
