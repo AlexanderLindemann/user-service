@@ -1,6 +1,6 @@
 package com.nft.platform.event.consumer;
 
-public interface PollKafkaEventListener {
+public interface KafkaEventListener {
 
     void receive(String event);
 }

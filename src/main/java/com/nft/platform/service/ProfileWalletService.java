@@ -1,5 +1,6 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.enums.EventType;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.Period;
 import com.nft.platform.domain.ProfileWallet;
@@ -7,6 +8,7 @@ import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
 import com.nft.platform.enums.PoeAction;
+import com.nft.platform.event.ProfileWalletCreatedEvent;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.redis.starter.service.SyncService;
@@ -18,6 +20,7 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,7 @@ public class ProfileWalletService {
     private final PoeRepository poeRepository;
     private final ProfileWalletRepository profileWalletRepository;
     private final SyncService syncService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public boolean updateProfileWalletOnPeriodIfNeeded(ProfileWalletPeriodUpdateDto requestDto) {
@@ -67,12 +71,21 @@ public class ProfileWalletService {
         });
     }
 
-    @Transactional
-    public ProfileWallet createAndSaveProfileWallet(UserProfile userProfile, Celebrity celebrity) {
+    public void createAndSaveProfileWallet(UserProfile userProfile, Celebrity celebrity) {
         ProfileWallet profileWallet = new ProfileWallet();
         profileWallet.setUserProfile(userProfile);
         profileWallet.setCelebrity(celebrity);
-        return profileWalletRepository.save(profileWallet);
+        profileWalletRepository.save(profileWallet);
+        publishProfileWalletCreatedEvent(profileWallet);
     }
 
+    private void publishProfileWalletCreatedEvent(ProfileWallet profileWallet) {
+        ProfileWalletCreatedEvent event = ProfileWalletCreatedEvent.builder()
+                .profileWalletId(profileWallet.getId())
+                .celebrityId(profileWallet.getCelebrity().getId())
+                .userId(profileWallet.getUserProfile().getKeycloakUserId())
+                .eventType(EventType.PROFILE_WALLET_CREATED)
+                .build();
+        applicationEventPublisher.publishEvent(event);
+    }
 }

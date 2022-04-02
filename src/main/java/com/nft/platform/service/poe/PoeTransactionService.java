@@ -25,6 +25,7 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,10 +51,8 @@ public class PoeTransactionService {
     @Transactional
     public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto requestDto) {
         log.info("Try to create PoeTransaction from dto={}", requestDto);
-        PoeAction poeAction;
-        if (requestDto.getEventType() == EventType.VOTE_CREATED) {
-            poeAction = PoeAction.VOTE;
-        } else {
+        PoeAction poeAction = mapEventToPoeAction(requestDto.getEventType());
+        if (poeAction == null) {
             throw new ItemNotFoundException(Poe.class, "can not find poe for event=" + requestDto.getEventType());
         }
         Poe poe = poeRepository.findByCode(poeAction)
@@ -70,6 +69,25 @@ public class PoeTransactionService {
 
         poeTransactionRepository.save(poeTransaction);
         return poeTransactionMapper.toDto(poeTransaction);
+    }
+
+    @Nullable
+    private PoeAction mapEventToPoeAction(EventType eventType) {
+        PoeAction poeAction;
+        switch (eventType) {
+            case VOTE_CREATED:
+                poeAction = PoeAction.VOTE;
+                break;
+            case PROFILE_WALLET_CREATED:
+                poeAction = PoeAction.REGISTRATION;
+                break;
+            case LIKE_ADDED:
+                poeAction = PoeAction.LIKE;
+                break;
+            default:
+                poeAction = null;
+        }
+        return poeAction;
     }
 
     @Transactional(readOnly = true)

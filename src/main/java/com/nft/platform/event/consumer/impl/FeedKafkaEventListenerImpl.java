@@ -3,7 +3,7 @@ package com.nft.platform.event.consumer.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nft.platform.annotation.OnKafkaConsumerEnabled;
 import com.nft.platform.common.enums.EventType;
-import com.nft.platform.common.event.VoteCreatedEvent;
+import com.nft.platform.common.event.LikeAddedEvent;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.event.consumer.KafkaEventListener;
 import com.nft.platform.mapper.poe.PoeTransactionMapper;
@@ -17,23 +17,23 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @OnKafkaConsumerEnabled
-public class PollKafkaEventListenerImpl implements KafkaEventListener {
+public class FeedKafkaEventListenerImpl implements KafkaEventListener {
 
     private final ObjectMapper objectMapper;
     private final PoeTransactionService poeTransactionService;
     private final PoeTransactionMapper poeTransactionMapper;
 
     @Override
-    @KafkaListener(topics = "${spring.kafka.consumer.poll-service.topic}")
+    @KafkaListener(topics = "${spring.kafka.consumer.feed-service.topic}")
     public void receive(String event) {
-        log.trace("Poll event received: {}", event);
+        log.trace("Feed event received: {}", event);
         try {
-            VoteCreatedEvent voteCreatedEvent = objectMapper.readValue(event, VoteCreatedEvent.class);
-            if (voteCreatedEvent.getEventType() != null && voteCreatedEvent.getEventType() == EventType.VOTE_CREATED) {
-                PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(voteCreatedEvent);
+            LikeAddedEvent likeAddedEvent = objectMapper.readValue(event, LikeAddedEvent.class);
+            if (likeAddedEvent.getEventType() != null && likeAddedEvent.getEventType() == EventType.LIKE_ADDED) {
+                PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(likeAddedEvent);
                 poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
             } else {
-                log.info("Skip event: {}", voteCreatedEvent);
+                log.info("Skip event: {}", likeAddedEvent);
             }
         } catch (Exception e) {
             log.error("ERROR: ", e);

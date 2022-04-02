@@ -16,11 +16,15 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog.xml
   kafka:
+    bootstrap-servers: tswf.io:9092
     consumer:
-      poll:
-        enabled: false
-        bootstrap-servers: tswf.io:9092
+      enabled: false
+      group:
+        id: user-service
+      poll-service:
         topic: poll-service
+      feed-service:
+        topic: feed-service
 
 redis:
   enabled: true

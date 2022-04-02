@@ -28,9 +28,11 @@ env:
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdev.cwol7reviywm.eu-central-1.rds.amazonaws.com/users
   SPRING_DATASOURCE_USERNAME: users
   SPRING_DATASOURCE_PASSWORD: users
-  SPRING_KAFKA_CONSUMER_POLL_ENABLED: true
-  SPRING_KAFKA_CONSUMER_POLL_TOPIC: poll-service
-  SPRING_KAFKA_CONSUMER_POLL_BOOTSTRAP_SERVERS: tswf.io:9092
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: tswf.io:9092
+  SPRING_KAFKA_CONSUMER_ENABLED: true
+  SPRING_KAFKA_CONSUMER_GROUP_ID: user-service
+  SPRING_KAFKA_CONSUMER_POLL_SERVICE_TOPIC: poll-service
+  SPRING_KAFKA_CONSUMER_FEED_SERVICE_TOPIC: feed-service
 
   REDIS_ENABLED: true
   REDIS_ADDRESS: nftdevredis.elesif.clustercfg.memorydb.eu-central-1.amazonaws.com:6379

@@ -27,7 +27,7 @@
         <redis-starter.version>1.0-SNAPSHOT</redis-starter.version>
         <shedlock.version>4.33.0</shedlock.version>
         <common-lib.version>1.0-SNAPSHOT</common-lib.version>
-        <spring-kafka.version>2.8.1</spring-kafka.version>
+        <kafka-starter.version>1.0-SNAPSHOT</kafka-starter.version>
     </properties>
     <dependencies>
         <!-- NFT -->
@@ -36,6 +36,12 @@
             <artifactId>common-lib</artifactId>
             <version>${common-lib.version}</version>
         </dependency>
+        <dependency>
+            <groupId>nft.platform</groupId>
+            <artifactId>kafka-starter</artifactId>
+            <version>${kafka-starter.version}</version>
+        </dependency>
+
         <!-- DB -->
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -82,11 +88,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-            <version>${spring-kafka.version}</version>
         </dependency>
 
         <!-- Redis -->
