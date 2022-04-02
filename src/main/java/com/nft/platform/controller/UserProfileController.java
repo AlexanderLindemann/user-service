@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +31,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -152,5 +155,15 @@ public class UserProfileController {
     @ResponseStatus(HttpStatus.OK)
     public boolean isConnectedWithCelebrity(@Valid @ParameterObject KeycloakUserIdWithCelebrityIdDto requestDto) {
         return userProfileService.isConnectedWithCelebrity(requestDto);
+    }
+
+    @PostMapping(value = "/upload-user-image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload Profile Image")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_MARKETPLACE_USER,
+            RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_CONTENT_MODERATOR, RoleConstants.ROLE_ADMIN_PLATFORM,
+            RoleConstants.ROLE_TECH_TOKEN})
+    public String uploadUserProfileImage(@PathVariable("id") UUID userId, @RequestPart(name = "file") MultipartFile file) {
+        return userProfileService.uploadUserProfileImage(userId, file);
     }
 }

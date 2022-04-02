@@ -1,5 +1,6 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.enums.FileType;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
@@ -12,9 +13,11 @@ import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
+import com.nft.platform.exception.FileUploadException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
+import com.nft.platform.feign.client.FileServiceClient;
 import com.nft.platform.mapper.CurrentUserProfileWithWalletsMapper;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.mapper.UserProfileWithCelebrityIdsMapper;
@@ -29,6 +32,7 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -37,7 +41,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,6 +64,8 @@ public class UserProfileService {
     private final CurrentUserProfileWithWalletsMapper currentUserProfileWithWalletsMapper;
     private final SecurityUtil securityUtil;
     private final SyncService syncService;
+
+    private final FileServiceClient fileServiceClient;
 
     @NonNull
     @Transactional(readOnly = true)
@@ -221,5 +229,40 @@ public class UserProfileService {
     public boolean isConnectedWithCelebrity(KeycloakUserIdWithCelebrityIdDto requestDto) {
         return userProfileRepository.findByKeycloakUserIdAndCelebrityId(
                 requestDto.getKeycloakUserId(), requestDto.getCelebrityId()).isPresent();
+    }
+
+    @Transactional
+    public String uploadUserProfileImage(UUID id, @NotNull MultipartFile file) {
+        String url = null;
+        String oldUrl = null;
+
+        UserProfile profile = userProfileRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, id));
+        oldUrl = profile.getImageUrl();
+        // trying upload new image
+        try {
+            var response = fileServiceClient.fileUpload(FileType.AVATAR, file);
+            if (response.getBody() != null) {
+                profile.setImageUrl(response.getBody().getUrl());
+                userProfileRepository.save(profile);
+                url = profile.getImageUrl();
+            } else {
+                log.error("Can't get url of uploaded file");
+                throw new FileUploadException("Upload File", "Can't get url of uploaded file");
+            }
+        } catch (Exception e) {
+            log.error("Error while uploading file: {}", e.getMessage());
+            throw new FileUploadException("Upload File ", e.getMessage());
+        }
+        // trying to delete old image
+        if (!StringUtils.isEmpty(oldUrl)) {
+            try {
+                fileServiceClient.deleteFile(oldUrl);
+            } catch (Exception e) {
+                log.error("Can't Delete OLD User Image url = {}", oldUrl);
+            }
+        }
+
+        return url;
     }
 }

@@ -31,6 +31,8 @@ env:
   REDIS_ENABLED: true
   REDIS_ADDRESS: nftdevredis.elesif.clustercfg.memorydb.eu-central-1.amazonaws.com:6379
   FEIGN_NFT_SOLANA_ADAPTER_URL: "http://solana-adapter:8080/solana-adapter"
+  FEIGN_NFT_FILE_SERVICE_URL: "http://file-service:8080/file-service"
+
 
 serviceAccount:
   # Specifies whether a service account should be created
