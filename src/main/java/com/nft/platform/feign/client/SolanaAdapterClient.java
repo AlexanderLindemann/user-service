@@ -1,6 +1,7 @@
 package com.nft.platform.feign.client;
 
 import com.nft.platform.feign.client.dto.WalletBalanceResponse;
+import com.nft.platform.feign.client.dto.WalletInfoResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,4 +17,7 @@ public interface SolanaAdapterClient {
 
     @GetMapping(value = "/api/solana/balance/{walletPubkey}")
     ResponseEntity<WalletBalanceResponse> getWalletBalance(@PathVariable("walletPubkey") String walletPubkey);
+
+    @GetMapping(value = "/api/solana/info/{walletPubkey}")
+    ResponseEntity<WalletInfoResponseDto> getWalletInfoBalance(@PathVariable("walletPubkey") String walletPubkey);
 }

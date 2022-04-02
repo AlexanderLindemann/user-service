@@ -52,7 +52,7 @@ public class CryptoWalletController {
     @Operation(summary = "Create new Crypto Wallet for User")
     @ResponseStatus(HttpStatus.CREATED)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_USER, RoleConstants.ROLE_TECH_TOKEN})
-    public CryptoWalletResponseDto createUpdateUserProfile(@Parameter(name = "CryptoWalletRequestDto", description = "Crypto Wallet Request Dto")
+    public CryptoWalletResponseDto createCryptoWallet(@Parameter(name = "CryptoWalletRequestDto", description = "Crypto Wallet Request Dto")
                                                            @Valid @RequestBody CryptoWalletRequestDto cryptoWalletRequestDto) {
         return cryptoWalletService.createWallet(cryptoWalletRequestDto);
     }

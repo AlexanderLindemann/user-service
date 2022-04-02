@@ -10,6 +10,7 @@ import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.feign.client.SolanaAdapterClient;
 import com.nft.platform.feign.client.dto.WalletBalanceResponse;
+import com.nft.platform.feign.client.dto.WalletInfoResponseDto;
 import com.nft.platform.mapper.CryptoWalletMapper;
 import com.nft.platform.repository.CryptoWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
@@ -17,6 +18,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,8 +74,22 @@ public class CryptoWalletService {
             requestDto.setBlockchain(Blockchain.SOLANA);
         }
         if (cryptoWalletRepository.existsByExternalCryptoWalletIdAndBlockchain(requestDto.getExternalCryptoWalletId(), requestDto.getBlockchain())) {
-            throw new ItemConflictException(CryptoWallet.class, requestDto.getExternalCryptoWalletId());
+            throw new ItemConflictException(CryptoWallet.class, requestDto.getExternalCryptoWalletId(), "Wallet already exists in system");
         }
+
+        // checking wallet in blockchain
+        try {
+            // TODO now it is only for SOLANA
+            var resp = solanaAdapterClient.getWalletInfoBalance(requestDto.getExternalCryptoWalletId());
+            if (HttpStatus.NOT_FOUND.equals(resp.getStatusCode())) {
+                log.error("Can't create wallet {}, wallet doesn't exists in blockchain", requestDto.getExternalCryptoWalletId());
+                throw new BadRequestException(CryptoWallet.class, "create wallet", "wallet doesn't exists in blockchain");
+            }
+        } catch (Exception e) {
+            log.error("Can't create wallet: Can't get info for wallet with publicKey {}", requestDto.getExternalCryptoWalletId());
+            throw new BadRequestException(CryptoWallet.class, "create wallet", "Can't get info for wallet with publicKey = " + requestDto.getExternalCryptoWalletId());
+        }
+
         CryptoWallet wallet = new CryptoWallet();
         wallet = mapper.toEntity(requestDto, wallet);
         Set<CryptoWallet> existedWallets = userProfile.getCryptoWallets();
