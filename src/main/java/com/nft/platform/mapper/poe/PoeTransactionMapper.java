@@ -1,5 +1,6 @@
 package com.nft.platform.mapper.poe;
 
+import com.nft.platform.common.event.ChallengeCompletedEvent;
 import com.nft.platform.common.event.LikeAddedEvent;
 import com.nft.platform.common.event.VoteCreatedEvent;
 import com.nft.platform.domain.poe.PoeTransaction;
@@ -21,4 +22,6 @@ public interface PoeTransactionMapper {
     PoeTransactionRequestDto toRequestDto(ProfileWalletCreatedEvent profileWalletCreatedEvent);
 
     PoeTransactionRequestDto toRequestDto(LikeAddedEvent likeAddedEvent);
+
+    PoeTransactionRequestDto toRequestDto(ChallengeCompletedEvent challengeCompletedEvent);
 }

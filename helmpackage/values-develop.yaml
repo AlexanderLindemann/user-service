@@ -33,6 +33,7 @@ env:
   SPRING_KAFKA_CONSUMER_GROUP_ID: user-service
   SPRING_KAFKA_CONSUMER_POLL_SERVICE_TOPIC: poll-service
   SPRING_KAFKA_CONSUMER_FEED_SERVICE_TOPIC: feed-service
+  SPRING_KAFKA_CONSUMER_CHALLENGE_SERVICE_TOPIC: challenge-service
 
   REDIS_ENABLED: true
   REDIS_ADDRESS: nftdevredis.elesif.clustercfg.memorydb.eu-central-1.amazonaws.com:6379

@@ -3,7 +3,7 @@ package com.nft.platform.event.consumer.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nft.platform.annotation.OnKafkaConsumerEnabled;
 import com.nft.platform.common.enums.EventType;
-import com.nft.platform.common.event.VoteCreatedEvent;
+import com.nft.platform.common.event.ChallengeCompletedEvent;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.event.consumer.KafkaEventListener;
 import com.nft.platform.mapper.poe.PoeTransactionMapper;
@@ -17,23 +17,23 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @OnKafkaConsumerEnabled
-public class PollKafkaEventListenerImpl implements KafkaEventListener {
+public class ChallengeKafkaEventListenerImpl implements KafkaEventListener {
 
     private final ObjectMapper objectMapper;
     private final PoeTransactionService poeTransactionService;
     private final PoeTransactionMapper poeTransactionMapper;
 
     @Override
-    @KafkaListener(topics = "${spring.kafka.consumer.poll-service.topic}")
+    @KafkaListener(topics = "${spring.kafka.consumer.challenge-service.topic}")
     public void receive(String event) {
-        log.info("Poll event received: {}", event);
+        log.info("Challenge event received: {}", event);
         try {
-            VoteCreatedEvent voteCreatedEvent = objectMapper.readValue(event, VoteCreatedEvent.class);
-            if (voteCreatedEvent.getEventType() != null && voteCreatedEvent.getEventType() == EventType.VOTE_CREATED) {
-                PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(voteCreatedEvent);
+            ChallengeCompletedEvent challengeCompletedEvent = objectMapper.readValue(event, ChallengeCompletedEvent.class);
+            if (challengeCompletedEvent.getEventType() != null && challengeCompletedEvent.getEventType() == EventType.CHALLENGE_COMPLETED) {
+                PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(challengeCompletedEvent);
                 poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
             } else {
-                log.info("Skip event: {}", voteCreatedEvent);
+                log.info("Skip event: {}", challengeCompletedEvent);
             }
         } catch (Exception e) {
             log.error("ERROR: ", e);

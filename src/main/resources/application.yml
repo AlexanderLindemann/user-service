@@ -25,6 +25,8 @@ spring:
         topic: poll-service
       feed-service:
         topic: feed-service
+      challenge-service:
+        topic: challenge-service
 
 redis:
   enabled: true

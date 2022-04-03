@@ -84,6 +84,9 @@ public class PoeTransactionService {
             case LIKE_ADDED:
                 poeAction = PoeAction.LIKE;
                 break;
+            case CHALLENGE_COMPLETED:
+                poeAction = PoeAction.CHALLENGE;
+                break;
             default:
                 poeAction = null;
         }

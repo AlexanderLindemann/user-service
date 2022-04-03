@@ -26,7 +26,7 @@ public class FeedKafkaEventListenerImpl implements KafkaEventListener {
     @Override
     @KafkaListener(topics = "${spring.kafka.consumer.feed-service.topic}")
     public void receive(String event) {
-        log.trace("Feed event received: {}", event);
+        log.info("Feed event received: {}", event);
         try {
             LikeAddedEvent likeAddedEvent = objectMapper.readValue(event, LikeAddedEvent.class);
             if (likeAddedEvent.getEventType() != null && likeAddedEvent.getEventType() == EventType.LIKE_ADDED) {
