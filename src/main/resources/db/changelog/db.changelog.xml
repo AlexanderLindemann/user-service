@@ -27,4 +27,5 @@
     <include file="create/poe/2022-03-30-create-poe-transaction-table.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-03-31-drop-table-poe-settings-and-user-balance.xml" relativeToChangelogFile="true"/>
     <include file="sql/data/2022-03-31-insert-poe.sql" relativeToChangelogFile="true"/>
+    <include file="update/2022-04-06-add-subscriber-field-to-wallet.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

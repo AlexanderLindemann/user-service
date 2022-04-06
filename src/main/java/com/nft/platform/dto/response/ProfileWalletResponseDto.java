@@ -17,4 +17,7 @@ import lombok.experimental.SuperBuilder;
 public class ProfileWalletResponseDto extends AbstractProfileWalletDto {
 
     private CelebrityResponseDto celebrityDto;
+
+    @Schema(description = "Is subscriber")
+    private boolean subscriber;
 }

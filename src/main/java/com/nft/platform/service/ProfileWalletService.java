@@ -51,12 +51,7 @@ public class ProfileWalletService {
                 throw new RestException("Period does not exists", HttpStatus.INTERNAL_SERVER_ERROR);
             }
             Period currentPeriod = currentPeriodO.get();
-            ProfileWallet profileWallet = profileWalletRepository
-                    .findByKeycloakUserIdAndCelebrityId(keycloakUserId, requestDto.getCelebrityId())
-                    .orElseThrow(() ->
-                            new ItemNotFoundException(ProfileWallet.class,
-                                    "keycloakUserId: " + keycloakUserId + " celebrityId: " + requestDto.getCelebrityId())
-                    );
+            ProfileWallet profileWallet = getProfileWallet(keycloakUserId, requestDto.getCelebrityId());
             if (profileWallet.getPeriod() != null && currentPeriod.getId().equals(profileWallet.getPeriod().getId())) {
                 log.info("ProfileWallet updated for period = {}", currentPeriod);
                 return false;
@@ -69,6 +64,20 @@ public class ProfileWalletService {
             profileWalletRepository.save(profileWallet);
             return true;
         });
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isUserSubscriber(UUID keycloakUserId, UUID celebrityId) {
+        ProfileWallet profileWallet = getProfileWallet(keycloakUserId, celebrityId);
+        return profileWallet.isSubscriber();
+    }
+
+    private ProfileWallet getProfileWallet(UUID keycloakUserId, UUID celebrityId) {
+        return profileWalletRepository.findByKeycloakUserIdAndCelebrityId(keycloakUserId, celebrityId)
+                .orElseThrow(() ->
+                        new RestException("ProfileWaller does not exists userId=" + keycloakUserId +
+                                " celebrityId=" + celebrityId, HttpStatus.CONFLICT)
+                );
     }
 
     public void createAndSaveProfileWallet(UserProfile userProfile, Celebrity celebrity) {
