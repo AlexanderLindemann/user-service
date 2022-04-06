@@ -3,6 +3,8 @@ include:
   - project: 'nft-platform/devops/ci-box'
     file: 'variables.yaml'
   - project: 'nft-platform/devops/ci-box'
+    file: 'maven-test.yaml'
+  - project: 'nft-platform/devops/ci-box'
     file: 'build-variables.yaml'
   - project: 'nft-platform/devops/ci-box'
     file: 'maven-build.yaml'
@@ -19,6 +21,7 @@ variables:
 
 stages:
   - variables
+  - maven:test
   - maven:build
   - docker:build
   - helm:lint
