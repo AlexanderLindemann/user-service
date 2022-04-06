@@ -9,6 +9,7 @@ import com.nft.platform.repository.PeriodRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
+import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +35,10 @@ public class PeriodService {
 
     @Transactional
     public void createNewPeriodIfNeeded() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime endTime = now.plusSeconds(periodProperties.getDurationSeconds());
-        createNewPeriodIfNeeded(now, endTime);
+        CronExpression cronTrigger = CronExpression.parse(periodProperties.getCronExpression());
+        LocalDateTime periodStartTime = LocalDateTime.now();
+        LocalDateTime periodEndTime = cronTrigger.next(LocalDateTime.now());
+        createNewPeriodIfNeeded(periodStartTime, periodEndTime);
     }
 
     @Transactional

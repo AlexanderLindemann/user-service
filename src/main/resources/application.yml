@@ -95,7 +95,6 @@ nft:
         username: nftbackend@no.no
         password: 8yfz537z3yr7h99w
   period:
-    durationSeconds: 28800
     cronExpression: "0 0 */8 * * *"
   celebrity:
     default-uuid: "b5ecb411-a2a8-4a72-b9ab-3a64d8c70120"

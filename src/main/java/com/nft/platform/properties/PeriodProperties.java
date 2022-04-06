@@ -10,6 +10,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class PeriodProperties {
     public static final String PREFIX = "nft.period";
 
-    private int durationSeconds;
     private String cronExpression;
 }
