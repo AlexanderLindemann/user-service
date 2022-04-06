@@ -10,7 +10,6 @@ import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.feign.client.SolanaAdapterClient;
 import com.nft.platform.feign.client.dto.WalletBalanceResponse;
-import com.nft.platform.feign.client.dto.WalletInfoResponseDto;
 import com.nft.platform.mapper.CryptoWalletMapper;
 import com.nft.platform.repository.CryptoWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
@@ -80,13 +79,13 @@ public class CryptoWalletService {
         // checking wallet in blockchain
         try {
             // TODO now it is only for SOLANA
-            var resp = solanaAdapterClient.getWalletInfoBalance(requestDto.getExternalCryptoWalletId());
-            if (HttpStatus.NOT_FOUND.equals(resp.getStatusCode())) {
+            var resp = solanaAdapterClient.getWalletInfo(requestDto.getExternalCryptoWalletId());
+            if (resp.getBody() != null && Boolean.FALSE.equals(resp.getBody().getIsSolana())) {
                 log.error("Can't create wallet {}, wallet doesn't exists in blockchain", requestDto.getExternalCryptoWalletId());
                 throw new BadRequestException(CryptoWallet.class, "create wallet", "wallet doesn't exists in blockchain");
             }
         } catch (Exception e) {
-            log.error("Can't create wallet: Can't get info for wallet with publicKey {}", requestDto.getExternalCryptoWalletId());
+            log.error("Can't create wallet: Can't get info for wallet with publicKey {}; \n error = {}", requestDto.getExternalCryptoWalletId(), e.getMessage());
             throw new BadRequestException(CryptoWallet.class, "create wallet", "Can't get info for wallet with publicKey = " + requestDto.getExternalCryptoWalletId());
         }
 

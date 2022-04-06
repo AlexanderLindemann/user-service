@@ -19,5 +19,5 @@ public interface SolanaAdapterClient {
     ResponseEntity<WalletBalanceResponse> getWalletBalance(@PathVariable("walletPubkey") String walletPubkey);
 
     @GetMapping(value = "/api/solana/info/{walletPubkey}")
-    ResponseEntity<WalletInfoResponseDto> getWalletInfoBalance(@PathVariable("walletPubkey") String walletPubkey);
+    ResponseEntity<WalletInfoResponseDto> getWalletInfo(@PathVariable("walletPubkey") String walletPubkey);
 }
