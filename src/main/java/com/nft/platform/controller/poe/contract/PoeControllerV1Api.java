@@ -1,5 +1,6 @@
 package com.nft.platform.controller.poe.contract;
 
+import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
 import com.nft.platform.dto.poe.response.PoeResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +41,8 @@ public interface PoeControllerV1Api {
     @GetMapping
     @Operation(summary = "Get Page of Poe by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)
-    Page<PoeResponseDto> getPoesPage(@PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC)
+    Page<PoeResponseDto> getPoesPage(@ParameterObject PoeFilterDto filter,
+                                     @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC)
                                      @ParameterObject Pageable pageable
     );
 

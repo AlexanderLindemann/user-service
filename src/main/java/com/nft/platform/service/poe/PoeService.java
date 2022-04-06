@@ -1,5 +1,6 @@
 package com.nft.platform.service.poe;
 
+import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
 import com.nft.platform.dto.poe.response.PoeResponseDto;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ public interface PoeService {
 
     PoeResponseDto findById(UUID id);
 
-    Page<PoeResponseDto> getPoesPage(Pageable pageable);
+    Page<PoeResponseDto> getPoesPage(PoeFilterDto filter, Pageable pageable);
 
     PoeResponseDto createPoe(PoeRequestDto requestDto);
 

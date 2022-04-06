@@ -1,17 +1,20 @@
 package com.nft.platform.service.poe.impl;
 
 import com.nft.platform.domain.poe.Poe;
+import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
 import com.nft.platform.dto.poe.response.PoeResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.mapper.IMapper;
 import com.nft.platform.repository.poe.PoeRepository;
+import com.nft.platform.repository.spec.PoeSpecifications;
 import com.nft.platform.service.poe.PoeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +41,9 @@ public class PoeServiceImpl implements PoeService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PoeResponseDto> getPoesPage(Pageable pageable) {
-        val poePage = poeRepository.findAll(pageable);
+    public Page<PoeResponseDto> getPoesPage(PoeFilterDto filter, Pageable pageable) {
+        Specification<Poe> spec = PoeSpecifications.from(filter);
+        val poePage = poeRepository.findAll(spec, pageable);
         return poePage.map(poeResponseDtoIMapper::convert);
     }
 
