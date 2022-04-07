@@ -34,6 +34,7 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/celebrity-category/**").permitAll().and()
+                .authorizeRequests().antMatchers(HttpMethod.PUT, "/api/v1/profile-wallet/subscription").permitAll().and()
                 .authorizeRequests().antMatchers("/", "/api").permitAll().and()
                 .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/celebrity/**").permitAll().and()
                 .authorizeRequests().antMatchers("/api/**").authenticated();

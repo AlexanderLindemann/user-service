@@ -21,9 +21,12 @@ public class SecurityUtil {
     public KeycloakUserProfile getCurrentUserOrNull() {
         var securityContext = SecurityContextHolder.getContext();
         if (securityContext != null) {
-            var authentication = (OAuth2Authentication) securityContext.getAuthentication();
-            if (authentication != null) {
-                return (KeycloakUserProfile) authentication.getOAuth2Request().getExtensions().get(JwtAccessTokenCustomizer.USER_PROFILE);
+            var authentication = securityContext.getAuthentication();
+            if (authentication instanceof OAuth2Authentication) {
+                OAuth2Authentication oAuth2Authentication = (OAuth2Authentication) authentication;
+                return (KeycloakUserProfile) oAuth2Authentication.getOAuth2Request()
+                        .getExtensions()
+                        .get(JwtAccessTokenCustomizer.USER_PROFILE);
             }
         }
         return null;

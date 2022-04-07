@@ -7,6 +7,7 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
+import com.nft.platform.dto.request.SubscriptionRequestDto;
 import com.nft.platform.enums.PoeAction;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
 import com.nft.platform.exception.ItemNotFoundException;
@@ -72,11 +73,17 @@ public class ProfileWalletService {
         return profileWallet.isSubscriber();
     }
 
+    @Transactional
+    public void updateSubscriptionStatus(SubscriptionRequestDto requestDto) {
+        ProfileWallet profileWallet = getProfileWallet(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
+        profileWallet.setSubscriber(requestDto.isSubscriber());
+        profileWalletRepository.save(profileWallet);
+    }
+
     private ProfileWallet getProfileWallet(UUID keycloakUserId, UUID celebrityId) {
         return profileWalletRepository.findByKeycloakUserIdAndCelebrityId(keycloakUserId, celebrityId)
-                .orElseThrow(() ->
-                        new RestException("ProfileWaller does not exists userId=" + keycloakUserId +
-                                " celebrityId=" + celebrityId, HttpStatus.CONFLICT)
+                .orElseThrow(() -> new ItemNotFoundException(ProfileWallet.class,
+                        "keycloakUserId=" + keycloakUserId + " celebrityId=" + celebrityId)
                 );
     }
 

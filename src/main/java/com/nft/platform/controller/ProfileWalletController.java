@@ -1,6 +1,7 @@
 package com.nft.platform.controller;
 
 import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
+import com.nft.platform.dto.request.SubscriptionRequestDto;
 import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,6 +35,14 @@ public class ProfileWalletController {
                                     @RequestParam UUID celebrityId) {
         return profileWalletService.isUserSubscriber(keycloakUserId, celebrityId);
     }
+
+    @PutMapping("/subscription")
+    @Operation(summary = "Update subscription status")
+    @ResponseStatus(HttpStatus.OK)
+    public void updateSubscriptionStatus(@RequestBody SubscriptionRequestDto requestDto) {
+        profileWalletService.updateSubscriptionStatus(requestDto);
+    }
+
 
     @PutMapping
     @Operation(summary = "Update Profile Wallet On Period If Needed")
