@@ -10,19 +10,23 @@ import org.springframework.stereotype.Repository;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface CryptoWalletRepository extends JpaRepository<CryptoWallet, UUID> {
 
-    List<CryptoWallet> findAllByUserProfileId(@NotNull UUID userProfileId);
+    List<CryptoWallet> findAllByUserProfileIdOrderByUpdatedAt(@NotNull UUID userProfileId);
 
-    List<CryptoWallet> findAllByUserProfileKeycloakUserId(@NotNull UUID userKeycloakId);
+    List<CryptoWallet> findAllByUserProfileKeycloakUserIdOrderByUpdatedAt(@NotNull UUID userKeycloakId);
 
     boolean existsByExternalCryptoWalletIdAndBlockchain(@NotNull String cryptoWalletId, @NotNull Blockchain blockchain);
+
+    Optional<CryptoWallet> findByExternalCryptoWalletIdAndBlockchain(@NotNull String cryptoWalletId, @NotNull Blockchain blockchain);
 
     @Modifying
     @Query("update CryptoWallet cw set cw.defaultWallet = :isDefault where cw.id in (:cwIds)")
     int setCryptoWalletsDefaultByIds(@Param("isDefault") boolean isDefault, @Param("cwIds") List<UUID> cwIds);
+
 
 }
