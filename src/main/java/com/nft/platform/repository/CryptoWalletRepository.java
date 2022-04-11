@@ -16,9 +16,9 @@ import java.util.UUID;
 @Repository
 public interface CryptoWalletRepository extends JpaRepository<CryptoWallet, UUID> {
 
-    List<CryptoWallet> findAllByUserProfileIdOrderByUpdatedAt(@NotNull UUID userProfileId);
+    List<CryptoWallet> findAllByUserProfileIdOrderByCreatedAt(@NotNull UUID userProfileId);
 
-    List<CryptoWallet> findAllByUserProfileKeycloakUserIdOrderByUpdatedAt(@NotNull UUID userKeycloakId);
+    List<CryptoWallet> findAllByUserProfileKeycloakUserIdOrderByCreatedAt(@NotNull UUID userKeycloakId);
 
     boolean existsByExternalCryptoWalletIdAndBlockchain(@NotNull String cryptoWalletId, @NotNull Blockchain blockchain);
 

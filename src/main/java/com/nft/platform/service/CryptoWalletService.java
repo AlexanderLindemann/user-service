@@ -47,14 +47,14 @@ public class CryptoWalletService {
     @NonNull
     @Transactional(readOnly = true)
     public List<CryptoWalletResponseDto> getAllByUserProfileId(@NonNull UUID userProfileId) {
-        return cryptoWalletRepository.findAllByUserProfileIdOrderByUpdatedAt(userProfileId)
+        return cryptoWalletRepository.findAllByUserProfileIdOrderByCreatedAt(userProfileId)
                 .stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
     @NonNull
     @Transactional(readOnly = true)
     public List<CryptoWalletResponseDto> getAllByUserKeycloakId(@NonNull UUID userKeycloakId) {
-        return cryptoWalletRepository.findAllByUserProfileKeycloakUserIdOrderByUpdatedAt(userKeycloakId)
+        return cryptoWalletRepository.findAllByUserProfileKeycloakUserIdOrderByCreatedAt(userKeycloakId)
                 .stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
@@ -95,32 +95,23 @@ public class CryptoWalletService {
 
     @NonNull
     @Transactional
-    public CryptoWalletResponseDto updateCryptoWallet(@NonNull UUID id, @NonNull CryptoWalletRequestDto requestDto) {
+    public CryptoWalletResponseDto makeDefaultWallet(@NonNull UUID id) {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
         CryptoWallet wallet = cryptoWalletRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(CryptoWallet.class, id));
+
         UserProfile userProfile = wallet.getUserProfile();
         if (!userProfile.getKeycloakUserId().equals(keycloakUserId)) {
             log.error("Failed Updating: Wallet = {} belongs to other user", wallet.getId());
             throw new BadRequestException(CryptoWallet.class, wallet.getId(), "update", " belongs to other user");
         }
-        if (ObjectUtils.isEmpty(requestDto.getBlockchain())) {
-            // TODO now only SOLANA
-            requestDto.setBlockchain(Blockchain.SOLANA);
-        }
 
-        if (requestDto.isDefaultWallet()) {
-            // if wallet is default, old wallets need to be marked as default = false
-            List<CryptoWallet> existedWallets = cryptoWalletRepository.findAllByUserProfileIdOrderByUpdatedAt(userProfile.getId());
-            List<UUID> ids = existedWallets.stream().map(CryptoWallet::getId).collect(Collectors.toList());
-            cryptoWalletRepository.setCryptoWalletsDefaultByIds(false, ids);
-        }
+        List<CryptoWallet> existedWallets = cryptoWalletRepository.findAllByUserProfileIdOrderByCreatedAt(userProfile.getId());
+        List<UUID> ids = existedWallets.stream().map(CryptoWallet::getId).collect(Collectors.toList());
+        cryptoWalletRepository.setCryptoWalletsDefaultByIds(false, ids);
 
-        // checking wallet
-        checkCryptoWalletBeforeAdd(requestDto, Boolean.FALSE, id);
-
-        wallet = mapper.toEntity(requestDto, wallet);
+        wallet.setDefaultWallet(Boolean.TRUE);
         wallet = cryptoWalletRepository.save(wallet);
         return mapper.toDto(wallet);
     }

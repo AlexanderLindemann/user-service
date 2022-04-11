@@ -53,18 +53,16 @@ public class CryptoWalletController {
     @ResponseStatus(HttpStatus.CREATED)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_USER, RoleConstants.ROLE_TECH_TOKEN})
     public CryptoWalletResponseDto createCryptoWallet(@Parameter(name = "CryptoWalletRequestDto", description = "Crypto Wallet Request Dto")
-                                                           @Valid @RequestBody CryptoWalletRequestDto cryptoWalletRequestDto) {
+                                                      @Valid @RequestBody CryptoWalletRequestDto cryptoWalletRequestDto) {
         return cryptoWalletService.createWallet(cryptoWalletRequestDto);
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Update Crypto Wallet")
+    @PutMapping("/makeDefault/{id}")
+    @Operation(summary = "Make Crypto Wallet as Default")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_USER, RoleConstants.ROLE_TECH_TOKEN})
-    public CryptoWalletResponseDto updateCryptoWallet(@Parameter(name = "id", description = "Crypto Wallet Id") @PathVariable("id") UUID walletId,
-                                                      @Parameter(name = "CryptoWalletRequestDto", description = "Crypto Wallet Request Dto")
-                                                      @Valid @RequestBody CryptoWalletRequestDto cryptoWalletRequestDto) {
-        return cryptoWalletService.updateCryptoWallet(walletId, cryptoWalletRequestDto);
+    public CryptoWalletResponseDto makeDefaultWallet(@Parameter(name = "id", description = "Crypto Wallet Id") @PathVariable("id") UUID walletId) {
+        return cryptoWalletService.makeDefaultWallet(walletId);
     }
 
     @DeleteMapping("/{id}")
