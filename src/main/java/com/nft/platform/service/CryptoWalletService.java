@@ -108,7 +108,7 @@ public class CryptoWalletService {
         }
 
         List<CryptoWallet> existedWallets = cryptoWalletRepository.findAllByUserProfileIdOrderByCreatedAt(userProfile.getId());
-        List<UUID> ids = existedWallets.stream().map(CryptoWallet::getId).collect(Collectors.toList());
+        List<UUID> ids = existedWallets.stream().map(CryptoWallet::getId).filter(wid -> !wid.equals(id)).collect(Collectors.toList());
         cryptoWalletRepository.setCryptoWalletsDefaultByIds(false, ids);
 
         wallet.setDefaultWallet(Boolean.TRUE);
