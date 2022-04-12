@@ -15,6 +15,8 @@ public interface PoeService {
 
     Page<PoeResponseDto> getPoesPage(PoeFilterDto filter, Pageable pageable);
 
+    List<PoeResponseDto> getPoesList(PoeFilterDto filter);
+
     PoeResponseDto createPoe(PoeRequestDto requestDto);
 
     List<PoeResponseDto> createPoes(List<PoeRequestDto> requestDtos);

@@ -46,6 +46,11 @@ public interface PoeControllerV1Api {
                                      @ParameterObject Pageable pageable
     );
 
+    @GetMapping("/list")
+    @Operation(summary = "Get Page of Poe by Page number and Page size")
+    @ResponseStatus(HttpStatus.OK)
+    List<PoeResponseDto> getPoesList(@ParameterObject PoeFilterDto filter);
+
     @PostMapping
     @Operation(summary = "Create Poe")
     @ResponseStatus(HttpStatus.CREATED)

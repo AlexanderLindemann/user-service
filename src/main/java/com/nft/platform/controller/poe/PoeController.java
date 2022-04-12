@@ -40,6 +40,12 @@ public class PoeController implements PoeControllerV1Api {
     }
 
     @Override
+    @Secured({ROLE_TECH_TOKEN, ROLE_ADMIN_PLATFORM, ROLE_ADMIN_CELEBRITY})
+    public List<PoeResponseDto> getPoesList(PoeFilterDto filter) {
+        return poeService.getPoesList(filter);
+    }
+
+    @Override
     @Secured({ROLE_ADMIN_PLATFORM})
     public PoeResponseDto createPoes(@Valid PoeRequestDto poeRequestDto) {
         return poeService.createPoe(poeRequestDto);

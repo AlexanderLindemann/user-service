@@ -3,6 +3,7 @@ package com.nft.platform.repository.spec;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.domain.poe.Poe_;
 import com.nft.platform.dto.poe.request.PoeFilterDto;
+import com.nft.platform.enums.PoeAction;
 import com.nft.platform.enums.PoeGroup;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
@@ -16,7 +17,8 @@ import static org.springframework.data.jpa.domain.Specification.where;
 public class PoeSpecifications {
 
     public static Specification<Poe> from(PoeFilterDto filterDto) {
-        return where(groupIn(filterDto.getGroups()));
+        return where(groupIn(filterDto.getGroups()))
+                .and(codeIn(filterDto.getPoeActions()));
     }
 
     public static Specification<Poe> groupIn(Set<PoeGroup> groups) {
@@ -24,5 +26,12 @@ public class PoeSpecifications {
             return null;
         }
         return (root, query, criteriaBuilder) -> root.get(Poe_.group).in(groups);
+    }
+
+    public static Specification<Poe> codeIn(Set<PoeAction> actions) {
+        if (CollectionUtils.isEmpty(actions)) {
+            return null;
+        }
+        return (root, query, criteriaBuilder) -> root.get(Poe_.code).in(actions);
     }
 }

@@ -48,6 +48,15 @@ public class PoeServiceImpl implements PoeService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<PoeResponseDto> getPoesList(PoeFilterDto filter) {
+        Specification<Poe> spec = PoeSpecifications.from(filter);
+        val poes = poeRepository.findAll(spec);
+        return poes.stream().map(poeResponseDtoIMapper::convert)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
     public PoeResponseDto createPoe(PoeRequestDto requestDto) {
         var poe = poeRequestDtoIMapper.reverse(requestDto);
