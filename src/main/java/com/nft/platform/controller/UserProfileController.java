@@ -1,5 +1,6 @@
 package com.nft.platform.controller;
 
+import com.nft.platform.dto.request.EditUserProfileRequestDto;
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
@@ -25,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -133,6 +135,15 @@ public class UserProfileController {
         return userProfileService.updateUserProfile(userId, userProfileRequestDto);
     }
 
+    @PatchMapping
+    @Operation(summary = "Patch Fields in User Profile")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_MARKETPLACE_USER})
+    public UserProfileResponseDto patchUserProfile(@Parameter(name = "userProfileRequestDto", description = "User Profile Request Dto")
+                                                   @Valid @RequestBody EditUserProfileRequestDto editUserProfileRequestDto) {
+        return userProfileService.patchUserProfile(editUserProfileRequestDto);
+    }
+
     @PostMapping
     @Operation(summary = "Create/Update User Profile")
     @ResponseStatus(HttpStatus.CREATED)
@@ -157,13 +168,39 @@ public class UserProfileController {
         return userProfileService.isConnectedWithCelebrity(requestDto);
     }
 
-    @PostMapping(value = "/upload-user-image/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload-user-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload Profile Image")
     @ResponseStatus(HttpStatus.CREATED)
     @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_MARKETPLACE_USER,
             RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_CONTENT_MODERATOR, RoleConstants.ROLE_ADMIN_PLATFORM,
             RoleConstants.ROLE_TECH_TOKEN})
-    public String uploadUserProfileImage(@PathVariable("id") UUID userId, @RequestPart(name = "file") MultipartFile file) {
-        return userProfileService.uploadUserProfileImage(userId, file);
+    public String uploadUserProfileImage(@RequestPart(name = "file") MultipartFile file) {
+        return userProfileService.uploadUserProfileImageForCurrent(file);
     }
+
+    @PutMapping("/remove-user-image")
+    @Operation(summary = "Remove User Profile Image")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_MARKETPLACE_USER,
+            RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_CONTENT_MODERATOR, RoleConstants.ROLE_ADMIN_PLATFORM})
+    public void removeUserProfileImage() {
+        userProfileService.removeUserProfileImage();
+    }
+
+    @PostMapping(value = "/upload-user-banner", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload Profile Banner")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_MARKETPLACE_USER})
+    public String uploadUserProfileBanner(@RequestPart(name = "file") MultipartFile file) {
+        return userProfileService.uploadUserProfileBannerForCurrent(file);
+    }
+
+    @PutMapping("/remove-user-banner")
+    @Operation(summary = "Remove User Profile Banner")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_MARKETPLACE_USER})
+    public void removeUserProfileBanner() {
+        userProfileService.removeUserProfileBanner();
+    }
+
 }

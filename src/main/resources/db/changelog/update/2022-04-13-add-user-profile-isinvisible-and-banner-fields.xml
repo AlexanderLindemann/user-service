@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="esenkovskaya" id="2022-04-13-add-user-profile-isinvisible-and-banner-fields">
+        <addColumn tableName="user_profile">
+            <column name="is_invisible_email" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_invisible_phone" type="boolean" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_promo_banner_url" type="varchar(1024)"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

@@ -43,6 +43,9 @@ public class UserProfile extends BaseEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "is_invisible_email")
+    private boolean invisibleEmail;
+
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -51,6 +54,9 @@ public class UserProfile extends BaseEntity {
 
     @Column(name = "is_verified_phone")
     private boolean verifiedPhone;
+
+    @Column(name = "is_invisible_phone")
+    private boolean invisiblePhone;
 
     @Column(name = "is_invisible_name")
     private boolean invisibleName;
@@ -81,6 +87,9 @@ public class UserProfile extends BaseEntity {
 
     @Column(name = "nickname")
     private String nickname;
+
+    @Column(name = "image_promo_banner_url")
+    private String imagePromoBannerUrl;
 
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ProfileWallet> profileWallets;
