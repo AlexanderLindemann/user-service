@@ -19,6 +19,7 @@ import java.util.UUID;
 import static com.nft.platform.util.security.RoleConstants.ROLE_ADMIN_CELEBRITY;
 import static com.nft.platform.util.security.RoleConstants.ROLE_ADMIN_PLATFORM;
 import static com.nft.platform.util.security.RoleConstants.ROLE_TECH_TOKEN;
+import static com.nft.platform.util.security.RoleConstants.ROLE_USER;
 import static java.util.Optional.ofNullable;
 
 @RestController
@@ -40,7 +41,7 @@ public class PoeController implements PoeControllerV1Api {
     }
 
     @Override
-    @Secured({ROLE_TECH_TOKEN, ROLE_ADMIN_PLATFORM, ROLE_ADMIN_CELEBRITY})
+    @Secured({ROLE_USER, ROLE_TECH_TOKEN, ROLE_ADMIN_PLATFORM, ROLE_ADMIN_CELEBRITY})
     public List<PoeResponseDto> getPoesList(PoeFilterDto filter) {
         return poeService.getPoesList(filter);
     }
