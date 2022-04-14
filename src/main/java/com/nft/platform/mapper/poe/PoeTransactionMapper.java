@@ -1,6 +1,6 @@
 package com.nft.platform.mapper.poe;
 
-import com.nft.platform.common.event.ChallengeCompletedEvent;
+import com.nft.platform.challengeservice.api.event.KafkaChallengeCompletedEvent;
 import com.nft.platform.common.event.LikeAddedEvent;
 import com.nft.platform.common.event.VoteCreatedEvent;
 import com.nft.platform.domain.poe.PoeTransaction;
@@ -23,5 +23,5 @@ public interface PoeTransactionMapper {
 
     PoeTransactionRequestDto toRequestDto(LikeAddedEvent likeAddedEvent);
 
-    PoeTransactionRequestDto toRequestDto(ChallengeCompletedEvent challengeCompletedEvent);
+    PoeTransactionRequestDto toRequestDto(KafkaChallengeCompletedEvent challengeCompletedEvent);
 }
