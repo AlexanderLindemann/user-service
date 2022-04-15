@@ -23,6 +23,8 @@ public class ChallengeRewardService {
                 .mapToInt(AbstractRewardDto::getQuantity)
                 .sum();
         log.info("Got coinsAward={}", coinsAward);
-        profileWalletRepository.updateProfileWalletBalance(event.getUserId(), event.getCelebrityId(), coinsAward);
+        if (coinsAward != 0) {
+            profileWalletRepository.updateProfileWalletBalance(event.getUserId(), event.getCelebrityId(), coinsAward);
+        }
     }
 }
