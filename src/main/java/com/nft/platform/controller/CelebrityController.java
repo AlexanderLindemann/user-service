@@ -1,6 +1,7 @@
 package com.nft.platform.controller;
 
 import com.nft.platform.dto.request.CelebrityRequestDto;
+import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.service.CelebrityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,16 +14,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -74,5 +69,12 @@ public class CelebrityController {
             @Valid @RequestBody CelebrityRequestDto celebrityRequestDto
     ) {
         return celebrityService.createCelebrity(celebrityRequestDto);
+    }
+
+    @GetMapping(path = "/showcase")
+    @Operation(summary = "Get Celebrity and his last created Nft")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CelebrityShowcaseResponseDto> getShowcase(@RequestParam Integer size) {
+        return celebrityService.getShowcase(size);
     }
 }

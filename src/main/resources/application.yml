@@ -78,6 +78,8 @@ feign:
     url: ${nft.stand.base-url}/solana-adapter
   nft-file-service:
     url: ${nft.stand.base-url}/file-service
+  nft-service-api:
+    url: ${nft.stand.base-url}/nft-service
 
 nft:
   logging:

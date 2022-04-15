@@ -3,6 +3,7 @@ package com.nft.platform.mapper;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.CelebrityCategory;
 import com.nft.platform.dto.request.CelebrityRequestDto;
+import com.nft.platform.dto.response.CelebrityNftResponseDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.repository.CelebrityCategoryRepository;
@@ -28,4 +29,6 @@ public abstract class CelebrityMapper {
     public abstract Celebrity toEntity(CelebrityRequestDto requestDto, @MappingTarget Celebrity celebrity);
 
     public abstract CelebrityResponseDto toDto(Celebrity celebrity);
+
+    public abstract CelebrityNftResponseDto toNftDto(Celebrity celebrity, Integer nftCount);
 }
