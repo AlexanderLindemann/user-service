@@ -1,9 +1,9 @@
 package com.nft.platform.repository.spec;
 
+import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.domain.poe.Poe_;
 import com.nft.platform.dto.poe.request.PoeFilterDto;
-import com.nft.platform.enums.PoeAction;
 import com.nft.platform.enums.PoeGroup;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,5 +33,9 @@ public class PoeSpecifications {
             return null;
         }
         return (root, query, criteriaBuilder) -> root.get(Poe_.code).in(actions);
+    }
+
+    public static Specification<Poe> codeEqual(PoeAction poeAction) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get(Poe_.code), poeAction);
     }
 }

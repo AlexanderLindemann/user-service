@@ -1,5 +1,7 @@
 package com.nft.platform.controller.poe;
 
+import com.nft.platform.common.dto.PoeForUserDto;
+import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.controller.poe.contract.PoeControllerV1Api;
 import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.nft.platform.util.security.RoleConstants.ROLE_ADMIN_CELEBRITY;
@@ -44,6 +47,18 @@ public class PoeController implements PoeControllerV1Api {
     @Secured({ROLE_USER, ROLE_TECH_TOKEN, ROLE_ADMIN_PLATFORM, ROLE_ADMIN_CELEBRITY})
     public List<PoeResponseDto> getPoesList(PoeFilterDto filter) {
         return poeService.getPoesList(filter);
+    }
+
+    @Override
+    @Secured({ROLE_TECH_TOKEN})
+    public List<PoeForUserDto> getPoesListForUser(PoeFilterDto filter, UUID userId, UUID celebrityId) {
+        return poeService.getPoesListForUser(filter, userId, celebrityId);
+    }
+
+    @Override
+    @Secured({ROLE_TECH_TOKEN})
+    public Optional<PoeForUserDto> getPoeForUser(PoeAction poeAction, UUID userId, UUID celebrityId) {
+        return poeService.getPoeForUser(poeAction, userId, celebrityId);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.nft.platform.service;
 
 import com.nft.platform.common.enums.EventType;
+import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.Period;
 import com.nft.platform.domain.ProfileWallet;
@@ -8,7 +9,6 @@ import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
 import com.nft.platform.dto.request.SubscriptionRequestDto;
-import com.nft.platform.enums.PoeAction;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;

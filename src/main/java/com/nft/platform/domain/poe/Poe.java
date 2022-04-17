@@ -1,7 +1,7 @@
 package com.nft.platform.domain.poe;
 
+import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.domain.BaseEntity;
-import com.nft.platform.enums.PoeAction;
 import com.nft.platform.enums.PoeGroup;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +17,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.UUID;

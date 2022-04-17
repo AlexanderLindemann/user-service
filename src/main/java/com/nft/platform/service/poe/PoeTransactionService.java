@@ -1,6 +1,7 @@
 package com.nft.platform.service.poe;
 
 import com.nft.platform.common.enums.EventType;
+import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.domain.Period;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
@@ -11,7 +12,6 @@ import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
-import com.nft.platform.enums.PoeAction;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
