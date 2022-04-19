@@ -99,7 +99,7 @@ nft:
   period:
     cronExpression: "0 0 */8 * * *"
   celebrity:
-    default-uuid: "b5ecb411-a2a8-4a72-b9ab-3a64d8c70120"
+    default-uuid: "d212e77f-3057-4db5-80f2-14d52d4dae35"
 
 management:
   endpoints:
