@@ -87,6 +87,9 @@ public class PoeTransactionService {
             case CHALLENGE_COMPLETED:
                 poeAction = PoeAction.CHALLENGE;
                 break;
+            case QUIZ_COMPLETED:
+                poeAction = PoeAction.QUIZ;
+                break;
             default:
                 poeAction = null;
         }
