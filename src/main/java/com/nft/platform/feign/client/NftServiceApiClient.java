@@ -15,6 +15,6 @@ import java.util.UUID;
 public interface NftServiceApiClient {
     String NAME = "nft-service-api";
 
-    @GetMapping(path = "/api/v1/nfts/getShowcase")
+    @GetMapping(path = "/api/v1/nfts/showcase")
     List<ShowcaseResponseDto> getShowcase(@RequestParam("celebrityIds") List<UUID> celebrityIds);
 }

@@ -10,7 +10,6 @@ import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.feign.client.NftServiceApiClient;
 import com.nft.platform.mapper.CelebrityMapper;
 import com.nft.platform.repository.CelebrityRepository;
-import feign.FeignException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import static java.util.Collections.emptyList;
 
 @Service
 @Slf4j
@@ -84,7 +82,7 @@ public class CelebrityService {
     public List<CelebrityShowcaseResponseDto> getShowcase(Integer size) {
         List<Celebrity> celebrities = celebrityRepository.findAll(PageRequest.of(0, size)).getContent();
 
-        List<ShowcaseResponseDto> showcases = getShowcase(celebrities.stream()
+        List<ShowcaseResponseDto> showcases = nftServiceApiClient.getShowcase(celebrities.stream()
                 .map(Celebrity::getId)
                 .collect(Collectors.toList()));
 
@@ -92,13 +90,5 @@ public class CelebrityService {
                 .mapToObj(i -> new CelebrityShowcaseResponseDto(
                         mapper.toNftDto(celebrities.get(i), showcases.get(i).getNftCount()), showcases.get(i).getNft()))
                 .collect(Collectors.toList());
-    }
-
-    private List<ShowcaseResponseDto> getShowcase(List<UUID> celebrityIds) {
-        try {
-            return nftServiceApiClient.getShowcase(celebrityIds);
-        } catch (FeignException.FeignClientException.NotFound e) {
-            return emptyList();
-        }
     }
 }
