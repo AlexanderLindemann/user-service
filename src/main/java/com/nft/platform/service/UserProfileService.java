@@ -46,8 +46,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -339,5 +341,14 @@ public class UserProfileService {
         removeProfileImage(oldUrl, Boolean.TRUE);
         profile.setImagePromoBannerUrl(null);
         userProfileRepository.save(profile);
+    }
+
+    @Transactional
+    public List<UserProfileResponseDto> getUsersInfo(List<UUID> userIds) {
+        List<UserProfile> userProfiles = userProfileRepository.findAllByIds(userIds);
+
+        return userProfiles.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 }

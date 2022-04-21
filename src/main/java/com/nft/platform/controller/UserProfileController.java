@@ -12,6 +12,7 @@ import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.service.UserProfileService;
 import com.nft.platform.util.security.RoleConstants;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,8 +40,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+
+import static java.util.Optional.ofNullable;
 
 @Tag(name = "User Profile Api")
 @RestController
@@ -203,4 +208,11 @@ public class UserProfileController {
         userProfileService.removeUserProfileBanner();
     }
 
+    @GetMapping("/info")
+    @ResponseStatus(HttpStatus.OK)
+    @Hidden
+    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_MARKETPLACE_USER})
+    public ResponseEntity<List<UserProfileResponseDto>> getUsersInfo(@RequestParam(name = "userIds") List<UUID> userIds) {
+        return ResponseEntity.of(ofNullable(userProfileService.getUsersInfo(userIds)));
+    }
 }

@@ -34,4 +34,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
 
     @Query("select distinct up from UserProfile up left join fetch up.profileWallets pw left join fetch pw.celebrity where up.keycloakUserId = :keycloakUserId")
     Optional<UserProfile> findByKeycloakUserIdWithCelebrities(UUID keycloakUserId);
+
+    @Query("select up from UserProfile up where up.id in :userIds")
+    List<UserProfile> findAllByIds(List<UUID> userIds);
 }
