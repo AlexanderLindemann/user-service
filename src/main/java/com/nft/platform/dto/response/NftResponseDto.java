@@ -25,5 +25,6 @@ public class NftResponseDto {
     private String sellType;
     private boolean onSale;
     private boolean hasMyBid;
-    private CelebrityNftResponseDto celebrity;
+    private UUID celebrityId;
+    private String celebrityName;
 }

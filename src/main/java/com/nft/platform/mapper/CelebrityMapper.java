@@ -41,7 +41,8 @@ public abstract class CelebrityMapper {
         );
 
         var nft = showcase.getNft();
-        nft.setCelebrity(celebrity);
+        nft.setCelebrityId(celebrity.getId());
+        nft.setCelebrityName(celebrity.getName());
 
         return new CelebrityShowcaseResponseDto(celebrity, nft);
     }
