@@ -2,6 +2,7 @@ package com.nft.platform.service;
 
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.dto.request.CelebrityRequestDto;
+import com.nft.platform.dto.response.CelebrityNftResponseDto;
 import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.ShowcaseResponseDto;
@@ -23,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @Slf4j
@@ -86,9 +86,9 @@ public class CelebrityService {
                 .map(Celebrity::getId)
                 .collect(Collectors.toList()));
 
-        return IntStream.range(0, celebrities.size())
-                .mapToObj(i -> new CelebrityShowcaseResponseDto(
-                        mapper.toNftDto(celebrities.get(i), showcases.get(i).getNftCount()), showcases.get(i).getNft()))
+        return showcases.stream()
+                .map(showcase -> mapper.toShowcaseDto(celebrities, showcase))
+                .filter(showcase -> showcase.getNft() != null && showcase.getCelebrity() != null)
                 .collect(Collectors.toList());
     }
 }
