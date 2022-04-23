@@ -6,24 +6,32 @@ import com.nft.platform.domain.Period;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.domain.poe.PoeTransaction;
+import com.nft.platform.domain.poe.PoeTransaction_;
 import com.nft.platform.dto.poe.request.LeaderboardRequestDto;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
+import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.mapper.poe.PoeTransactionMapper;
+import com.nft.platform.mapper.poe.PoeTransactionToUserHistoryMapper;
 import com.nft.platform.repository.PeriodRepository;
 import com.nft.platform.repository.UserProfileRepository;
 import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.repository.poe.PoeTransactionRepository;
 import com.nft.platform.repository.poe.UserBalance;
+import com.nft.platform.repository.spec.PoeTransactionSpecifications;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -46,7 +54,17 @@ public class PoeTransactionService {
     private final PoeRepository poeRepository;
     private final PoeTransactionMapper poeTransactionMapper;
     private final UserProfileMapper userProfileMapper;
+    private final PoeTransactionToUserHistoryMapper poeTransactionToUserHistoryMapper;
     private final SecurityUtil securityUtil;
+
+    @Transactional(readOnly = true)
+    public List<PoeTransactionUserHistoryDto> findLastPoeHistory(UUID celebrityId) {
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(PoeTransaction_.CREATED_AT).descending());
+        Specification<PoeTransaction> spec = PoeTransactionSpecifications.forPoeUserHistory(celebrityId);
+        return poeTransactionRepository.findAll(spec, pageable).stream()
+                .map(poeTransactionToUserHistoryMapper::convert)
+                .collect(Collectors.toList());
+    }
 
     @Transactional
     public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto requestDto) {
@@ -59,7 +77,7 @@ public class PoeTransactionService {
                 .orElseThrow(() -> new ItemNotFoundException(Poe.class, "code=" + poeAction.getActionCode()));
         PoeTransaction poeTransaction = poeTransactionMapper.toEntity(requestDto, new PoeTransaction());
         poeTransaction.setPeriodId(periodRepository.findFirst1ByOrderByStartTimeDesc().get().getId());
-        poeTransaction.setPoeId(poe.getId());
+        poeTransaction.setPoe(poe);
         if (poe.getCoinsReward() != null) {
             poeTransaction.setCoinsReward(poe.getCoinsReward() * requestDto.getAmount());
         }
@@ -119,6 +137,7 @@ public class PoeTransactionService {
         UUID userId = securityUtil.getCurrentUserId();
         List<UserBalance> userBalances = poeTransactionRepository
                 .calculateTopUsersActivityBalance(period.getId(), userId, requestDto.getFrom(), requestDto.getTo());
+        long amountUsers = poeTransactionRepository.countDistinctUserIdByPeriodId(period.getId());
 
         Map<UUID, UserProfile> userProfileByKeycloakUserId;
         if (!userBalances.isEmpty()) {
@@ -148,10 +167,10 @@ public class PoeTransactionService {
         } else {
             currentUser = null;
         }
-
         return LeaderboardResponseDto.builder()
                 .currentUser(currentUser)
                 .leaderboard(leaderboard)
+                .amountUsers(amountUsers)
                 .build();
     }
 

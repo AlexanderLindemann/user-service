@@ -6,18 +6,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Leaderboard Response DTO")
-public class LeaderboardResponseDto {
+@Schema(description = "Poe History DTO")
+public class PoeTransactionUserHistoryDto {
 
-    private List<UserActivityBalancePositionResponseDto> leaderboard;
-
-    private UserActivityBalancePositionResponseDto currentUser;
-
-    private long amountUsers;
+    private String poeName;
+    private int points;
+    private LocalDateTime createdAt;
 }

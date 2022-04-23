@@ -9,8 +9,11 @@ import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.UUID;
 
@@ -37,8 +40,9 @@ public class PoeTransaction extends BaseEntity {
     @Column(name = "period_id", nullable = false)
     private UUID periodId;
 
-    @Column(name = "poe_id", nullable = false)
-    private UUID poeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "poe_id", nullable = false)
+    private Poe poe;
 
     @Column(name = "points_reward")
     private Integer pointsReward;
