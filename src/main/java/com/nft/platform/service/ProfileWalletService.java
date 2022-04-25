@@ -7,8 +7,9 @@ import com.nft.platform.domain.Period;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
-import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
+import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.request.SubscriptionRequestDto;
+import com.nft.platform.event.FirstAppOpenOnPeriodEvent;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
@@ -42,19 +43,19 @@ public class ProfileWalletService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
-    public boolean updateProfileWalletOnPeriodIfNeeded(ProfileWalletPeriodUpdateDto requestDto) {
+    public boolean updateProfileWalletOnPeriodIfNeeded(UUID celebrityId) {
         UUID keycloakUserId = securityUtil.getCurrentUserId();
-        String lockKey = RLockKeys.createVoteUpdateKey(keycloakUserId, requestDto.getCelebrityId());
+        String lockKey = RLockKeys.createVoteUpdateKey(keycloakUserId, celebrityId);
         RLock rLock = syncService.getNamedLock(lockKey);
         return syncService.doSynchronized(rLock).run(() -> {
-            Optional<Period> currentPeriodO = periodRepository.findFirst1ByOrderByStartTimeDesc();
+            Optional<Period> currentPeriodO = periodRepository.findByStatus(PeriodStatus.ACTIVE);
             if (currentPeriodO.isEmpty()) {
                 throw new RestException("Period does not exists", HttpStatus.INTERNAL_SERVER_ERROR);
             }
             Period currentPeriod = currentPeriodO.get();
-            ProfileWallet profileWallet = getProfileWallet(keycloakUserId, requestDto.getCelebrityId());
+            ProfileWallet profileWallet = getProfileWallet(keycloakUserId, celebrityId);
             if (profileWallet.getPeriod() != null && currentPeriod.getId().equals(profileWallet.getPeriod().getId())) {
-                log.info("ProfileWallet updated for period = {}", currentPeriod);
+                log.info("ProfileWallet already updated for period = {}", currentPeriod);
                 return false;
             }
             Integer freeAmountVoteOnPeriod = poeRepository.findByCode(PoeAction.VOTE)
@@ -63,6 +64,7 @@ public class ProfileWalletService {
             profileWallet.setVoteBalance(profileWallet.getVoteBalance() + freeAmountVoteOnPeriod);
             profileWallet.setPeriod(currentPeriod);
             profileWalletRepository.save(profileWallet);
+            publishFirstAppOpenOnPeriod(celebrityId, keycloakUserId);
             return true;
         });
     }
@@ -93,6 +95,15 @@ public class ProfileWalletService {
         profileWallet.setCelebrity(celebrity);
         profileWalletRepository.save(profileWallet);
         publishProfileWalletCreatedEvent(profileWallet);
+    }
+
+    private void publishFirstAppOpenOnPeriod(UUID celebrityId, UUID keycloakUserId) {
+        FirstAppOpenOnPeriodEvent event = FirstAppOpenOnPeriodEvent.builder()
+                .celebrityId(celebrityId)
+                .userId(keycloakUserId)
+                .eventType(EventType.FIRST_TIME_PERIOD_APP_OPEN)
+                .build();
+        applicationEventPublisher.publishEvent(event);
     }
 
     private void publishProfileWalletCreatedEvent(ProfileWallet profileWallet) {

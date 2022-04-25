@@ -1,13 +1,16 @@
 package com.nft.platform.controller;
 
-import com.nft.platform.dto.request.ProfileWalletPeriodUpdateDto;
+import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.request.SubscriptionRequestDto;
+import com.nft.platform.dto.response.PeriodResponseDto;
+import com.nft.platform.service.PeriodService;
 import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -26,6 +29,7 @@ import java.util.UUID;
 public class ProfileWalletController {
 
     private final ProfileWalletService profileWalletService;
+    private final PeriodService periodService;
 
     @GetMapping("/is-subscriber")
     @Operation(summary = "Is User subscriber")
@@ -47,9 +51,9 @@ public class ProfileWalletController {
     @PutMapping
     @Operation(summary = "Update Profile Wallet On Period If Needed")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM})
-    public boolean updateProfileWalletOnPeriodIfNeeded(@RequestBody ProfileWalletPeriodUpdateDto requestDto) {
-        return profileWalletService.updateProfileWalletOnPeriodIfNeeded(requestDto);
+    @Secured({RoleConstants.ROLE_USER})
+    public ResponseEntity<PeriodResponseDto> updateProfileWalletOnPeriodIfNeeded(@RequestBody UUID celebrityId) {
+        profileWalletService.updateProfileWalletOnPeriodIfNeeded(celebrityId);
+        return ResponseEntity.of(periodService.findPeriod(PeriodStatus.NEXT));
     }
-
 }

@@ -1,7 +1,9 @@
 package com.nft.platform.controller;
 
+import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.response.PeriodResponseDto;
 import com.nft.platform.service.PeriodService;
+import com.nft.platform.service.ProfileWalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +23,21 @@ import java.util.Optional;
 public class PeriodController {
 
     private final PeriodService periodService;
+    private final ProfileWalletService profileWalletService;
 
     @GetMapping("/current")
     @Operation(summary = "Get Current Period")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<PeriodResponseDto> getCurrentPeriod() {
-        Optional<PeriodResponseDto> periodResponseDtoO = periodService.findCurrentPeriod();
+        Optional<PeriodResponseDto> periodResponseDtoO = periodService.findPeriod(PeriodStatus.ACTIVE);
+        return ResponseEntity.of(periodResponseDtoO);
+    }
+
+    @GetMapping("/next")
+    @Operation(summary = "Get Next Period start time")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<PeriodResponseDto> getNextPeriod() {
+        Optional<PeriodResponseDto> periodResponseDtoO = periodService.findPeriod(PeriodStatus.NEXT);
         return ResponseEntity.of(periodResponseDtoO);
     }
 }

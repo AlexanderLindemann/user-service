@@ -1,6 +1,7 @@
 package com.nft.platform.service;
 
 import com.nft.platform.domain.Period;
+import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.response.PeriodResponseDto;
 import com.nft.platform.mapper.PeriodMapper;
 import com.nft.platform.properties.PeriodProperties;
@@ -13,6 +14,7 @@ import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -27,49 +29,65 @@ public class PeriodService {
     private final SyncService syncService;
 
     @Transactional(readOnly = true)
-    public Optional<PeriodResponseDto> findCurrentPeriod() {
-        log.info("Try to find current Period");
-        return periodRepository.findFirst1ByOrderByStartTimeDesc()
+    public Optional<PeriodResponseDto> findPeriod(PeriodStatus status) {
+        log.info("Try to find Period status={}", status);
+        return periodRepository.findByStatus(status)
                 .map(periodMapper::toDto);
     }
 
     @Transactional
     public void createNewPeriodIfNeeded() {
         CronExpression cronTrigger = CronExpression.parse(periodProperties.getCronExpression());
-        LocalDateTime periodStartTime = LocalDateTime.now();
-        LocalDateTime periodEndTime = cronTrigger.next(LocalDateTime.now());
-        createNewPeriodIfNeeded(periodStartTime, periodEndTime);
-    }
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nextCronStartTime = cronTrigger.next(LocalDateTime.now());
 
-    @Transactional
-    public void createNewPeriodIfNeeded(LocalDateTime startTime, LocalDateTime endTime) {
         log.info("Try create new period");
         String lockKey = "period-update";
         RLock rLock = syncService.getNamedLock(lockKey);
         syncService.doSynchronized(rLock).run(() -> {
-            Optional<Period> lastPeriodO = periodRepository.findFirst1ByOrderByStartTimeDesc();
-            if (lastPeriodO.isEmpty()) {
-                log.info("Last period is empty. Will create new");
-            }
-            if (lastPeriodO.isEmpty() || isPeriodExpired(startTime, lastPeriodO.get())) {
-                createAndSaveNewPeriod(startTime, endTime);
+            Optional<Period> activePeriodO = periodRepository.findByStatus(PeriodStatus.ACTIVE);
+            if (activePeriodO.isEmpty()) {
+                log.info("Active period is empty. Will create new active and next period");
+                createActivePeriod(now, nextCronStartTime);
+                createNextPeriod(nextCronStartTime);
             } else {
-                log.info("Last period is not expired");
+                Period activePeriod = activePeriodO.get();
+                if (isPeriodExpired(now, activePeriod)) {
+                    log.info("Active period is expired.");
+                    activePeriod.setStatus(PeriodStatus.COMPLETED);
+                    Period nextPeriod = periodRepository.findByStatus(PeriodStatus.NEXT)
+                            .orElseThrow(() -> new ResolutionException("Next period does not exist"));
+                    nextPeriod.setStatus(PeriodStatus.ACTIVE);
+                    nextPeriod.setEndTime(nextCronStartTime);
+                    createNextPeriod(nextCronStartTime);
+                } else {
+                    log.info("Active period is not expired. Do nothing.");
+                }
             }
         });
     }
 
-    private boolean isPeriodExpired(LocalDateTime now, Period period) {
-        return !now.isBefore(period.getEndTime());
-    }
-
-    private void createAndSaveNewPeriod(LocalDateTime startTime, LocalDateTime endTime) {
-        log.info("Will create new period startDate={}, endDate={}", startTime, endTime);
+    private void createActivePeriod(LocalDateTime startTime, LocalDateTime endTime) {
+        log.info("Will create ACTIVE period startDate={}, endDate={}", startTime, endTime);
         Period period = Period.builder()
                 .startTime(startTime)
                 .endTime(endTime)
+                .status(PeriodStatus.ACTIVE)
                 .build();
         periodRepository.save(period);
+    }
+
+    private void createNextPeriod(LocalDateTime startTime) {
+        log.info("Will create NEXT period startDate={}, endDate=null", startTime);
+        Period period = Period.builder()
+                .startTime(startTime)
+                .status(PeriodStatus.NEXT)
+                .build();
+        periodRepository.save(period);
+    }
+
+    private boolean isPeriodExpired(LocalDateTime now, Period period) {
+        return !now.isBefore(period.getEndTime());
     }
 
 }

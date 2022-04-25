@@ -22,6 +22,6 @@ public class PeriodResponseDto {
     @Schema(description = "Start Time", required = true)
     private LocalDateTime startTime;
 
-    @Schema(description = "End Time", required = true)
+    @Schema(description = "End Time")
     private LocalDateTime endTime;
 }
