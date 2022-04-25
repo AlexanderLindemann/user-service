@@ -28,4 +28,7 @@
     <include file="update/2022-04-06-add-subscriber-field-to-wallet.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-04-13-add-user-profile-isinvisible-and-banner-fields.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-04-25-add-period-status.xml" relativeToChangelogFile="true"/>
+    <include file="create/2022-04-25-create-vote-price-table.xml" relativeToChangelogFile="true"/>
+    <include file="sql/data/2022-04-25-insert-vote-price.sql" relativeToChangelogFile="true" context="!test"/>
+    <include file="update/2022-04-25-add-wheel-balance.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

@@ -41,6 +41,9 @@ public class ProfileWallet extends BaseEntity {
     @Column(name = "vote_balance", nullable = false)
     private int voteBalance;
 
+    @Column(name = "wheel_balance", nullable = false)
+    private int wheelBalance;
+
     @Column(name = "coin_balance", nullable = false)
     private long coinBalance;
 

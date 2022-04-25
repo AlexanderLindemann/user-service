@@ -3,11 +3,13 @@ package com.nft.platform.repository;
 import com.nft.platform.domain.ProfileWallet;
 import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.LockModeType;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,11 +24,28 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
             "and pW.celebrity.id = :celebrityId")
     Optional<ProfileWallet> findByKeycloakUserIdAndCelebrityId(@NonNull UUID keycloakUserId, @NonNull UUID celebrityId);
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query(value = "select pW " +
+            "from ProfileWallet pW " +
+            "where pW.userProfile.keycloakUserId = :keycloakUserId " +
+            "and pW.celebrity.id = :celebrityId "
+    )
+    Optional<ProfileWallet> findByKeycloakUserIdAndCelebrityIdForUpdate(@NonNull UUID keycloakUserId, @NonNull UUID celebrityId);
+
     @Query(value = "select voteBalance"
             + " from ProfileWallet pW"
             + " where pW.userProfile.keycloakUserId = :keycloakUserId"
             + " and pW.celebrity.id = :celebrityId")
     Optional<Integer> findVoteBalance(
+            @Param("keycloakUserId") UUID keycloakUserId,
+            @Param("celebrityId") UUID celebrityId
+    );
+
+    @Query(value = "select wheelBalance"
+            + " from ProfileWallet pW"
+            + " where pW.userProfile.keycloakUserId = :keycloakUserId"
+            + " and pW.celebrity.id = :celebrityId")
+    Optional<Integer> findWheelBalance(
             @Param("keycloakUserId") UUID keycloakUserId,
             @Param("celebrityId") UUID celebrityId
     );
