@@ -94,7 +94,7 @@ public class PoeTransactionService {
             pointsAward += CommonUtils.toPrimitive(poe.getPointsRewardSub());
         }
         poeTransaction.setPointsReward(pointsAward * requestDto.getAmount());
-        poeTransaction.setCoinsReward(poe.getCoinsReward() * requestDto.getAmount());
+        poeTransaction.setCoinsReward(coinsAward * requestDto.getAmount());
 
         if (coinsAward != 0) {
             profileWalletRepository.updateProfileWalletBalance(requestDto.getUserId(), requestDto.getCelebrityId(), coinsAward);
