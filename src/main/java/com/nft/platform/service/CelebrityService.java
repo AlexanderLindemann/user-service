@@ -2,9 +2,9 @@ package com.nft.platform.service;
 
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.dto.request.CelebrityRequestDto;
-import com.nft.platform.dto.response.CelebrityNftResponseDto;
-import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
+import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
+import com.nft.platform.dto.response.NftCountResponseDto;
 import com.nft.platform.dto.response.ShowcaseResponseDto;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
@@ -14,6 +14,7 @@ import com.nft.platform.repository.CelebrityRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,9 +22,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.IntStream.range;
 
 @Service
 @Slf4j
@@ -84,11 +89,37 @@ public class CelebrityService {
 
         List<ShowcaseResponseDto> showcases = nftServiceApiClient.getShowcase(celebrities.stream()
                 .map(Celebrity::getId)
-                .collect(Collectors.toList()));
+                .collect(toList()));
 
         return showcases.stream()
                 .map(showcase -> mapper.toShowcaseDto(celebrities, showcase))
                 .filter(showcase -> showcase.getNft() != null && showcase.getCelebrity() != null)
-                .collect(Collectors.toList());
+                .collect(toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<CelebrityResponseDto> getPopular(String searchName) {
+        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContains(searchName);
+
+        List<NftCountResponseDto> nftCountList = nftServiceApiClient.getNftCount(celebrities.stream()
+                .map(Celebrity::getId)
+                .collect(toList()));
+
+        return sortCelebritiesByNftCountList(celebrities, nftCountList).stream()
+                .map(mapper::toDto)
+                .collect(toList());
+    }
+
+    private List<Celebrity> sortCelebritiesByNftCountList(List<Celebrity> celebrities,
+                                                          List<NftCountResponseDto> nftCountList) {
+        final Map<UUID, Integer> celebrityIdToIndexMap = range(0, nftCountList.size()).boxed()
+                .collect(toMap(i -> nftCountList.get(i).getCelebrityId(), i -> i, (a, b) -> b));
+
+        celebrities.sort(comparing(celebrity -> {
+            val index = celebrityIdToIndexMap.get(celebrity.getId());
+            return index != null ? index : celebrities.size() - 1;
+        }));
+
+        return celebrities;
     }
 }

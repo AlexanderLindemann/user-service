@@ -1,5 +1,6 @@
 package com.nft.platform.feign.client;
 
+import com.nft.platform.dto.response.NftCountResponseDto;
 import com.nft.platform.dto.response.ShowcaseResponseDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,4 +18,7 @@ public interface NftServiceApiClient {
 
     @GetMapping(path = "/api/v1/nfts/showcase")
     List<ShowcaseResponseDto> getShowcase(@RequestParam("celebrityIds") List<UUID> celebrityIds);
+
+    @GetMapping(path = "/api/v1/nfts/nftCount")
+    List<NftCountResponseDto> getNftCount(@RequestParam("celebrityIds") List<UUID> celebrityIds);
 }

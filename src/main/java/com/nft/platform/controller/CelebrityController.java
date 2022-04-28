@@ -77,4 +77,11 @@ public class CelebrityController {
     public List<CelebrityShowcaseResponseDto> getShowcase(@RequestParam Integer size) {
         return celebrityService.getShowcase(size);
     }
+
+    @GetMapping(path = "/popular")
+    @Operation(summary = "Get popular celebrities")
+    @ResponseStatus(HttpStatus.OK)
+    public List<CelebrityResponseDto> getPopular(@RequestParam(defaultValue = "", required = false) String searchName) {
+        return celebrityService.getPopular(searchName);
+    }
 }
