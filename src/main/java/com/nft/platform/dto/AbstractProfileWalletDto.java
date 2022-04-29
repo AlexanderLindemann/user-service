@@ -29,4 +29,7 @@ public abstract class AbstractProfileWalletDto {
 
     @Schema(description = "Vote balance")
     private int voteBalance;
+
+    @Schema(description = "Wheel balance")
+    private int wheelBalance;
 }

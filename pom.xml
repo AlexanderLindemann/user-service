@@ -27,7 +27,7 @@
         <redis-starter.version>1.0-SNAPSHOT</redis-starter.version>
         <shedlock.version>4.33.0</shedlock.version>
         <common-lib.version>1.0-SNAPSHOT</common-lib.version>
-        <kafka-starter.version>1.0-SNAPSHOT</kafka-starter.version>
+        <kafka-starter.version>1.1-SNAPSHOT</kafka-starter.version>
         <challenge-service-api-contracts.version>1.0.0-SNAPSHOT</challenge-service-api-contracts.version>
         <platform-activity-service-api-contracts.version>1.0.0-SNAPSHOT</platform-activity-service-api-contracts.version>
     </properties>

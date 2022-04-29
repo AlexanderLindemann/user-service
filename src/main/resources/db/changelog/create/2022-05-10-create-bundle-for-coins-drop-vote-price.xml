@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="vmargiev" id="2022-05-10-create-bundle-for-coins-drop-vote-price">
+        <dropTable tableName="vote_price"/>
+
+        <createTable tableName="bundle_for_coins">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="poe_settings_pkey"/>
+            </column>
+
+            <column name="bundle_size" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="coins" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_url" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <addUniqueConstraint tableName="bundle_for_coins" columnNames="bundle_size, type"/>
+    </changeSet>
+
+</databaseChangeLog>

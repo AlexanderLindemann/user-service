@@ -1,11 +1,8 @@
 package com.nft.platform.event.consumer.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nft.platform.annotation.OnKafkaConsumerEnabled;
-import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.event.LikeAddedEvent;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
-import com.nft.platform.event.consumer.KafkaEventListener;
 import com.nft.platform.mapper.poe.PoeTransactionMapper;
 import com.nft.platform.service.poe.PoeTransactionService;
 import lombok.RequiredArgsConstructor;
@@ -17,26 +14,15 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @OnKafkaConsumerEnabled
-public class FeedKafkaEventListenerImpl implements KafkaEventListener {
+public class FeedKafkaEventListenerImpl {
 
-    private final ObjectMapper objectMapper;
     private final PoeTransactionService poeTransactionService;
     private final PoeTransactionMapper poeTransactionMapper;
 
-    @Override
     @KafkaListener(topics = "${spring.kafka.consumer.feed-service.topic}")
-    public void receive(String event) {
-        log.info("Feed event received: {}", event);
-        try {
-            LikeAddedEvent likeAddedEvent = objectMapper.readValue(event, LikeAddedEvent.class);
-            if (likeAddedEvent.getEventType() != null && likeAddedEvent.getEventType() == EventType.LIKE_ADDED) {
-                PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(likeAddedEvent);
-                poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
-            } else {
-                log.info("Skip event: {}", likeAddedEvent);
-            }
-        } catch (Exception e) {
-            log.error("ERROR: ", e);
-        }
+    public void receive(LikeAddedEvent event) {
+        log.info("Feed service event received: {}", event);
+        PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
+        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
     }
 }

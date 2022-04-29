@@ -1,7 +1,7 @@
 package com.nft.platform.controller;
 
+import com.nft.platform.common.dto.PeriodResponseDto;
 import com.nft.platform.dto.enums.PeriodStatus;
-import com.nft.platform.dto.response.PeriodResponseDto;
 import com.nft.platform.service.PeriodService;
 import com.nft.platform.service.ProfileWalletService;
 import io.swagger.v3.oas.annotations.Operation;

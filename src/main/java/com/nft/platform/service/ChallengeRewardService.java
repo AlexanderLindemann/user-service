@@ -1,7 +1,7 @@
 package com.nft.platform.service;
 
-import com.nft.platform.challengeservice.api.dto.AbstractRewardDto;
 import com.nft.platform.challengeservice.api.dto.enums.AwardType;
+import com.nft.platform.challengeservice.api.dto.response.RewardResponseDto;
 import com.nft.platform.challengeservice.api.event.KafkaChallengeCompletedEvent;
 import com.nft.platform.repository.ProfileWalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +19,21 @@ public class ChallengeRewardService {
     @Transactional
     public void handleRewards(KafkaChallengeCompletedEvent event) {
         log.info("Will handle challenge rewards");
-        int coinsAward = event.getRewards().stream().filter(r -> r.getAwardType() == AwardType.COINS)
-                .mapToInt(AbstractRewardDto::getQuantity)
-                .sum();
-        log.info("Got coinsAward={}", coinsAward);
-        if (coinsAward != 0) {
-            profileWalletRepository.updateProfileWalletCoinBalance(event.getUserId(), event.getCelebrityId(), coinsAward);
+        for (RewardResponseDto rewardResponseDto : event.getRewards()) {
+            if (rewardResponseDto.getAwardType() == AwardType.COINS) {
+                profileWalletRepository.updateProfileWalletCoinBalance(
+                        event.getUserId(),
+                        event.getCelebrityId(),
+                        rewardResponseDto.getQuantity()
+                );
+            }
+            if (rewardResponseDto.getAwardType() == AwardType.SUBSCRIBE) {
+                profileWalletRepository.updateProfileWalletSubscription(
+                        event.getUserId(),
+                        event.getCelebrityId(),
+                        true
+                );
+            }
         }
     }
 }

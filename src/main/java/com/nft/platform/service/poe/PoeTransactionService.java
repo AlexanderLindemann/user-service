@@ -107,30 +107,28 @@ public class PoeTransactionService {
 
     @Nullable
     private PoeAction mapEventToPoeAction(EventType eventType) {
-        PoeAction poeAction;
-        switch (eventType) {
-            case VOTE_CREATED:
-                poeAction = PoeAction.VOTE;
-                break;
-            case PROFILE_WALLET_CREATED:
-                poeAction = PoeAction.REGISTRATION;
-                break;
-            case LIKE_ADDED:
-                poeAction = PoeAction.LIKE;
-                break;
-            case CHALLENGE_COMPLETED:
-                poeAction = PoeAction.CHALLENGE;
-                break;
-            case QUIZ_COMPLETED:
-                poeAction = PoeAction.QUIZ;
-                break;
-            case FIRST_TIME_PERIOD_APP_OPEN:
-                poeAction = PoeAction.PERIOD_ENTRY;
-                break;
-            default:
-                poeAction = null;
+        if (eventType == EventType.VOTE_CREATED) {
+            return PoeAction.VOTE;
         }
-        return poeAction;
+        if (eventType == EventType.PROFILE_WALLET_CREATED) {
+            return PoeAction.REGISTRATION;
+        }
+        if (eventType == EventType.LIKE_ADDED) {
+            return PoeAction.LIKE;
+        }
+        if (eventType == EventType.CHALLENGE_COMPLETED) {
+            return PoeAction.CHALLENGE;
+        }
+        if (eventType == EventType.QUIZ_COMPLETED) {
+            return PoeAction.QUIZ;
+        }
+        if (eventType == EventType.FIRST_TIME_PERIOD_APP_OPEN) {
+            return PoeAction.PERIOD_ENTRY;
+        }
+        if (eventType == EventType.WHEEL_ROLLED) {
+            return PoeAction.WHEEL_ROLLED;
+        }
+        return null;
     }
 
     @Transactional(readOnly = true)

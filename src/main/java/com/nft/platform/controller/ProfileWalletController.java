@@ -1,9 +1,10 @@
 package com.nft.platform.controller;
 
+import com.nft.platform.common.dto.PeriodResponseDto;
 import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.request.*;
-import com.nft.platform.dto.response.PeriodResponseDto;
-import com.nft.platform.dto.response.VotePriceResponseDto;
+import com.nft.platform.dto.request.SubscriptionRequestDto;
+import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.service.PeriodService;
 import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.util.security.RoleConstants;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -59,22 +59,6 @@ public class ProfileWalletController {
     public ResponseEntity<PeriodResponseDto> updateProfileWalletOnPeriodIfNeeded() {
         profileWalletService.updateProfileWalletOnPeriodIfNeeded();
         return ResponseEntity.of(periodService.findPeriod(PeriodStatus.NEXT));
-    }
-
-    @PostMapping("/buy-votes")
-    @Operation(summary = "Buy votes for coins")
-    @ResponseStatus(HttpStatus.CREATED)
-    @Secured({RoleConstants.ROLE_USER})
-    public void buyVotesForCoins(@RequestBody ProfileWalletVotesDto requestDto) {
-        profileWalletService.buyVotesForCoins(requestDto);
-    }
-
-    @GetMapping("/vote-bundles")
-    @Operation(summary = "Get Vote Bundles")
-    @ResponseStatus(HttpStatus.OK)
-    @Secured({RoleConstants.ROLE_USER, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_ADMIN_CELEBRITY})
-    public List<VotePriceResponseDto> getVoteBundles() {
-        return profileWalletService.getVoteBundles();
     }
 
     @GetMapping("/wheel-balance")

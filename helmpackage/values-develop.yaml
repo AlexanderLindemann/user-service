@@ -29,12 +29,15 @@ env:
   SPRING_DATASOURCE_USERNAME: users
   SPRING_DATASOURCE_PASSWORD: users
   SPRING_KAFKA_BOOTSTRAP_SERVERS: b-2.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092,b-1.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092
+  SPRING_KAFKA_PRODUCER_ENABLED: true
+  SPRING_KAFKA_PRODUCER_TOPIC: user-service
   SPRING_KAFKA_CONSUMER_ENABLED: true
   SPRING_KAFKA_CONSUMER_GROUP_ID: user-service
   SPRING_KAFKA_CONSUMER_POLL_SERVICE_TOPIC: poll-service
   SPRING_KAFKA_CONSUMER_FEED_SERVICE_TOPIC: feed-service
   SPRING_KAFKA_CONSUMER_CHALLENGE_SERVICE_TOPIC: challenge-service
   SPRING_KAFKA_CONSUMER_QUIZ_SERVICE_TOPIC: quiz-service
+  SPRING_KAFKA_CONSUMER_PLATFORM_ACTIVITY_SERVICE_TOPIC: platform-activity-service
 
   REDIS_ENABLED: true
   REDIS_ADDRESS: nftdevredis.elesif.clustercfg.memorydb.eu-central-1.amazonaws.com:6379

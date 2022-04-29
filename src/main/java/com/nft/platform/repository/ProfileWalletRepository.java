@@ -62,6 +62,16 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
 
     @Modifying
     @Query(value = "UPDATE profile_wallet AS pw"
+            + " SET wheel_balance = wheel_balance + :amount"
+            + " FROM user_profile AS up"
+            + " WHERE up.keycloak_user_id = :keycloakUserId"
+            + " AND pw.celebrity_id = :celebrityId"
+            + " AND pw.user_profile_id = up.id",
+            nativeQuery = true)
+    int updateProfileWalletWheelBalance(UUID keycloakUserId, UUID celebrityId, int amount);
+
+    @Modifying
+    @Query(value = "UPDATE profile_wallet AS pw"
             + " SET vote_balance = vote_balance + :amount"
             + " FROM user_profile AS up"
             + " WHERE up.keycloak_user_id = :keycloakUserId"

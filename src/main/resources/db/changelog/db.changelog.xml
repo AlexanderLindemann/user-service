@@ -32,4 +32,7 @@
     <include file="sql/data/2022-04-25-insert-vote-price.sql" relativeToChangelogFile="true" context="!test"/>
     <include file="update/2022-04-25-add-wheel-balance.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-05-06-add-nft-vote-balance.xml" relativeToChangelogFile="true"/>
+    <include file="create/2022-05-10-create-bundle-for-coins-drop-vote-price.xml" relativeToChangelogFile="true"/>
+    <include file="sql/data/2022-05-10-insert-poe-wheel-rolled.sql" relativeToChangelogFile="true"/>
+    <include file="sql/data/2022-05-10-insert-bundle-for-coins.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

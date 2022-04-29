@@ -2,20 +2,24 @@ package com.nft.platform.service;
 
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
-import com.nft.platform.domain.*;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.request.*;
-import com.nft.platform.dto.response.VotePriceResponseDto;
+import com.nft.platform.domain.Celebrity;
+import com.nft.platform.domain.Period;
+import com.nft.platform.domain.ProfileWallet;
+import com.nft.platform.domain.UserProfile;
+import com.nft.platform.dto.request.SubscriptionRequestDto;
+import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.event.FirstAppOpenOnPeriodEvent;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
-import com.nft.platform.mapper.VotePriceMapper;
+import com.nft.platform.platformactivityservice.api.dto.enums.RewardType;
+import com.nft.platform.platformactivityservice.api.event.WheelRewardKafkaEvent;
 import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.PeriodRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
-import com.nft.platform.repository.VotePriceRepository;
 import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.util.RLockKeys;
 import com.nft.platform.util.security.SecurityUtil;
@@ -28,10 +32,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -45,8 +47,6 @@ public class ProfileWalletService {
     private final PeriodRepository periodRepository;
     private final PoeRepository poeRepository;
     private final ProfileWalletRepository profileWalletRepository;
-    private final VotePriceMapper votePriceMapper;
-    private final VotePriceRepository votePriceRepository;
     private final SyncService syncService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -98,6 +98,15 @@ public class ProfileWalletService {
                 );
     }
 
+    @Transactional(readOnly = true)
+    public ProfileWallet getProfileWalletForUpdate(UUID keycloakUserId, UUID celebrityId) {
+        return profileWalletRepository.findByKeycloakUserIdAndCelebrityIdForUpdate(keycloakUserId, celebrityId)
+                .orElseThrow(() -> new ItemNotFoundException(ProfileWallet.class,
+                        "keycloakUserId=" + keycloakUserId + " celebrityId=" + celebrityId)
+                );
+    }
+
+
     public void createAndSaveProfileWallet(UserProfile userProfile, Celebrity celebrity) {
         ProfileWallet profileWallet = new ProfileWallet();
         profileWallet.setUserProfile(userProfile);
@@ -123,32 +132,6 @@ public class ProfileWalletService {
                 .eventType(EventType.PROFILE_WALLET_CREATED)
                 .build();
         applicationEventPublisher.publishEvent(event);
-    }
-
-    @Transactional
-    public void buyVotesForCoins(ProfileWalletVotesDto requestDto) {
-        UUID keycloakUserId = securityUtil.getCurrentUserId();
-        ProfileWallet profileWallet = profileWalletRepository
-                .findByKeycloakUserIdAndCelebrityIdForUpdate(keycloakUserId, requestDto.getCelebrityId())
-                .orElseThrow(() -> new ItemNotFoundException(ProfileWallet.class,
-                        "keycloakUserId=" + keycloakUserId + " celebrityId=" + requestDto.getCelebrityId())
-                );
-        VotePrice votePrice = votePriceRepository.findByVotes(requestDto.getVotes())
-                .orElseThrow(() -> new ItemNotFoundException(VotePrice.class, "votes=" + requestDto.getVotes()));
-        int coins = votePrice.getCoins();
-        if (profileWallet.getCoinBalance() < coins) {
-            throw new RestException("Not enough coins", HttpStatus.CONFLICT);
-        }
-        profileWallet.setVoteBalance(profileWallet.getVoteBalance() + requestDto.getVotes());
-        profileWallet.setCoinBalance(profileWallet.getCoinBalance() - coins);
-        profileWalletRepository.save(profileWallet);
-    }
-
-    @Transactional(readOnly = true)
-    public List<VotePriceResponseDto> getVoteBundles() {
-        return votePriceRepository.findAll().stream()
-                .map(votePriceMapper::toDto)
-                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -191,4 +174,27 @@ public class ProfileWalletService {
                 requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
     }
 
+    public void handleWheelReward(WheelRewardKafkaEvent wheelRewardKafkaEvent) {
+        if (wheelRewardKafkaEvent.getRewardType() == RewardType.COINS) {
+            profileWalletRepository.updateProfileWalletCoinBalance(
+                    wheelRewardKafkaEvent.getUserId(),
+                    wheelRewardKafkaEvent.getCelebrityId(),
+                    wheelRewardKafkaEvent.getQuantity()
+            );
+        }
+        if (wheelRewardKafkaEvent.getRewardType() == RewardType.VOTES) {
+            profileWalletRepository.updateProfileWalletVoteBalance(
+                    wheelRewardKafkaEvent.getUserId(),
+                    wheelRewardKafkaEvent.getCelebrityId(),
+                    wheelRewardKafkaEvent.getQuantity()
+            );
+        }
+        if (wheelRewardKafkaEvent.getRewardType() == RewardType.GOLD_STATUS) {
+            profileWalletRepository.updateProfileWalletSubscription(
+                    wheelRewardKafkaEvent.getUserId(),
+                    wheelRewardKafkaEvent.getCelebrityId(),
+                    true
+            );
+        }
+    }
 }

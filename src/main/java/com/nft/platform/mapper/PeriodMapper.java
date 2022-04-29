@@ -1,7 +1,7 @@
 package com.nft.platform.mapper;
 
+import com.nft.platform.common.dto.PeriodResponseDto;
 import com.nft.platform.domain.Period;
-import com.nft.platform.dto.response.PeriodResponseDto;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

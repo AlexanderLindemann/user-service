@@ -1,8 +1,11 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.dto.PeriodResponseDto;
+import com.nft.platform.common.enums.EventType;
+import com.nft.platform.common.event.PeriodCreatedEvent;
 import com.nft.platform.domain.Period;
 import com.nft.platform.dto.enums.PeriodStatus;
-import com.nft.platform.dto.response.PeriodResponseDto;
+import com.nft.platform.event.producer.PeriodCreatedEventProducer;
 import com.nft.platform.mapper.PeriodMapper;
 import com.nft.platform.properties.PeriodProperties;
 import com.nft.platform.redis.starter.service.SyncService;
@@ -27,6 +30,8 @@ public class PeriodService {
     private final PeriodRepository periodRepository;
     private final PeriodProperties periodProperties;
     private final SyncService syncService;
+
+    private final PeriodCreatedEventProducer periodCreatedEventProducer;
 
     @Transactional(readOnly = true)
     public Optional<PeriodResponseDto> findPeriod(PeriodStatus status) {
@@ -60,6 +65,7 @@ public class PeriodService {
                     nextPeriod.setStatus(PeriodStatus.ACTIVE);
                     nextPeriod.setEndTime(nextCronStartTime);
                     createNextPeriod(nextCronStartTime);
+                    sendPeriodCreatedEvent(activePeriod, nextPeriod);
                 } else {
                     log.info("Active period is not expired. Do nothing.");
                 }
@@ -90,4 +96,12 @@ public class PeriodService {
         return !now.isBefore(period.getEndTime());
     }
 
+    private void sendPeriodCreatedEvent(Period previous, Period created) {
+        PeriodCreatedEvent periodCreatedEvent = PeriodCreatedEvent.builder()
+                .previousPeriod(periodMapper.toDto(previous))
+                .createdPeriod(periodMapper.toDto(created))
+                .eventType(EventType.PERIOD_CREATED)
+                .build();
+        periodCreatedEventProducer.handle(periodCreatedEvent);
+    }
 }

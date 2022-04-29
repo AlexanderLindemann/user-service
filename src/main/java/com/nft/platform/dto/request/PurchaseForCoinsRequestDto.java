@@ -5,18 +5,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotNull;
 import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "Subscription Request DTO")
-public class ProfileWalletVotesDto {
+@Schema(description = "Bundle for Coins Request DTO")
+public class PurchaseForCoinsRequestDto {
 
     @Schema(required = true)
-    private int votes;
+    private UUID bundleForCoinsId;
 
-    @NotNull
-    private UUID celebrityId;
 }

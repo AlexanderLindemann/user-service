@@ -10,6 +10,7 @@ import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.event.FirstAppOpenOnPeriodEvent;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
+import com.nft.platform.platformactivityservice.api.event.WheelRewardKafkaEvent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -39,4 +40,6 @@ public interface PoeTransactionMapper {
     PoeTransactionRequestDto toRequestDto(KafkaChallengeCompletedEvent challengeCompletedEvent);
 
     PoeTransactionRequestDto toRequestDto(FirstAppOpenOnPeriodEvent event);
+
+    PoeTransactionRequestDto toRequestDto(WheelRewardKafkaEvent event);
 }
