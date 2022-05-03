@@ -12,10 +12,12 @@ import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.poe.request.LeaderboardRequestDto;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
+import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
+import com.nft.platform.dto.poe.response.UserIdActivityBalancePositionResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
@@ -188,6 +190,28 @@ public class PoeTransactionService {
                 .currentUser(currentUser)
                 .leaderboard(leaderboard)
                 .amountUsers(amountUsers)
+                .build();
+    }
+
+    public LeaderboardFullResponseDto calculateUsersActivityBalance(UUID periodId) {
+        log.info("Try to calculate LeaderboardFull periodId={}", periodId);
+        Period period = periodRepository.findById(periodId)
+                .orElseThrow(() -> new ItemNotFoundException(Period.class, periodId));
+        List<UserBalance> userBalances = poeTransactionRepository
+                .calculateUsersActivityBalance(period.getId());
+        List<UserIdActivityBalancePositionResponseDto> leaderboard = userBalances.stream()
+                .map(this::userBalanceToDto)
+                .collect(Collectors.toList());
+        return LeaderboardFullResponseDto.builder()
+                .leaderboard(leaderboard)
+                .build();
+    }
+
+    private UserIdActivityBalancePositionResponseDto userBalanceToDto(UserBalance userBalance) {
+        return UserIdActivityBalancePositionResponseDto.builder()
+                .activityBalance(userBalance.getActivityBalance())
+                .position(userBalance.getRowNumber())
+                .keycloakUserId(userBalance.getUserId())
                 .build();
     }
 

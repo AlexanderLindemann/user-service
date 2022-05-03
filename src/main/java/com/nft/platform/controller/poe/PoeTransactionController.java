@@ -3,6 +3,7 @@ package com.nft.platform.controller.poe;
 import com.nft.platform.dto.poe.request.LeaderboardRequestDto;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
+import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
@@ -60,6 +61,14 @@ public class PoeTransactionController {
     @Secured({RoleConstants.ROLE_USER})
     public LeaderboardResponseDto getLeaderboard(@ParameterObject LeaderboardRequestDto requestDto) {
         return poeTransactionService.calculateTopUsersActivityBalance(requestDto);
+    }
+
+    @GetMapping("/leaderboard/full")
+    @Operation(summary = "Get Full Leaderboard")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public LeaderboardFullResponseDto getLeaderboardFull(@RequestParam UUID periodId) {
+        return poeTransactionService.calculateUsersActivityBalance(periodId);
     }
 
     @GetMapping("/last-poe")

@@ -40,6 +40,21 @@ public interface PoeTransactionRepository extends JpaRepository<PoeTransaction, 
     List<UserBalance> calculateTopUsersActivityBalance(UUID periodId, UUID userId, Integer from, Integer to);
 
     @Query(value = ""
+            + "select t.rowNumber, cast(t.userId as varchar), t.activityBalance from "
+            + "("
+            + "select "
+            + "row_number() over(order by sum(points_reward) desc, max(created_at)) as rowNumber, "
+            + "user_id as userId, "
+            + "sum(points_reward) as activityBalance "
+            + "from poe_transaction p "
+            + "where period_id = :periodId "
+            + "group by(user_id, period_id) "
+            + ") t ",
+            nativeQuery = true
+    )
+    List<UserBalance> calculateUsersActivityBalance(UUID periodId);
+
+    @Query(value = ""
             + "select count (distinct user_id) "
             + "from poe_transaction p "
             + "where period_id = :periodId",
