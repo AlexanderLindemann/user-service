@@ -133,3 +133,32 @@ spec:
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+{{- $top := . -}}
+{{- range $index, $hpa := .Values.HorizontalPodAutoscaler }}
+---
+apiVersion: autoscaling/v2beta2 
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "name" $top }}-{{ $hpa.name }}
+  labels:
+    {{- include "labels" $top  | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "name" $top }}
+  minReplicas: {{ $top.Values.replicaCount }}
+  maxReplicas: {{ $hpa.maxReplicas }}
+  metrics:
+  - type: Resource
+    resource:
+      name: {{ $hpa.resourceName }}
+      {{- with $hpa.target }}
+      target:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $hpa.behavior }}
+  behavior:
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+{{- end }}
