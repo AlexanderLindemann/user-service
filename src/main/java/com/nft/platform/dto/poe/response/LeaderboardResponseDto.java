@@ -18,4 +18,6 @@ public class LeaderboardResponseDto {
     private List<UserActivityBalancePositionResponseDto> leaderboard;
 
     private UserActivityBalancePositionResponseDto currentUser;
+
+    private long amountUsers;
 }

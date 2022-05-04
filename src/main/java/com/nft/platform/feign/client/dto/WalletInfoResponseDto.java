@@ -1,13 +1,11 @@
 package com.nft.platform.feign.client.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 @Data
 public class WalletInfoResponseDto {
-    private boolean executable;
-    private BigDecimal lamports;
-    private String owner;
-    private BigDecimal rentEpoch;
+
+    @Schema(description = "isSolana")
+    private Boolean isSolana;
 }

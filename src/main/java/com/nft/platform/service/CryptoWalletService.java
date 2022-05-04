@@ -8,12 +8,13 @@ import com.nft.platform.dto.response.CryptoWalletResponseDto;
 import com.nft.platform.exception.BadRequestException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
+import com.nft.platform.exception.RestException;
 import com.nft.platform.feign.client.SolanaAdapterClient;
 import com.nft.platform.feign.client.dto.WalletBalanceResponse;
-import com.nft.platform.feign.client.dto.WalletInfoResponseDto;
 import com.nft.platform.mapper.CryptoWalletMapper;
 import com.nft.platform.repository.CryptoWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
+import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,34 +42,30 @@ public class CryptoWalletService {
     private final UserProfileRepository userProfileRepository;
     private final CryptoWalletMapper mapper;
     private final SolanaAdapterClient solanaAdapterClient;
+    private final SecurityUtil securityUtil;
 
     @NonNull
     @Transactional(readOnly = true)
     public List<CryptoWalletResponseDto> getAllByUserProfileId(@NonNull UUID userProfileId) {
-        return cryptoWalletRepository.findAllByUserProfileId(userProfileId)
+        return cryptoWalletRepository.findAllByUserProfileIdOrderByCreatedAt(userProfileId)
                 .stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
     @NonNull
     @Transactional(readOnly = true)
     public List<CryptoWalletResponseDto> getAllByUserKeycloakId(@NonNull UUID userKeycloakId) {
-        return cryptoWalletRepository.findAllByUserProfileKeycloakUserId(userKeycloakId)
+        return cryptoWalletRepository.findAllByUserProfileKeycloakUserIdOrderByCreatedAt(userKeycloakId)
                 .stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
     @NonNull
     @Transactional
     public CryptoWalletResponseDto createWallet(@NonNull CryptoWalletRequestDto requestDto) {
-        UserProfile userProfile;
-        if (requestDto.getUserProfileId() != null) {
-            userProfile = userProfileRepository.findById(requestDto.getUserProfileId())
-                    .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, requestDto.getUserProfileId()));
-        } else if (requestDto.getUserKeycloakId() != null) {
-            userProfile = userProfileRepository.findByKeycloakUserId(requestDto.getUserKeycloakId())
-                    .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, requestDto.getUserKeycloakId()));
-        } else {
-            throw new BadRequestException(CryptoWallet.class, "create", " can't get UserProfile without id");
-        }
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
+        UserProfile userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                    .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
+
         if (ObjectUtils.isEmpty(requestDto.getBlockchain())) {
             // TODO now only SOLANA
             requestDto.setBlockchain(Blockchain.SOLANA);
@@ -77,18 +74,8 @@ public class CryptoWalletService {
             throw new ItemConflictException(CryptoWallet.class, requestDto.getExternalCryptoWalletId(), "Wallet already exists in system");
         }
 
-        // checking wallet in blockchain
-        try {
-            // TODO now it is only for SOLANA
-            var resp = solanaAdapterClient.getWalletInfoBalance(requestDto.getExternalCryptoWalletId());
-            if (HttpStatus.NOT_FOUND.equals(resp.getStatusCode())) {
-                log.error("Can't create wallet {}, wallet doesn't exists in blockchain", requestDto.getExternalCryptoWalletId());
-                throw new BadRequestException(CryptoWallet.class, "create wallet", "wallet doesn't exists in blockchain");
-            }
-        } catch (Exception e) {
-            log.error("Can't create wallet: Can't get info for wallet with publicKey {}", requestDto.getExternalCryptoWalletId());
-            throw new BadRequestException(CryptoWallet.class, "create wallet", "Can't get info for wallet with publicKey = " + requestDto.getExternalCryptoWalletId());
-        }
+        // checking wallet
+        checkCryptoWalletBeforeAdd(requestDto, Boolean.TRUE, null);
 
         CryptoWallet wallet = new CryptoWallet();
         wallet = mapper.toEntity(requestDto, wallet);
@@ -108,26 +95,66 @@ public class CryptoWalletService {
 
     @NonNull
     @Transactional
-    public CryptoWalletResponseDto updateCryptoWallet(@NonNull UUID id, @NonNull CryptoWalletRequestDto requestDto) {
+    public CryptoWalletResponseDto makeDefaultWallet(@NonNull UUID id) {
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
         CryptoWallet wallet = cryptoWalletRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(CryptoWallet.class, id));
+
         UserProfile userProfile = wallet.getUserProfile();
-        if (!userProfile.getId().equals(requestDto.getUserProfileId())
-                && !userProfile.getKeycloakUserId().equals(requestDto.getUserKeycloakId())) {
+        if (!userProfile.getKeycloakUserId().equals(keycloakUserId)) {
+            log.error("Failed Updating: Wallet = {} belongs to other user", wallet.getId());
             throw new BadRequestException(CryptoWallet.class, wallet.getId(), "update", " belongs to other user");
         }
-        wallet = mapper.toEntity(requestDto, wallet);
+
+        List<CryptoWallet> existedWallets = cryptoWalletRepository.findAllByUserProfileIdOrderByCreatedAt(userProfile.getId());
+        List<UUID> ids = existedWallets.stream().map(CryptoWallet::getId).filter(wid -> !wid.equals(id)).collect(Collectors.toList());
+        cryptoWalletRepository.setCryptoWalletsDefaultByIds(false, ids);
+
+        wallet.setDefaultWallet(Boolean.TRUE);
         wallet = cryptoWalletRepository.save(wallet);
         return mapper.toDto(wallet);
+    }
+
+    private void checkCryptoWalletBeforeAdd(@NonNull CryptoWalletRequestDto requestDto, boolean isForCreate, UUID idIfUpdate) {
+        if (isForCreate && cryptoWalletRepository.existsByExternalCryptoWalletIdAndBlockchain(requestDto.getExternalCryptoWalletId(), requestDto.getBlockchain())) {
+            throw new ItemConflictException(CryptoWallet.class, requestDto.getExternalCryptoWalletId(), "Wallet already exists in system");
+        } else if (!isForCreate) {
+            var existed = cryptoWalletRepository.findByExternalCryptoWalletIdAndBlockchain(requestDto.getExternalCryptoWalletId(), requestDto.getBlockchain());
+            if (existed.isPresent() && !existed.get().getId().equals(idIfUpdate)) {
+                throw new ItemConflictException(CryptoWallet.class, requestDto.getExternalCryptoWalletId(), "Wallet already exists in system");
+            }
+        }
+
+        // checking wallet in blockchain
+        try {
+            // TODO now it is only for SOLANA
+            var resp = solanaAdapterClient.getWalletInfo(requestDto.getExternalCryptoWalletId());
+            if (resp.getBody() != null && Boolean.FALSE.equals(resp.getBody().getIsSolana())) {
+                log.error("Can't create wallet {}, wallet doesn't exists in blockchain", requestDto.getExternalCryptoWalletId());
+                throw new BadRequestException(CryptoWallet.class, "create wallet", "wallet doesn't exists in blockchain");
+            }
+        } catch (Exception e) {
+            log.error("Can't create wallet: Can't get info for wallet with publicKey {}; \n error = {}", requestDto.getExternalCryptoWalletId(), e.getMessage());
+            throw new RestException("Can't get info for wallet with publicKey from blockchain = " + requestDto.getExternalCryptoWalletId(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Valid
     @Transactional
     public void deleteCryptoWallet(@NotNull UUID walletId) {
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
         if (!cryptoWalletRepository.existsById(walletId)) {
             throw new ItemNotFoundException(CryptoWallet.class, walletId);
         }
-        cryptoWalletRepository.deleteById(walletId);
+        var cryptoWallet = cryptoWalletRepository.getById(walletId);
+        if (keycloakUserId.equals(cryptoWallet.getUserProfile().getKeycloakUserId())) {
+            cryptoWalletRepository.deleteById(walletId);
+        } else {
+            log.error("Failed Deleting: Wallet = {} belongs to other user", walletId);
+            throw new BadRequestException(CryptoWallet.class, walletId, "delete", " belongs to other user");
+        }
     }
 
     @Valid

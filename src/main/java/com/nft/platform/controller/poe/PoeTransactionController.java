@@ -4,6 +4,7 @@ import com.nft.platform.dto.poe.request.LeaderboardRequestDto;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
+import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.service.poe.PoeTransactionService;
 import com.nft.platform.util.security.RoleConstants;
@@ -18,10 +19,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Poe transactions Api")
 @RestController
@@ -56,6 +60,14 @@ public class PoeTransactionController {
     @Secured({RoleConstants.ROLE_USER})
     public LeaderboardResponseDto getLeaderboard(@ParameterObject LeaderboardRequestDto requestDto) {
         return poeTransactionService.calculateTopUsersActivityBalance(requestDto);
+    }
+
+    @GetMapping("/last-poe")
+    @Operation(summary = "Get last poe history")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_USER})
+    public List<PoeTransactionUserHistoryDto> getLastPoeHistory(@RequestParam UUID celebrityId) {
+        return poeTransactionService.findLastPoeHistory(celebrityId);
     }
 
 }

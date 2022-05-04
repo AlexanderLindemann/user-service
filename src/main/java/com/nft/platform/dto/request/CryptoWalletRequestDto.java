@@ -18,9 +18,4 @@ import java.util.UUID;
 @Schema(description = "Crypto Wallet Request DTO")
 public class CryptoWalletRequestDto extends AbstractCryptoWalletDto {
 
-    @Schema(description = "User Profile Id")
-    private UUID userProfileId;
-
-    @Schema(description = "User Keycloak Id")
-    private UUID userKeycloakId;
 }

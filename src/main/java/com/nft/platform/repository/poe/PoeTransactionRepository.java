@@ -38,4 +38,12 @@ public interface PoeTransactionRepository extends JpaRepository<PoeTransaction, 
             nativeQuery = true
     )
     List<UserBalance> calculateTopUsersActivityBalance(UUID periodId, UUID userId, Integer from, Integer to);
+
+    @Query(value = ""
+            + "select count (distinct user_id) "
+            + "from poe_transaction p "
+            + "where period_id = :periodId",
+            nativeQuery = true
+    )
+    long countDistinctUserIdByPeriodId(UUID periodId);
 }

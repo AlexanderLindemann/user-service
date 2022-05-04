@@ -1,7 +1,6 @@
 package com.nft.platform.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,12 +12,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -46,6 +43,9 @@ public class UserProfile extends BaseEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "is_invisible_email")
+    private boolean invisibleEmail;
+
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -54,6 +54,9 @@ public class UserProfile extends BaseEntity {
 
     @Column(name = "is_verified_phone")
     private boolean verifiedPhone;
+
+    @Column(name = "is_invisible_phone")
+    private boolean invisiblePhone;
 
     @Column(name = "is_invisible_name")
     private boolean invisibleName;
@@ -85,9 +88,13 @@ public class UserProfile extends BaseEntity {
     @Column(name = "nickname")
     private String nickname;
 
+    @Column(name = "image_promo_banner_url")
+    private String imagePromoBannerUrl;
+
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ProfileWallet> profileWallets;
 
+    @OrderBy("createdAt asc")
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<CryptoWallet> cryptoWallets;
 

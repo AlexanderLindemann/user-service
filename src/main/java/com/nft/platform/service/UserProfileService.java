@@ -4,6 +4,7 @@ import com.nft.platform.common.enums.FileType;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
+import com.nft.platform.dto.request.EditUserProfileRequestDto;
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
@@ -19,6 +20,7 @@ import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.feign.client.FileServiceClient;
 import com.nft.platform.mapper.CurrentUserProfileWithWalletsMapper;
+import com.nft.platform.mapper.EditUserProfileMapper;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.mapper.UserProfileWithCelebrityIdsMapper;
 import com.nft.platform.mapper.UserProfileWithWalletsMapper;
@@ -44,8 +46,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -59,6 +63,7 @@ public class UserProfileService {
     private final CelebrityRepository celebrityRepository;
     private final ProfileWalletRepository profileWalletRepository;
     private final UserProfileMapper mapper;
+    private final EditUserProfileMapper editUserProfileMapper;
     private final UserProfileWithCelebrityIdsMapper mapperWithCelebrityIds;
     private final UserProfileWithWalletsMapper userProfileWithWalletsMapper;
     private final CurrentUserProfileWithWalletsMapper currentUserProfileWithWalletsMapper;
@@ -126,6 +131,20 @@ public class UserProfileService {
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, id));
         userProfile = mapper.toEntity(requestDto, userProfile);
         userProfileRepository.save(userProfile);
+        return mapper.toDto(userProfile);
+    }
+
+
+    @NonNull
+    @Transactional
+    public UserProfileResponseDto patchUserProfile(@NonNull EditUserProfileRequestDto editRequestDto) {
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
+        UserProfile userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
+
+        userProfile = editUserProfileMapper.toEntity(editRequestDto, userProfile);
+        userProfile = userProfileRepository.save(userProfile);
         return mapper.toDto(userProfile);
     }
 
@@ -223,20 +242,40 @@ public class UserProfileService {
     }
 
     @Transactional
-    public String uploadUserProfileImage(UUID id, @NotNull MultipartFile file) {
-        String url = null;
-        String oldUrl = null;
-
+    public String uploadUserProfileImageForUserById(@NotNull UUID id, @NotNull MultipartFile file) {
         UserProfile profile = userProfileRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, id));
-        oldUrl = profile.getImageUrl();
+
+        String oldUrl = profile.getImageUrl();
         // trying upload new image
+        String url = replaceUserProfileImage(file, oldUrl, FileType.AVATAR);
+        profile.setImageUrl(url);
+        userProfileRepository.save(profile);
+        return url;
+    }
+
+
+    @Transactional
+    public String uploadUserProfileImageForCurrent(@NotNull MultipartFile file) {
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
+
+        UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
+        String oldUrl = profile.getImageUrl();
+        // trying upload new image
+        String url = replaceUserProfileImage(file, oldUrl, FileType.AVATAR);
+        profile.setImageUrl(url);
+        userProfileRepository.save(profile);
+        return url;
+    }
+
+    private String replaceUserProfileImage(@NotNull MultipartFile file, String oldUrl, FileType fileType) {
+        String url;
         try {
-            var response = fileServiceClient.fileUpload(FileType.AVATAR, file);
+            var response = fileServiceClient.fileUpload(fileType, file);
             if (response.getBody() != null) {
-                profile.setImageUrl(response.getBody().getUrl());
-                userProfileRepository.save(profile);
-                url = profile.getImageUrl();
+                url = response.getBody().getUrl();
             } else {
                 log.error("Can't get url of uploaded file");
                 throw new FileUploadException("Upload File", "Can't get url of uploaded file");
@@ -245,15 +284,71 @@ public class UserProfileService {
             log.error("Error while uploading file: {}", e.getMessage());
             throw new FileUploadException("Upload File ", e.getMessage());
         }
-        // trying to delete old image
-        if (!StringUtils.isEmpty(oldUrl)) {
+        // trying to remove old image
+        removeProfileImage(oldUrl, Boolean.FALSE);
+        return url;
+    }
+
+    private void removeProfileImage(String url, boolean throwError) {
+        if (!StringUtils.isEmpty(url)) {
             try {
-                fileServiceClient.deleteFile(oldUrl);
+                fileServiceClient.deleteFile(url);
             } catch (Exception e) {
-                log.error("Can't Delete OLD User Image url = {}", oldUrl);
+                log.error("Can't Delete OLD User Image url = {}", url);
+                if (throwError) {
+                    throw new FileUploadException(" deleting ", e.getMessage());
+                }
             }
         }
+    }
 
+    @Transactional
+    public void removeUserProfileImage() {
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
+
+        UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
+        String oldUrl = profile.getImageUrl();
+        removeProfileImage(oldUrl, Boolean.TRUE);
+        profile.setImageUrl(null);
+        userProfileRepository.save(profile);
+    }
+
+    @Transactional
+    public String uploadUserProfileBannerForCurrent(@NotNull MultipartFile file) {
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
+
+        UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
+        String oldUrl = profile.getImagePromoBannerUrl();
+        // trying upload new image
+        String url = replaceUserProfileImage(file, oldUrl, FileType.BANNER);
+        profile.setImagePromoBannerUrl(url);
+        userProfileRepository.save(profile);
         return url;
+    }
+
+    @Transactional
+    public void removeUserProfileBanner() {
+        var currentUser = securityUtil.getCurrentUser();
+        UUID keycloakUserId = UUID.fromString(currentUser.getId());
+
+        UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
+        String oldUrl = profile.getImagePromoBannerUrl();
+        removeProfileImage(oldUrl, Boolean.TRUE);
+        profile.setImagePromoBannerUrl(null);
+        userProfileRepository.save(profile);
+    }
+
+    @Transactional
+    public List<UserProfileResponseDto> getUsersInfo(List<UUID> userIds) {
+        List<UserProfile> userProfiles = userProfileRepository.findAllByIds(userIds);
+
+        return userProfiles.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 }

@@ -5,6 +5,7 @@ import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +16,5 @@ public interface CelebrityRepository extends JpaRepository<Celebrity, UUID> {
 
     boolean existsByNameIgnoreCase(@NonNull String name);
 
+    List<Celebrity> findCelebritiesByNameContains(String searchName);
 }

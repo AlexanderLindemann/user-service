@@ -1,5 +1,8 @@
 package com.nft.platform.controller.poe.contract;
 
+import com.nft.platform.common.dto.PoeForUserDto;
+import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
 import com.nft.platform.dto.poe.response.PoeResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,10 +22,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -40,9 +45,29 @@ public interface PoeControllerV1Api {
     @GetMapping
     @Operation(summary = "Get Page of Poe by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)
-    Page<PoeResponseDto> getPoesPage(@PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC)
+    Page<PoeResponseDto> getPoesPage(@ParameterObject PoeFilterDto filter,
+                                     @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC)
                                      @ParameterObject Pageable pageable
     );
+
+    @GetMapping("/list")
+    @Operation(summary = "Get Page of Poe by Page number and Page size")
+    @ResponseStatus(HttpStatus.OK)
+    List<PoeResponseDto> getPoesList(@ParameterObject PoeFilterDto filter);
+
+    @GetMapping("/list/for-user")
+    @Operation(summary = "Get list of Poe for user")
+    @ResponseStatus(HttpStatus.OK)
+    List<PoeForUserDto> getPoesListForUser(@ParameterObject PoeFilterDto filter,
+                                           @RequestParam UUID userId,
+                                           @RequestParam UUID celebrityId);
+
+    @GetMapping("/for-user")
+    @Operation(summary = "Get Poe for user")
+    @ResponseStatus(HttpStatus.OK)
+    Optional<PoeForUserDto> getPoeForUser(@RequestParam PoeAction poeAction,
+                                          @RequestParam UUID userId,
+                                          @RequestParam UUID celebrityId);
 
     @PostMapping
     @Operation(summary = "Create Poe")

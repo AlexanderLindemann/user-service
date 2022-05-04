@@ -25,6 +25,7 @@ import java.util.UUID;
 public class ProfileWallet extends BaseEntity {
 
     public ProfileWallet() {
+        this.subscriber = false;
         this.experienceCount = 0;
         this.coinBalance = 0L;
     }
@@ -40,8 +41,14 @@ public class ProfileWallet extends BaseEntity {
     @Column(name = "vote_balance", nullable = false)
     private int voteBalance;
 
+    @Column(name = "wheel_balance", nullable = false)
+    private int wheelBalance;
+
     @Column(name = "coin_balance", nullable = false)
     private long coinBalance;
+
+    @Column(name = "subscriber", nullable = false)
+    private boolean subscriber;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "celebrity_id", nullable = false)
