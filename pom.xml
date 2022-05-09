@@ -29,6 +29,7 @@
         <common-lib.version>1.0-SNAPSHOT</common-lib.version>
         <kafka-starter.version>1.0-SNAPSHOT</kafka-starter.version>
         <challenge-service-api-contracts.version>1.0.0-SNAPSHOT</challenge-service-api-contracts.version>
+        <platform-activity-service-api-contracts.version>1.0.0-SNAPSHOT</platform-activity-service-api-contracts.version>
     </properties>
     <dependencies>
         <!-- NFT -->
@@ -46,6 +47,11 @@
             <groupId>com.nft.platform</groupId>
             <artifactId>challenge-service-api-contracts</artifactId>
             <version>${challenge-service-api-contracts.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.nft.platform</groupId>
+            <artifactId>platform-activity-service-api-contracts</artifactId>
+            <version>${platform-activity-service-api-contracts.version}</version>
         </dependency>
 
         <!-- DB -->

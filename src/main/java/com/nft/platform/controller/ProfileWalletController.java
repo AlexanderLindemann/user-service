@@ -1,9 +1,7 @@
 package com.nft.platform.controller;
 
 import com.nft.platform.dto.enums.PeriodStatus;
-import com.nft.platform.dto.request.ProfileWalletVotesDto;
-import com.nft.platform.dto.request.SubscriptionRequestDto;
-import com.nft.platform.dto.request.UserVoteReductionDto;
+import com.nft.platform.dto.request.*;
 import com.nft.platform.dto.response.PeriodResponseDto;
 import com.nft.platform.dto.response.VotePriceResponseDto;
 import com.nft.platform.service.PeriodService;
@@ -87,8 +85,8 @@ public class ProfileWalletController {
             @RequestParam("keycloakUserId") UUID keycloakUserId,
             @RequestParam UUID celebrityId
     ) {
-        Optional<Integer> wheelBalance0 = profileWalletService.findWheelBalance(keycloakUserId, celebrityId);
-        return ResponseEntity.of(wheelBalance0);
+        Optional<Integer> wheelBalance = profileWalletService.findWheelBalance(keycloakUserId, celebrityId);
+        return ResponseEntity.of(wheelBalance);
     }
 
     @PostMapping("/wheel-balance/decrement")
@@ -100,4 +98,35 @@ public class ProfileWalletController {
     ) {
         profileWalletService.decrementWheelBalance(requestDto);
     }
+
+    @PostMapping("/coins-addition")
+    @Operation(summary = "Add Coins")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public void addCoins(
+            @Valid @RequestBody UserRewardIncreaseDto requestDto
+    ) {
+        profileWalletService.addCoins(requestDto);
+    }
+
+    @PostMapping("/votes-addition")
+    @Operation(summary = "Add Votes")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public void addVotes(
+            @Valid @RequestBody UserRewardIncreaseDto requestDto
+    ) {
+        profileWalletService.addVotes(requestDto);
+    }
+
+    @PostMapping("/nft-votes-addition")
+    @Operation(summary = "Add Nft Votes")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public void addNftVotes(
+            @Valid @RequestBody UserRewardIncreaseDto requestDto
+    ) {
+        profileWalletService.addNftVotes(requestDto);
+    }
+
 }

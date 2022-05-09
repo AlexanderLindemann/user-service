@@ -24,7 +24,7 @@ public class ChallengeRewardService {
                 .sum();
         log.info("Got coinsAward={}", coinsAward);
         if (coinsAward != 0) {
-            profileWalletRepository.updateProfileWalletBalance(event.getUserId(), event.getCelebrityId(), coinsAward);
+            profileWalletRepository.updateProfileWalletCoinBalance(event.getUserId(), event.getCelebrityId(), coinsAward);
         }
     }
 }

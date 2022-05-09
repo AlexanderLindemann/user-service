@@ -99,7 +99,7 @@ public class PoeTransactionService {
         poeTransaction.setCoinsReward(coinsAward * requestDto.getAmount());
 
         if (coinsAward != 0) {
-            profileWalletRepository.updateProfileWalletBalance(requestDto.getUserId(), requestDto.getCelebrityId(), coinsAward);
+            profileWalletRepository.updateProfileWalletCoinBalance(requestDto.getUserId(), requestDto.getCelebrityId(), coinsAward);
         }
         poeTransactionRepository.save(poeTransaction);
         return poeTransactionMapper.toDto(poeTransaction);

@@ -52,21 +52,42 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
 
     @Modifying
     @Query(value = "UPDATE profile_wallet AS pw"
-            + " SET vote_balance = vote_balance - 1"
-            + " FROM user_profile AS up"
-            + " WHERE up.keycloak_user_id = :keycloakUserId"
-            + " AND pw.celebrity_id = :celebrityId"
-            + " AND pw.user_profile_id = up.id",
-            nativeQuery = true)
-    int decrementUserVotes(@Param("keycloakUserId") UUID keycloakUserId, @Param("celebrityId") UUID celebrityId);
-
-    @Modifying
-    @Query(value = "UPDATE profile_wallet AS pw"
             + " SET coin_balance = coin_balance + :coins"
             + " FROM user_profile AS up"
             + " WHERE up.keycloak_user_id = :keycloakUserId"
             + " AND pw.celebrity_id = :celebrityId"
             + " AND pw.user_profile_id = up.id",
             nativeQuery = true)
-    int updateProfileWalletBalance(UUID keycloakUserId, UUID celebrityId, int coins);
+    int updateProfileWalletCoinBalance(UUID keycloakUserId, UUID celebrityId, int coins);
+
+    @Modifying
+    @Query(value = "UPDATE profile_wallet AS pw"
+            + " SET vote_balance = vote_balance + :amount"
+            + " FROM user_profile AS up"
+            + " WHERE up.keycloak_user_id = :keycloakUserId"
+            + " AND pw.celebrity_id = :celebrityId"
+            + " AND pw.user_profile_id = up.id",
+            nativeQuery = true)
+    int updateProfileWalletVoteBalance(UUID keycloakUserId, UUID celebrityId, int amount);
+
+    @Modifying
+    @Query(value = "UPDATE profile_wallet AS pw"
+            + " SET nft_votes_balance = nft_votes_balance + :amount"
+            + " FROM user_profile AS up"
+            + " WHERE up.keycloak_user_id = :keycloakUserId"
+            + " AND pw.celebrity_id = :celebrityId"
+            + " AND pw.user_profile_id = up.id",
+            nativeQuery = true)
+    int updateProfileWalletNftVoteBalance(UUID keycloakUserId, UUID celebrityId, int amount);
+
+    @Modifying
+    @Query(value = "UPDATE profile_wallet AS pw"
+            + " SET subscriber = :subscribed"
+            + " FROM user_profile AS up"
+            + " WHERE up.keycloak_user_id = :keycloakUserId"
+            + " AND pw.celebrity_id = :celebrityId"
+            + " AND pw.user_profile_id = up.id",
+            nativeQuery = true)
+    int updateProfileWalletSubscription(UUID keycloakUserId, UUID celebrityId, boolean subscribed);
+
 }

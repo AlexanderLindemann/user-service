@@ -2,16 +2,10 @@ package com.nft.platform.service;
 
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
-import com.nft.platform.domain.Celebrity;
-import com.nft.platform.domain.Period;
-import com.nft.platform.domain.ProfileWallet;
-import com.nft.platform.domain.UserProfile;
-import com.nft.platform.domain.VotePrice;
+import com.nft.platform.domain.*;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.enums.PeriodStatus;
-import com.nft.platform.dto.request.ProfileWalletVotesDto;
-import com.nft.platform.dto.request.SubscriptionRequestDto;
-import com.nft.platform.dto.request.UserVoteReductionDto;
+import com.nft.platform.dto.request.*;
 import com.nft.platform.dto.response.VotePriceResponseDto;
 import com.nft.platform.event.FirstAppOpenOnPeriodEvent;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
@@ -178,4 +172,23 @@ public class ProfileWalletService {
         profileWallet.setWheelBalance(wheelBalance - requestDto.getAmount());
         profileWalletRepository.save(profileWallet);
     }
+
+    @Transactional
+    public void addCoins(UserRewardIncreaseDto requestDto) {
+        profileWalletRepository.updateProfileWalletCoinBalance(
+                requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
+    }
+
+    @Transactional
+    public void addVotes(UserRewardIncreaseDto requestDto) {
+        profileWalletRepository.updateProfileWalletVoteBalance(
+                requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
+    }
+
+    @Transactional
+    public void addNftVotes(UserRewardIncreaseDto requestDto) {
+        profileWalletRepository.updateProfileWalletNftVoteBalance(
+                requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
+    }
+
 }
