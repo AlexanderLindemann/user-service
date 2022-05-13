@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @SuperBuilder
@@ -20,7 +20,7 @@ public class NftResponseDto {
     private Double priceToken;
     private Double priceUsd;
     private Double priceSol;
-    private LocalDateTime endTime;
+    private OffsetDateTime endTime;
     private boolean my;
     private String sellType;
     private boolean onSale;
