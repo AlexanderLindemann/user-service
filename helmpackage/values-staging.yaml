@@ -1,0 +1,196 @@
+# Default values for temp.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 3
+
+image:
+  repository: "container.nexus.nnmdev.ru/nft-platform/user-service"
+  tag: #default "SNAPSHOT"
+  pullPolicy: Always
+
+#imagePullSecrets:
+#  - name: dcloudnexus
+nameOverride: ""
+fullnameOverride: ""
+
+env:
+  NFT_LOGGING_LOGSTASH_ENABLED: false
+  NFT_LOGGING_USEJSONFORMAT: true
+
+  NFT_STAND_BASE-URL: "https://nftstage.nnmdev.ru"
+  NFT_TECH_USER_AUTH_USERNAME: "nftbackend@no.no"
+  NFT_TECH_USER_AUTH_PASSWORD: "8yfz537z3yr7h99w"
+  SERVER_SERVLET_CONTEXTPATH: "/user-service"
+  SPRING_LIQUIBASE_CONTEXTS: "dev"
+  SERVER_PORT: 8080
+  TZ: "Europe/Moscow"
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgresstage.cwol7reviywm.eu-central-1.rds.amazonaws.com/user_service?&ssl=true&sslrootcert=/tmp/rdsssl/global-bundle.pem
+  SPRING_DATASOURCE_USERNAME: postgresstage
+  SPRING_DATASOURCE_PASSWORD: NTItZ5cYpLJzehSgW2dO
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: b-1.kafkastage.8jcavr.c5.kafka.eu-central-1.amazonaws.com:9092,b-2.kafkastage.8jcavr.c5.kafka.eu-central-1.amazonaws.com:9092
+  SPRING_KAFKA_PRODUCER_ENABLED: true
+  SPRING_KAFKA_PRODUCER_TOPIC: user-service
+  SPRING_KAFKA_CONSUMER_ENABLED: true
+  SPRING_KAFKA_CONSUMER_GROUP_ID: user-service
+  SPRING_KAFKA_CONSUMER_POLL_SERVICE_TOPIC: poll-service
+  SPRING_KAFKA_CONSUMER_FEED_SERVICE_TOPIC: feed-service
+  SPRING_KAFKA_CONSUMER_CHALLENGE_SERVICE_TOPIC: challenge-service
+  SPRING_KAFKA_CONSUMER_QUIZ_SERVICE_TOPIC: quiz-service
+  SPRING_KAFKA_CONSUMER_PLATFORM_ACTIVITY_SERVICE_TOPIC: platform-activity-service
+
+  REDIS_ENABLED: true
+  REDIS_ADDRESS: nftstageredis-0001-001.nftstageredis.elesif.memorydb.eu-central-1.amazonaws.com:6379
+  FEIGN_NFT_SOLANA_ADAPTER_URL: "http://solana-adapter:8080/solana-adapter"
+  FEIGN_NFT_FILE_SERVICE_URL: "http://file-service:8080/file-service"
+
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8080
+
+container:
+  port: 8080
+
+livenessProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  successThreshold: 1
+  failureThreshold: 5
+  httpGet:
+    path: /actuator/health
+    port: 8080
+
+readinessProbe:
+  enabled: false
+  initialDelaySeconds: 30
+  periodSeconds: 5
+  timeoutSeconds: 2
+  successThreshold: 1
+  failureThreshold: 5
+  httpGet:
+    path: /actuator/health
+    port: 8080
+
+volumeMounts:
+  - name: aws-rds-ssl
+    mountPath: "/tmp/rdsssl/global-bundle.pem"
+    subPath: global-bundle.pem
+
+volumes:
+  - name: aws-rds-ssl
+    secret:
+      secretName: secret-aws-rds-ssl
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/ingress.class: nginx
+
+  hosts:
+    - host: nftstage.nnmdev.ru
+      paths:
+        - /user-service
+      pathType: ImplementationSpecific
+  tls:
+    - secretName: nftstage.nnmdev.ru-tls
+      hosts:
+        - nftstage.nnmdev.ru
+
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+HorizontalPodAutoscaler:
+  - name: cpu-utilization
+    resourceName: cpu
+    maxReplicas: 10
+    target:
+        type: Utilization
+        averageValue: 1000m
+    behavior:
+      scaleDown: 
+        policies: 
+        - type: Pods 
+          value: 2 
+          periodSeconds: 120 
+        - type: Percent
+          value: 10 
+          periodSeconds: 120
+        selectPolicy: Min 
+        stabilizationWindowSeconds: 300 
+      scaleUp: 
+        policies:
+        - type: Pods
+          value: 5 
+          periodSeconds: 70
+        - type: Percent
+          value: 20
+          periodSeconds: 80
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+  - name: memory-utilization
+    resourceName: memory
+    maxReplicas: 10
+    target:
+      type: Utilization
+      averageValue: 3000Mi
+    behavior:
+      scaleDown: 
+        policies: 
+        - type: Pods 
+          value: 2 
+          periodSeconds: 120 
+        - type: Percent
+          value: 10 
+          periodSeconds: 120
+        selectPolicy: Min 
+        stabilizationWindowSeconds: 300 
+      scaleUp: 
+        policies:
+        - type: Pods
+          value: 4
+          periodSeconds: 70
+        - type: Percent
+          value: 20 
+          periodSeconds: 80
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
