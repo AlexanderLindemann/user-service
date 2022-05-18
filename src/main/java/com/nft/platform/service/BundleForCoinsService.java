@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -61,9 +62,34 @@ public class BundleForCoinsService {
 
     @Transactional(readOnly = true)
     public List<BundleForCoinsResponseDto> getBundles(BundleType type) {
-        return bundleForCoinsRepository.findByType(type, Sort.by(BundleForCoins_.BUNDLE_SIZE)).stream()
-                .map(bundleForCoinsMapper::toDto)
+        List<BundleForCoins> bundles = bundleForCoinsRepository.findByType(type, Sort.by(BundleForCoins_.BUNDLE_SIZE));
+        BundleForCoins bundleWithMinSize = bundles.stream()
+                .min(Comparator.comparing(BundleForCoins::getBundleSize))
+                .orElseThrow(() -> new RestException("Bundle with type=" + type + " does not exists.", HttpStatus.BAD_REQUEST));
+        double maxPriceForOneLot = countPriceOfOneLot(bundleWithMinSize);
+        return bundles.stream()
+                .map(bundle -> convertAndCalculateDiscount(bundle, bundleWithMinSize, maxPriceForOneLot))
                 .collect(Collectors.toList());
+    }
+
+    private BundleForCoinsResponseDto convertAndCalculateDiscount(
+            BundleForCoins bundleForCoins,
+            BundleForCoins bundleWithMinSize,
+            double maxPriceForOneLot
+    ) {
+        BundleForCoinsResponseDto dto = bundleForCoinsMapper.toDto(bundleForCoins);
+        if (bundleForCoins.getId().equals(bundleWithMinSize.getId())) {
+            dto.setDiscount(0);
+        } else {
+            double priceForOneLot = countPriceOfOneLot(bundleForCoins);
+            int discount = (int) (100 * (maxPriceForOneLot - priceForOneLot) / maxPriceForOneLot);
+            dto.setDiscount(Math.max(discount, 0));
+        }
+        return dto;
+    }
+
+    private double countPriceOfOneLot(BundleForCoins bundleForCoins) {
+        return 1.0 * bundleForCoins.getCoins() / bundleForCoins.getBundleSize();
     }
 
 }

@@ -18,6 +18,7 @@ public class BundleForCoinsResponseDto {
 
     private int bundleSize;
     private int coins;
+    private int discount;
 
     private String imageUrl;
 
