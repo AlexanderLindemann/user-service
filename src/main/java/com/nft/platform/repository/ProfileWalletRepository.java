@@ -100,4 +100,13 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
             nativeQuery = true)
     int updateProfileWalletSubscription(UUID keycloakUserId, UUID celebrityId, boolean subscribed);
 
+    @Modifying
+    @Query(value = "UPDATE profile_wallet AS pw"
+            + " SET experience_count = experience_count + :experience"
+            + " FROM user_profile AS up"
+            + " WHERE up.keycloak_user_id = :keycloakUserId"
+            + " AND pw.celebrity_id = :celebrityId"
+            + " AND pw.user_profile_id = up.id",
+            nativeQuery = true)
+    void updateProfileWalletExperienceBalance(UUID keycloakUserId, UUID celebrityId, int experience);
 }

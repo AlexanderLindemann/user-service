@@ -39,6 +39,7 @@ public abstract class CurrentUserProfileWithWalletsDecorator implements CurrentU
     @Override
     public CurrentUserProfileWithWalletsResponseDto toDto(UserProfile userProfile) {
         CurrentUserProfileWithWalletsResponseDto dto = delegate.toDto(userProfile);
+        setUserProfileAllActivityBalance(userProfile.getKeycloakUserId(), dto);
         if (!CollectionUtils.isEmpty(userProfile.getProfileWallets())) {
             dto.setProfileWalletDto(userProfile.getProfileWallets().stream().findFirst().map(profileWalletMapper::toDto).orElse(null));
             setProfileWalletActivityBalance(userProfile.getKeycloakUserId(), dto.getProfileWalletDto());
@@ -56,6 +57,15 @@ public abstract class CurrentUserProfileWithWalletsDecorator implements CurrentU
         }
 
         return dto;
+    }
+
+    private void setUserProfileAllActivityBalance(UUID keycloakUserId, CurrentUserProfileWithWalletsResponseDto dto) {
+        Long userAllActivityBalance = poeTransactionService.calculateUserAllActivityBalance(
+                UserBalanceRequestDto.builder()
+                        .userId(keycloakUserId)
+                        .build()
+        );
+        dto.setPointBalanceAll(userAllActivityBalance);
     }
 
 

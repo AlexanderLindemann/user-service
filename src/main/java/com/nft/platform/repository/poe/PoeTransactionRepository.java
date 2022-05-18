@@ -13,14 +13,23 @@ import java.util.UUID;
 public interface PoeTransactionRepository extends JpaRepository<PoeTransaction, UUID>, JpaSpecificationExecutor<PoeTransaction> {
 
     @Query(value = ""
+            + "SELECT SUM (p.pointsReward) AS activityBalance "
+            + "FROM PoeTransaction p "
+            + "WHERE p.userId = :userId "
+            + "AND p.periodId = :periodId "
+            + "AND p.celebrityId = :celebrityId "
+            + "GROUP BY (p.userId, p.periodId, p.celebrityId)"
+    )
+    Integer calculateUserActivityBalance(UUID userId, UUID celebrityId, UUID periodId);
+
+    @Query(value = ""
             + "select sum(p.pointsReward) as activityBalance "
             + "from PoeTransaction p "
             + "where p.userId = :userId "
             + "and p.periodId = :periodId "
-            + "and p.celebrityId = :celebrityId "
-            + "group by (p.userId, p.periodId, p.celebrityId)"
+            + "group by (p.userId, p.periodId)"
     )
-    Integer calculateUserActivityBalance(UUID userId, UUID celebrityId, UUID periodId);
+    long calculateUserAllActivityBalance(UUID userId, UUID periodId);
 
     @Query(value = ""
             + "select t.rowNumber, cast(t.userId as varchar), t.activityBalance from "

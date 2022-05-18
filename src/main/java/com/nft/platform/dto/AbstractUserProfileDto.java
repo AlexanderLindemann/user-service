@@ -55,4 +55,7 @@ public abstract class AbstractUserProfileDto extends MinimizedAbstractUserProfil
     @Size(max = 1024)
     private String imagePromoBannerUrl;
 
+    @Schema(required = true, description = "Balance of All Celebrity")
+    private Long pointBalanceAll;
+
 }

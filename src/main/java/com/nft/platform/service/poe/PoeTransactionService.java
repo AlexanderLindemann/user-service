@@ -101,6 +101,9 @@ public class PoeTransactionService {
         if (coinsAward != 0) {
             profileWalletRepository.updateProfileWalletCoinBalance(requestDto.getUserId(), requestDto.getCelebrityId(), coinsAward);
         }
+        if (pointsAward != 0) {
+            profileWalletRepository.updateProfileWalletExperienceBalance(requestDto.getUserId(), requestDto.getCelebrityId(), pointsAward);
+        }
         poeTransactionRepository.save(poeTransaction);
         return poeTransactionMapper.toDto(poeTransaction);
     }
@@ -141,6 +144,16 @@ public class PoeTransactionService {
                 period.getId()
         );
         return activityBalance == null ? 0 : activityBalance;
+    }
+    @Transactional(readOnly = true)
+    public Long calculateUserAllActivityBalance(UserBalanceRequestDto requestDto) {
+        log.info("Try to calculate UserAllActivityBalance from dto={}", requestDto);
+        Period period = calculatePeriodIfNull(requestDto.getPeriodId());
+        Long allActivityBalance = poeTransactionRepository.calculateUserAllActivityBalance(
+                requestDto.getUserId(),
+                period.getId()
+        );
+        return allActivityBalance == null ? 0 : allActivityBalance;
     }
 
     @Transactional(readOnly = true)
