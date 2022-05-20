@@ -29,7 +29,7 @@ public interface PoeTransactionRepository extends JpaRepository<PoeTransaction, 
             + "and p.periodId = :periodId "
             + "group by (p.userId, p.periodId)"
     )
-    long calculateUserAllActivityBalance(UUID userId, UUID periodId);
+    Long calculateUserAllActivityBalance(UUID userId, UUID periodId);
 
     @Query(value = ""
             + "select t.rowNumber, cast(t.userId as varchar), t.activityBalance from "
