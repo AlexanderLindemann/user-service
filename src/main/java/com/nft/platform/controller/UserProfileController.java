@@ -13,7 +13,6 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
-import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
@@ -106,28 +105,6 @@ public class UserProfileController {
             @PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable
     ) {
         return userProfileService.getUserProfilePage(pageable);
-    }
-
-    @GetMapping("/votes")
-    @Operation(summary = "Find User Vote Balance by Celebrity")
-    @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
-    public ResponseEntity<Integer> findUserVotes(
-            @RequestParam("keycloakUserId") UUID keycloakUserId,
-            @RequestParam("celebrityId") UUID celebrityId
-    ) {
-        Optional<Integer> userVotesO = userProfileService.findUserVotes(keycloakUserId, celebrityId);
-        return ResponseEntity.of(userVotesO);
-    }
-
-    @PutMapping("/decrement-votes")
-    @Operation(summary = "Decrement User Votes")
-    @ResponseStatus(HttpStatus.OK)
-    @Secured({ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
-    public void decrementUserVotes(
-            @Valid @RequestBody UserVoteReductionDto requestDto
-    ) {
-        userProfileService.decrementUserVotes(requestDto);
     }
 
     @PutMapping("/{id}")

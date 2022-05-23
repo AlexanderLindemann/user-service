@@ -35,4 +35,5 @@
     <include file="create/2022-05-10-create-bundle-for-coins-drop-vote-price.xml" relativeToChangelogFile="true"/>
     <include file="sql/data/2022-05-10-insert-poe-wheel-rolled.sql" relativeToChangelogFile="true"/>
     <include file="sql/data/2022-05-10-insert-bundle-for-coins.sql" relativeToChangelogFile="true"/>
+    <include file="update/2022-05-23-profile-wallet-add-check-constraints.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

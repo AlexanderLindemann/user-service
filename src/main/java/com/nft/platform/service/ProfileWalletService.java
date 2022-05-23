@@ -2,7 +2,9 @@ package com.nft.platform.service;
 
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.domain.BundleForCoins;
 import com.nft.platform.domain.poe.Poe;
+import com.nft.platform.dto.enums.BundleType;
 import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.request.*;
 import com.nft.platform.domain.Celebrity;
@@ -18,6 +20,7 @@ import com.nft.platform.exception.RestException;
 import com.nft.platform.platformactivityservice.api.dto.enums.RewardType;
 import com.nft.platform.platformactivityservice.api.event.WheelRewardKafkaEvent;
 import com.nft.platform.redis.starter.service.SyncService;
+import com.nft.platform.repository.BundleForCoinsRepository;
 import com.nft.platform.repository.PeriodRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.poe.PoeRepository;
@@ -49,6 +52,7 @@ public class ProfileWalletService {
     private final ProfileWalletRepository profileWalletRepository;
     private final SyncService syncService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final BundleForCoinsRepository bundleForCoinsRepository;
 
     @Transactional
     public boolean updateProfileWalletOnPeriodIfNeeded() {
@@ -135,25 +139,76 @@ public class ProfileWalletService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Integer> findWheelBalance(UUID keycloakUserId, UUID celebrityId) {
-        return profileWalletRepository.findWheelBalance(keycloakUserId, celebrityId);
+    public long findAvailableSpins(UUID keycloakUserId, UUID celebrityId) {
+        ProfileWallet profileWallet = getProfileWallet(keycloakUserId, celebrityId);
+        return calculateAvailableBalance(profileWallet, BundleType.WHEEL_SPIN, profileWallet.getWheelBalance());
+    }
+
+    @Transactional(readOnly = true)
+    public long findAvailableVotes(UUID keycloakUserId, UUID celebrityId) {
+        ProfileWallet profileWallet = getProfileWallet(keycloakUserId, celebrityId);
+        return calculateAvailableBalance(profileWallet, BundleType.VOTE, profileWallet.getVoteBalance());
+    }
+
+    private long calculateAvailableBalance(ProfileWallet profileWallet, BundleType bundleType, int balance) {
+        int priceOfOneLot = findPriceOfOneLot(bundleType);
+        return balance + calculateAvailableBalanceForCoins(profileWallet.getCoinBalance(), priceOfOneLot);
     }
 
     @Transactional
     public void decrementWheelBalance(UserVoteReductionDto requestDto) {
-        ProfileWallet profileWallet = profileWalletRepository
-                .findByKeycloakUserIdAndCelebrityIdForUpdate(requestDto.getKeycloakUserId(), requestDto.getCelebrityId())
-                .orElseThrow(() ->
-                        new RestException("ProfileWaller does not exists userId=" + requestDto.getKeycloakUserId() +
-                                " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT)
-                );
+        ProfileWallet profileWallet = getProfileWallet(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
         int wheelBalance = profileWallet.getWheelBalance();
-        if (wheelBalance < requestDto.getAmount()) {
-            throw new RestException("Not enough wheel balance for decrement. userId=" + requestDto.getKeycloakUserId() +
+        if (wheelBalance >= requestDto.getAmount()) {
+            profileWallet.setWheelBalance(wheelBalance - requestDto.getAmount());
+        } else {
+            profileWallet.setWheelBalance(0);
+            handleLotsForCoins(profileWallet, BundleType.WHEEL_SPIN, wheelBalance, requestDto);
+        }
+        profileWalletRepository.save(profileWallet);
+    }
+
+    @Transactional
+    public void decrementVoteBalance(UserVoteReductionDto requestDto) {
+        ProfileWallet profileWallet = getProfileWallet(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
+        int voteBalance = profileWallet.getVoteBalance();
+        if (voteBalance >= requestDto.getAmount()) {
+            profileWallet.setVoteBalance(voteBalance - requestDto.getAmount());
+        } else {
+            profileWallet.setVoteBalance(0);
+            handleLotsForCoins(profileWallet, BundleType.VOTE, voteBalance, requestDto);
+        }
+        profileWalletRepository.save(profileWallet);
+    }
+
+    private void handleLotsForCoins(
+            ProfileWallet profileWallet,
+            BundleType bundleType,
+            int availableBalance,
+            UserVoteReductionDto requestDto
+    ) {
+        int priceOfOneLot = findPriceOfOneLot(bundleType);
+        long availableBalanceForCoins = calculateAvailableBalanceForCoins(profileWallet.getCoinBalance(), priceOfOneLot);
+        if (availableBalance + availableBalanceForCoins < requestDto.getAmount()) {
+            throw new RestException("Not enough " + bundleType + " balance for decrement. userId=" + requestDto.getKeycloakUserId() +
                     " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
         }
-        profileWallet.setWheelBalance(wheelBalance - requestDto.getAmount());
-        profileWalletRepository.save(profileWallet);
+        int lotsBoughtForCoins = requestDto.getAmount() - availableBalance;
+        profileWallet.setCoinBalance(profileWallet.getCoinBalance() - (long) lotsBoughtForCoins * priceOfOneLot);
+    }
+
+    private int findPriceOfOneLot(BundleType bundleType) {
+        int bundleSize = 1;
+        return bundleForCoinsRepository.findByTypeAndBundleSize(bundleType, bundleSize)
+                .map(BundleForCoins::getCoins)
+                .orElseThrow(() ->
+                        new RestException("Bundle with size=" + bundleSize + " and type=" + bundleType
+                                + " does not exist", HttpStatus.CONFLICT)
+                );
+    }
+
+    private long calculateAvailableBalanceForCoins(long coinBalance, int priceOfOneLot) {
+        return coinBalance / priceOfOneLot;
     }
 
     @Transactional

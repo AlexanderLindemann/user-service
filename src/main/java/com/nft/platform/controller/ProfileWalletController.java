@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "Profile Wallet Api")
@@ -62,15 +61,25 @@ public class ProfileWalletController {
     }
 
     @GetMapping("/wheel-balance")
-    @Operation(summary = "Find Wheel Balance")
+    @Operation(summary = "Find User available Spins by Celebrity")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_TECH_TOKEN})
-    public ResponseEntity<Integer> findWheelBalance(
-            @RequestParam("keycloakUserId") UUID keycloakUserId,
+    public long findAvailableSpins(
+            @RequestParam UUID keycloakUserId,
             @RequestParam UUID celebrityId
     ) {
-        Optional<Integer> wheelBalance = profileWalletService.findWheelBalance(keycloakUserId, celebrityId);
-        return ResponseEntity.of(wheelBalance);
+        return profileWalletService.findAvailableSpins(keycloakUserId, celebrityId);
+    }
+
+    @GetMapping("/vote-balance")
+    @Operation(summary = "Find User available Votes by Celebrity")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public long findAvailableVotes(
+            @RequestParam UUID keycloakUserId,
+            @RequestParam UUID celebrityId
+    ) {
+        return profileWalletService.findAvailableVotes(keycloakUserId, celebrityId);
     }
 
     @PostMapping("/wheel-balance/decrement")
@@ -81,6 +90,16 @@ public class ProfileWalletController {
             @Valid @RequestBody UserVoteReductionDto requestDto
     ) {
         profileWalletService.decrementWheelBalance(requestDto);
+    }
+
+    @PostMapping("/vote-balance/decrement")
+    @Operation(summary = "Decrement Vote Balance")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public void decrementVoteBalance(
+            @Valid @RequestBody UserVoteReductionDto requestDto
+    ) {
+        profileWalletService.decrementVoteBalance(requestDto);
     }
 
     @PostMapping("/coins-addition")

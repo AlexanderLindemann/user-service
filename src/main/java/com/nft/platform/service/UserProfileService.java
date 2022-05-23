@@ -9,7 +9,6 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
-import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
@@ -17,30 +16,25 @@ import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.exception.FileUploadException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
-import com.nft.platform.exception.RestException;
 import com.nft.platform.feign.client.FileServiceClient;
 import com.nft.platform.mapper.CurrentUserProfileWithWalletsMapper;
 import com.nft.platform.mapper.EditUserProfileMapper;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.mapper.UserProfileWithCelebrityIdsMapper;
 import com.nft.platform.mapper.UserProfileWithWalletsMapper;
-import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
 import com.nft.platform.repository.spec.UserProfileSpecifications;
-import com.nft.platform.util.RLockKeys;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,7 +62,6 @@ public class UserProfileService {
     private final UserProfileWithWalletsMapper userProfileWithWalletsMapper;
     private final CurrentUserProfileWithWalletsMapper currentUserProfileWithWalletsMapper;
     private final SecurityUtil securityUtil;
-    private final SyncService syncService;
     private final ProfileWalletService profileWalletService;
 
     private final FileServiceClient fileServiceClient;
@@ -96,32 +89,6 @@ public class UserProfileService {
         Specification<UserProfile> spec = UserProfileSpecifications.fromUserProfileFilter(filterDto);
         Page<UserProfile> userProfilePage = userProfileRepository.findAll(spec, pageable);
         return userProfilePage.map(mapper::toDtoWithBaseFields);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Integer> findUserVotes(UUID keycloakUserId, UUID celebrityId) {
-        return profileWalletRepository.findVoteBalance(keycloakUserId, celebrityId);
-    }
-
-    @Transactional
-    public void decrementUserVotes(UserVoteReductionDto requestDto) {
-        String lockKey = RLockKeys.createVoteUpdateKey(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
-        RLock rLock = syncService.getNamedLock(lockKey);
-        syncService.doSynchronized(rLock).run(() -> {
-            ProfileWallet profileWallet = profileWalletRepository
-                    .findByKeycloakUserIdAndCelebrityId(requestDto.getKeycloakUserId(), requestDto.getCelebrityId())
-                    .orElseThrow(() ->
-                            new RestException("ProfileWaller does not exists userId=" + requestDto.getKeycloakUserId() +
-                                    " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT)
-                    );
-            int voteBalance = profileWallet.getVoteBalance();
-            if (voteBalance < requestDto.getAmount()) {
-                throw new RestException("Not enough votes for decrement. userId=" + requestDto.getKeycloakUserId() +
-                        " celebrityId=" + requestDto.getCelebrityId(), HttpStatus.CONFLICT);
-            }
-            profileWallet.setVoteBalance(voteBalance - requestDto.getAmount());
-            profileWalletRepository.save(profileWallet);
-        });
     }
 
     @NonNull
