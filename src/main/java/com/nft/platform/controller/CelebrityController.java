@@ -4,6 +4,7 @@ import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.service.CelebrityService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Tag(name = "Celebrity Api")
@@ -83,5 +85,14 @@ public class CelebrityController {
     @ResponseStatus(HttpStatus.OK)
     public List<CelebrityResponseDto> getPopular(@RequestParam(defaultValue = "", required = false) String searchName) {
         return celebrityService.getPopular(searchName);
+    }
+
+    @GetMapping(path = "/list")
+    @Operation(summary = "Get list of Celebrities by their Ids")
+    @ResponseStatus(HttpStatus.OK)
+    @Hidden
+    public Set<CelebrityResponseDto> getCelebrities(
+            @RequestParam(name = "celebrityIds") Set<UUID> celebrityIds) {
+        return celebrityService.getCelebrities(celebrityIds);
     }
 }
