@@ -18,17 +18,17 @@ env:
   NFT_LOGGING_LOGSTASH_ENABLED: false
   NFT_LOGGING_USEJSONFORMAT: true
 
-  NFT_STAND_BASE-URL: "https://nftdev.nnmdev.ru"
+  NFT_STAND_BASE-URL: "https://nfttest.nnmdev.ru"
   NFT_TECH_USER_AUTH_USERNAME: "nftbackend@no.no"
   NFT_TECH_USER_AUTH_PASSWORD: "8yfz537z3yr7h99w"
   SERVER_SERVLET_CONTEXTPATH: "/user-service"
   SPRING_LIQUIBASE_CONTEXTS: "dev"
   SERVER_PORT: 8080
   TZ: "Europe/Moscow"
-  SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdev.cwol7reviywm.eu-central-1.rds.amazonaws.com/users
-  SPRING_DATASOURCE_USERNAME: users
-  SPRING_DATASOURCE_PASSWORD: users
-  SPRING_KAFKA_BOOTSTRAP_SERVERS: b-2.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092,b-1.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgrestest.cwol7reviywm.eu-central-1.rds.amazonaws.com/user_service?&ssl=true&sslrootcert=/tmp/rdsssl/global-bundle.pem
+  SPRING_DATASOURCE_USERNAME: postgrestest
+  SPRING_DATASOURCE_PASSWORD: UiETnEBW8rll0Mp@hza1
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: b-1.kafkatest.sludup.c5.kafka.eu-central-1.amazonaws.com:9092,b-2.kafkatest.sludup.c5.kafka.eu-central-1.amazonaws.com:9092
   SPRING_KAFKA_PRODUCER_ENABLED: true
   SPRING_KAFKA_PRODUCER_TOPIC: user-service
   SPRING_KAFKA_CONSUMER_ENABLED: true
@@ -40,7 +40,7 @@ env:
   SPRING_KAFKA_CONSUMER_PLATFORM_ACTIVITY_SERVICE_TOPIC: platform-activity-service
 
   REDIS_ENABLED: true
-  REDIS_ADDRESS: nftdevredis.elesif.clustercfg.memorydb.eu-central-1.amazonaws.com:6379
+  REDIS_ADDRESS: nfttestredis-0001-001.nfttestredis.elesif.memorydb.eu-central-1.amazonaws.com:6379
   FEIGN_NFT_SOLANA_ADAPTER_URL: "http://solana-adapter:8080/solana-adapter"
   FEIGN_NFT_FILE_SERVICE_URL: "http://file-service:8080/file-service"
 
@@ -94,6 +94,15 @@ readinessProbe:
     path: /actuator/health
     port: 8080
 
+volumeMounts:
+  - name: aws-rds-ssl
+    mountPath: "/tmp/rdsssl/global-bundle.pem"
+    subPath: global-bundle.pem
+
+volumes:
+  - name: aws-rds-ssl
+    secret:
+      secretName: secret-aws-rds-ssl
 
 ingress:
   enabled: true
@@ -102,14 +111,14 @@ ingress:
     kubernetes.io/ingress.class: nginx
 
   hosts:
-    - host: nftdev.nnmdev.ru
+    - host: nfttest.nnmdev.ru
       paths:
         - /user-service
       pathType: ImplementationSpecific
   tls:
-    - secretName: nftdev.nnmdev.ru-tls
+    - secretName: nfttest.nnmdev.ru-tls
       hosts:
-        - nftdev.nnmdev.ru
+        - nfttest.nnmdev.ru
 
 
 resources:
@@ -185,7 +194,7 @@ nodeSelector: {}
 tolerations: []
 
 additionalLabels:
-  environment: develop
+  environment: test
 
 affinity:
   podAntiAffinity:
@@ -197,10 +206,9 @@ affinity:
           - key: environment
             operator: In
             values:
-            - develop
+            - test
           - key: app.kubernetes.io/name
             operator: In
             values:
             - user-service
         topologyKey: "kubernetes.io/hostname"
-

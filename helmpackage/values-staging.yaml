@@ -193,4 +193,22 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity: {}
+additionalLabels:
+  environment: staging
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 1
+      podAffinityTerm:
+        labelSelector:
+          matchExpressions:
+          - key: environment
+            operator: In
+            values:
+            - staging
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - user-service
+        topologyKey: "kubernetes.io/hostname"

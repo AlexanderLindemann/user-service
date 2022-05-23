@@ -68,6 +68,9 @@ metadata:
   name: {{ include "name" . }}
   labels:
     {{- include "labels" . | nindent 4 }}
+    {{- with .Values.additionalLabels }}
+    {{- toYaml . | nindent  4}}
+    {{- end }}   
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -77,6 +80,9 @@ spec:
     metadata:
       labels:
         {{- include "selectorLabels" . | nindent 8 }}
+    {{- with .Values.additionalLabels }}
+    {{- toYaml . | nindent  8}}
+    {{- end }}   
       annotations:
         rollme: {{ randAlphaNum 5 | quote }}
     spec:
