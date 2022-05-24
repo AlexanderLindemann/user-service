@@ -41,6 +41,10 @@ public abstract class AbstractCelebrityDto {
     @Size(max = 1024)
     private String celebritySignature;
 
+    @Schema(description = "Celebrity video url")
+    @Size(max = 1024)
+    private String celebrityVideo;
+
     @Schema(description = "Celebrity description", required = true)
     private String description;
 

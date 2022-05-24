@@ -39,6 +39,9 @@ public class Celebrity extends BaseEntity {
     @Column(name = "celebrity_signature")
     private String celebritySignature;
 
+    @Column(name = "celebrity_video")
+    private String celebrityVideo;
+
     @Column(name = "nick_name")
     private String nickName;
 
