@@ -29,9 +29,17 @@ public abstract class AbstractCelebrityDto {
     @NotNull
     private String name;
 
+    @Schema(description = "Celebrity nickname")
+    @Size(max = 1024)
+    private String nickName;
+
     @Schema(description = "Celebrity avatar image direct url")
     @Size(max = 1024)
     private String imageUrl;
+
+    @Schema(description = "Celebrity signature image url")
+    @Size(max = 1024)
+    private String celebritySignature;
 
     @Schema(description = "Celebrity description", required = true)
     private String description;
