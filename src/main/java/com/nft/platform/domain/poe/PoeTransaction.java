@@ -40,6 +40,9 @@ public class PoeTransaction extends BaseEntity {
     @Column(name = "period_id", nullable = false)
     private UUID periodId;
 
+    @Column(name = "action_id")
+    private UUID actionId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "poe_id", nullable = false)
     private Poe poe;

@@ -29,14 +29,18 @@ public interface PoeTransactionMapper {
         return poe.getId();
     }
 
+    @Mapping(source = "pollId", target = "actionId")
     PoeTransactionRequestDto toRequestDto(VoteCreatedEvent voteCreatedEvent);
 
     PoeTransactionRequestDto toRequestDto(ProfileWalletCreatedEvent profileWalletCreatedEvent);
 
+    @Mapping(source = "quizId", target = "actionId")
     PoeTransactionRequestDto toRequestDto(QuizCompletedEvent quizCompletedEvent);
 
+    @Mapping(source = "feedId", target = "actionId")
     PoeTransactionRequestDto toRequestDto(LikeAddedEvent likeAddedEvent);
 
+    @Mapping(source = "challengeId", target = "actionId")
     PoeTransactionRequestDto toRequestDto(KafkaChallengeCompletedEvent challengeCompletedEvent);
 
     PoeTransactionRequestDto toRequestDto(FirstAppOpenOnPeriodEvent event);

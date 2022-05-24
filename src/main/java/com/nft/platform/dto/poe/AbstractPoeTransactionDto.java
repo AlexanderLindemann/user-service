@@ -24,4 +24,6 @@ public class AbstractPoeTransactionDto {
     @Schema(description = "Celebrity Id", required = true)
     @NotNull
     private UUID celebrityId;
+
+    private UUID actionId;
 }

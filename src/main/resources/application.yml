@@ -7,6 +7,8 @@ spring:
     username: users
     password: users
   jpa:
+    hibernate:
+      ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
     properties:
       hibernate:
