@@ -1,8 +1,9 @@
 package com.nft.platform.controller;
 
 import com.nft.platform.dto.request.CelebrityRequestDto;
-import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
+import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
+import com.nft.platform.dto.response.CelebrityThemeResponseDto;
 import com.nft.platform.service.CelebrityService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +16,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -87,12 +96,21 @@ public class CelebrityController {
         return celebrityService.getPopular(searchName);
     }
 
+    @PutMapping("/{id}/theme")
+    @Operation(summary = "Upload Theme for Celebrities")
+    @ResponseStatus(HttpStatus.OK)
+    public CelebrityThemeResponseDto uploadCelebrityTheme(@Parameter(name = "id", description = "Celebrity Id")
+                                                          @PathVariable("id") UUID celebrityId,
+                                                          @Parameter(name = "celebrityTheme", description = "Celebrity Theme")
+                                                          @RequestBody String celebrityTheme) {
+        return celebrityService.uploadCelebrityTheme(celebrityId, celebrityTheme);
+    }
+
     @GetMapping(path = "/list")
     @Operation(summary = "Get list of Celebrities by their Ids")
     @ResponseStatus(HttpStatus.OK)
     @Hidden
-    public Set<CelebrityResponseDto> getCelebrities(
-            @RequestParam(name = "celebrityIds") Set<UUID> celebrityIds) {
+    public Set<CelebrityResponseDto> getCelebrities(@RequestParam(name = "celebrityIds") Set<UUID> celebrityIds) {
         return celebrityService.getCelebrities(celebrityIds);
     }
 }

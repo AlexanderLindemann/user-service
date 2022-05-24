@@ -10,7 +10,7 @@ class CelebrityControllerTest extends AbstractControllerTest {
     private static final String API_PATH = "/api/v1/celebrity";
 
     @Test
-    @DisplayName("Проверет что get возвращает 200 без токена авторизации")
+    @DisplayName("Проверит что get возвращает 200 без токена авторизации")
     void test_api_get_all_without_auth() {
         given()
                 .get()
@@ -19,7 +19,7 @@ class CelebrityControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @DisplayName("Проверет что post  возвращает 401 без токена авторизации")
+    @DisplayName("Проверит что post  возвращает 401 без токена авторизации")
     void test_api_post_without_auth() {
         given()
                 .post()
@@ -28,7 +28,7 @@ class CelebrityControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @DisplayName("Проверет что put возвращает 401 без токена авторизации")
+    @DisplayName("Проверит что put возвращает 401 без токена авторизации")
     void test_api_put_without_auth() {
         given()
                 .put()

@@ -37,5 +37,6 @@
     <include file="sql/data/2022-05-10-insert-bundle-for-coins.sql" relativeToChangelogFile="true"/>
     <include file="update/2022-05-23-profile-wallet-add-check-constraints.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-05-24-add-column-celebrity-signature-and-nick-name.xml" relativeToChangelogFile="true"/>
+    <include file="update/2022-05-06-add-theme-id-column-celebrity.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-05-24-add-column-celebrity-video-in-celebrity-table.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

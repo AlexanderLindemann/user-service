@@ -4,6 +4,7 @@ import com.nft.platform.domain.Celebrity;
 import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
+import com.nft.platform.dto.response.CelebrityThemeResponseDto;
 import com.nft.platform.dto.response.NftCountResponseDto;
 import com.nft.platform.dto.response.ShowcaseResponseDto;
 import com.nft.platform.exception.ItemConflictException;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -123,6 +125,19 @@ public class CelebrityService {
         }));
 
         return celebrities;
+    }
+
+
+    public CelebrityThemeResponseDto uploadCelebrityTheme(UUID celebrityId, String celebrityTheme) {
+        Celebrity celebrity = celebrityRepository.findById(celebrityId)
+                .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, celebrityId));
+        celebrity.setJsonTheme(celebrityTheme);
+        celebrityRepository.save(celebrity);
+
+        return CelebrityThemeResponseDto.builder()
+                .celebrityId(celebrityId)
+                .theme(celebrityTheme)
+                .build();
     }
 
     @Transactional(readOnly = true)

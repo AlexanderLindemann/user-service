@@ -1,21 +1,21 @@
 package com.nft.platform.domain;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Table(name = "celebrity")
 public class Celebrity extends BaseEntity {
     @Id
@@ -63,8 +64,12 @@ public class Celebrity extends BaseEntity {
     @ManyToMany
     @JoinTable(
             name = "celebrity_celebrity_category_map",
-            joinColumns = { @JoinColumn(name = "id") },
-            inverseJoinColumns = { @JoinColumn(name = "category_id") }
+            joinColumns = {@JoinColumn(name = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "category_id")}
     )
     private List<CelebrityCategory> category;
+
+    @Type(type = "jsonb")
+    @Column(name = "theme", columnDefinition = "json")
+    private Object jsonTheme;
 }

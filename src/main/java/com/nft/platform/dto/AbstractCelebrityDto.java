@@ -1,6 +1,5 @@
 package com.nft.platform.dto;
 
-import com.nft.platform.dto.response.CelebrityCategoryResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -12,8 +11,6 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
-import java.util.UUID;
 
 @SuperBuilder
 @ToString
@@ -56,4 +53,7 @@ public abstract class AbstractCelebrityDto {
 
     @Schema(description = "Celebrity banner image direct url", required = true)
     private String imagePromoUrl;
+
+    @Schema(description = "Celebrity theme", required = true)
+    private Object jsonTheme;
 }
