@@ -191,7 +191,8 @@ public class UserProfileController {
     @GetMapping("/info")
     @ResponseStatus(HttpStatus.OK)
     @Hidden
-    @Secured({ROLE_USER, ROLE_MARKETPLACE_USER})
+    @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
+            ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
     public ResponseEntity<List<UserProfileResponseDto>> getUsersInfo(@RequestParam(name = "userIds") List<UUID> userIds) {
         return ResponseEntity.of(ofNullable(userProfileService.getUsersInfo(userIds)));
     }
