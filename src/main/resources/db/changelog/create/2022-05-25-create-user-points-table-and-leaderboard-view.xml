@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="vmargiev" id="2022-05-25-create-user-points-table-and-leaderboard-view">
+        <createTable tableName="user_points">
+            <column defaultValueComputed="uuid_generate_v4()" name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="user_points_pkey"/>
+            </column>
+
+            <column name="keycloak_user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="points" type="int">
+                <constraints nullable="false"/>
+            </column>
+
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <createIndex tableName="user_points" indexName="user_points_points_idx">
+            <column name="points" descending="true"/>
+            <column name="updated_at"/>
+        </createIndex>
+        <createIndex tableName="user_points" indexName="user_points_user_unique_idx" unique="true">
+            <column name="keycloak_user_id"/>
+        </createIndex>
+        <createIndex tableName="period" indexName="period_status_idx">
+            <column name="status"/>
+        </createIndex>
+
+        <sql>
+            CREATE MATERIALIZED VIEW leaderboard_numbers AS
+                SELECT row_number() over(ORDER BY points DESC, updated_at ASC) row_number, keycloak_user_id, points, period_id
+                FROM user_points
+                WHERE period_id = (SELECT id from period where status = 'ACTIVE');
+            CREATE UNIQUE INDEX ON leaderboard_numbers(keycloak_user_id);
+            CREATE INDEX ON leaderboard_numbers(row_number);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

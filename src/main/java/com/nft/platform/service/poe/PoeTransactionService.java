@@ -30,16 +30,20 @@ import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.repository.poe.PoeTransactionRepository;
 import com.nft.platform.repository.poe.UserBalance;
 import com.nft.platform.repository.spec.PoeTransactionSpecifications;
+import com.nft.platform.service.UserPointsService;
 import com.nft.platform.util.CommonUtils;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +61,7 @@ public class PoeTransactionService {
     private final PeriodRepository periodRepository;
     private final UserProfileRepository userProfileRepository;
     private final PoeTransactionRepository poeTransactionRepository;
+    private final UserPointsService userPointsService;
     private final ProfileWalletRepository profileWalletRepository;
     private final PoeRepository poeRepository;
     private final PoeTransactionMapper poeTransactionMapper;
@@ -74,6 +79,7 @@ public class PoeTransactionService {
     }
 
     @Transactional
+    @Retryable(value = DataIntegrityViolationException.class, backoff = @Backoff(delay = 100, maxDelay = 300))
     public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto requestDto) {
         log.info("Try to create PoeTransaction from dto={}", requestDto);
         PoeAction poeAction = mapEventToPoeAction(requestDto.getEventType());
@@ -105,6 +111,11 @@ public class PoeTransactionService {
             profileWalletRepository.updateProfileWalletExperienceBalance(requestDto.getUserId(), requestDto.getCelebrityId(), pointsAward);
         }
         poeTransactionRepository.save(poeTransaction);
+        userPointsService.createOrUpdateUserPoints(
+                poeTransaction.getPeriodId(),
+                poeTransaction.getUserId(),
+                poeTransaction.getPointsReward()
+        );
         return poeTransactionMapper.toDto(poeTransaction);
     }
 
@@ -145,6 +156,7 @@ public class PoeTransactionService {
         );
         return activityBalance == null ? 0 : activityBalance;
     }
+
     @Transactional(readOnly = true)
     public Long calculateUserAllActivityBalance(UserBalanceRequestDto requestDto) {
         log.info("Try to calculate UserAllActivityBalance from dto={}", requestDto);

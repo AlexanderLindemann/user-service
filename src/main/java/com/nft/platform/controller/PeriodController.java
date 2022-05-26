@@ -3,7 +3,6 @@ package com.nft.platform.controller;
 import com.nft.platform.common.dto.PeriodResponseDto;
 import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.service.PeriodService;
-import com.nft.platform.service.ProfileWalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +22,6 @@ import java.util.Optional;
 public class PeriodController {
 
     private final PeriodService periodService;
-    private final ProfileWalletService profileWalletService;
 
     @GetMapping("/current")
     @Operation(summary = "Get Current Period")

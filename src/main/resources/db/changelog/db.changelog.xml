@@ -41,4 +41,5 @@
     <include file="update/2022-05-24-add-column-celebrity-video-in-celebrity-table.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-05-23-poe-transaction-add-action-id.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-05-26-alter-celebrity-theme-type.xml" relativeToChangelogFile="true"/>
+    <include file="create/2022-05-25-create-user-points-table-and-leaderboard-view.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
