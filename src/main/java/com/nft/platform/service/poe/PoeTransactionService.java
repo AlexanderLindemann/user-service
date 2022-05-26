@@ -14,8 +14,9 @@ import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
 import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
-import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
+import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
+import com.nft.platform.dto.poe.response.RewardResponseDto;
 import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
 import com.nft.platform.dto.poe.response.UserIdActivityBalancePositionResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
@@ -30,11 +31,13 @@ import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.repository.poe.PoeTransactionRepository;
 import com.nft.platform.repository.poe.UserBalance;
 import com.nft.platform.repository.spec.PoeTransactionSpecifications;
+import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.service.UserPointsService;
 import com.nft.platform.util.CommonUtils;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +50,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,10 +62,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PoeTransactionService {
 
+    @Value("${nft.celebrity.default-uuid}")
+    private String defaultCelebrity;
     private final PeriodRepository periodRepository;
     private final UserProfileRepository userProfileRepository;
     private final PoeTransactionRepository poeTransactionRepository;
     private final UserPointsService userPointsService;
+    private final ProfileWalletService profileWalletService;
     private final ProfileWalletRepository profileWalletRepository;
     private final PoeRepository poeRepository;
     private final PoeTransactionMapper poeTransactionMapper;
@@ -265,4 +272,40 @@ public class PoeTransactionService {
                 .orElseThrow(() -> new ItemNotFoundException(Period.class, "currentPeriod"));
     }
 
+    public List<RewardResponseDto> getFeedReward(List<UUID> feedsId, UUID clientId) {
+        List<RewardResponseDto> rewardList = new ArrayList<>();
+        Poe poe = poeRepository.findByCode(PoeAction.LIKE).get();
+        Map<UUID, PoeTransaction> poeTransactionMap = poeTransactionRepository.
+                findByActionIdInAndUserIdAndPoe(feedsId, clientId, poeRepository.findByCode(PoeAction.LIKE).get())
+                .stream().collect(Collectors.toMap(PoeTransaction::getActionId, poeTransaction -> poeTransaction));
+        feedsId.forEach(feedId -> {
+            PoeTransaction poeTransaction = poeTransactionMap.get(feedId);
+            if (poeTransaction != null) {
+                rewardList.add(RewardResponseDto.builder()
+                        .id(poeTransaction.getId())
+                        .actionId(feedId)
+                        .isReceived(true)
+                        .poeAction(poe.getCode())
+                        .coins(poeTransaction.getCoinsReward())
+                        .poe(poeTransaction.getPointsReward())
+                        .build());
+            } else if (profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity))) {
+                rewardList.add(RewardResponseDto.builder()
+                        .actionId(feedId)
+                        .isReceived(false)
+                        .poeAction(poe.getCode())
+                        .coins(poe.getCoinsReward() + poe.getCoinsRewardSub())
+                        .poe(poe.getPointsReward() + poe.getPointsRewardSub())
+                        .build());
+            } else
+                rewardList.add(RewardResponseDto.builder()
+                        .actionId(feedId)
+                        .isReceived(false)
+                        .poeAction(poe.getCode())
+                        .coins(poe.getCoinsReward())
+                        .poe(poe.getPointsReward())
+                        .build());
+        });
+        return rewardList;
+    }
 }

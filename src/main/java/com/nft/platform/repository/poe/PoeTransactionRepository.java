@@ -1,5 +1,6 @@
 package com.nft.platform.repository.poe;
 
+import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.domain.poe.PoeTransaction;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -70,4 +71,6 @@ public interface PoeTransactionRepository extends JpaRepository<PoeTransaction, 
             nativeQuery = true
     )
     long countDistinctUserIdByPeriodId(UUID periodId);
+
+    List<PoeTransaction> findByActionIdInAndUserIdAndPoe(List<UUID> actionId, UUID userId, Poe poe);
 }

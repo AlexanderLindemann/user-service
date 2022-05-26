@@ -7,6 +7,7 @@ import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
+import com.nft.platform.dto.poe.response.RewardResponseDto;
 import com.nft.platform.service.poe.PoeTransactionService;
 import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,4 +80,11 @@ public class PoeTransactionController {
         return poeTransactionService.findLastPoeHistory(celebrityId);
     }
 
+    @GetMapping("/feed-poe")
+    @Operation(summary = "Get feed poe")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_USER})
+    public List<RewardResponseDto> getFeedReward(@RequestParam(name = "feedsId") List<UUID> feedsId, @RequestParam UUID clientId) {
+        return poeTransactionService.getFeedReward(feedsId, clientId);
+    }
 }
