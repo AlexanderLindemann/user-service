@@ -318,4 +318,12 @@ public class UserProfileService {
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    public List<UserProfileResponseDto> getUsersInfoByKeycloakIds(List<UUID> keycloakUserIds) {
+        List<UserProfile> userProfiles = userProfileRepository.findByKeycloakUserIdIn(keycloakUserIds);
+
+        return userProfiles.stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
+    }
 }
