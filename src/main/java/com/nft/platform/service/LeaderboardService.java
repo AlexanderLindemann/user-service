@@ -9,6 +9,7 @@ import com.nft.platform.dto.response.LeaderboardV2ResponseDto;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.repository.UserProfileRepository;
 import com.nft.platform.util.LeaderboardQueryUtils;
+import com.nft.platform.util.security.KeycloakUserProfile;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,8 +56,72 @@ public class LeaderboardService {
 
     @Transactional(readOnly = true)
     public LeaderboardV2ResponseDto calculateLeaderboard() {
+        KeycloakUserProfile currentUser = securityUtil.getCurrentUserOrNull();
+        if (currentUser == null) {
+            return calculateLeaderboardForUnauthorized();
+        }
+        return calculateLeaderboardAuthorized();
+    }
+
+    private LeaderboardV2ResponseDto calculateLeaderboardForUnauthorized() {
+        List<LeaderboardRow> leaderboardRows = findLeaderboardTop6AndLastRow();
+        if (leaderboardRows.size() == 0) {
+            log.info("Leaderboard for unauthorized is empty");
+            return new LeaderboardV2ResponseDto();
+        }
+        Comparator<LeaderboardRow> comparator = Comparator.comparing(LeaderboardRow::getRowNumber);
+        List<LeaderboardRow> rowsWithTop10CohortsSorted = calculateAndSetCohortAndFindTop10Cohort(leaderboardRows).stream()
+                .sorted(comparator)
+                .collect(Collectors.toList());
+        List<LeaderboardPositionDto> firstBlock = rowsWithTop10CohortsSorted.stream()
+                .map(r -> mapLeaderboardRowToDto(r, null))
+                .collect(Collectors.toList());
+        LeaderboardV2ResponseDto leaderboardV2ResponseDto = LeaderboardV2ResponseDto.builder()
+                .firstBlock(firstBlock)
+                .build();
+        findAndSetLeaderboardUserInfo(leaderboardV2ResponseDto);
+        return leaderboardV2ResponseDto;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<LeaderboardRow> findLeaderboardTop6AndLastRow() {
+        List<Object[]> results = entityManager.createNativeQuery(LeaderboardQueryUtils.FIND_LEADERBOARD_TOP_6_AND_LAST)
+                .getResultList();
+        return results.stream()
+                .map(this::mapResultOfLeaderboardQueryToLeaderboardRow)
+                .collect(Collectors.toList());
+    }
+
+    private Set<LeaderboardRow> calculateAndSetCohortAndFindTop10Cohort(List<LeaderboardRow> leaderboardRows) {
+        LeaderboardRow lastRow = calculateLastRow(leaderboardRows);
+        List<LeaderboardRow> top6Rows = leaderboardRows.stream()
+                .filter(r -> r.getUserGroup() == null)
+                .collect(Collectors.toList());
+        Set<LeaderboardRow> rowsWithCohorts;
+        if (lastRow.getRowNumber() < 11) {
+            log.info("Leaderboard for unauthorized size less than 11");
+            rowsWithCohorts = calculateAndSetCohortsWhenLess11(top6Rows);
+        } else {
+            rowsWithCohorts = top6Rows.stream()
+                    .peek(row -> {
+                        if (row.getRowNumber() * 100 / 10 / lastRow.getRowNumber() <= 10) {
+                            row.setUserGroup(LeaderboardGroup.TOP_10);
+                        }
+                    })
+                    .collect(Collectors.toSet());
+        }
+        return rowsWithCohorts.stream()
+                .filter(r -> r.getUserGroup() == LeaderboardGroup.TOP_10)
+                .collect(Collectors.toSet());
+    }
+
+    private LeaderboardV2ResponseDto calculateLeaderboardAuthorized() {
         UUID userId = securityUtil.getCurrentUserId();
         Set<LeaderboardRow> leaderboardRowsWithCohorts = calculateLeaderboardRowsWithCohort(userId);
+        if (leaderboardRowsWithCohorts.isEmpty()) {
+            log.info("Leaderboard for authorized is empty");
+            return new LeaderboardV2ResponseDto();
+        }
         LeaderboardV2ResponseDto leaderboardV2ResponseDto = calculateLeaderboardResponseFromRowsWithCohorts(
                 leaderboardRowsWithCohorts,
                 userId
@@ -68,7 +133,7 @@ public class LeaderboardService {
     private Set<LeaderboardRow> calculateLeaderboardRowsWithCohort(UUID userId) {
         List<LeaderboardRow> rowsWithTop11AndCohorts = findLeaderboardRowsWithCohortsCurrentUserAndTop11Users(userId);
         if (rowsWithTop11AndCohorts.size() == 0) {
-            log.info("Leaderboard is empty");
+            log.info("Leaderboard calculateLeaderboardRowsWithCohort is empty");
             return Set.of();
         }
         LeaderboardRow lastRow = calculateLastRow(rowsWithTop11AndCohorts);
@@ -379,9 +444,29 @@ public class LeaderboardService {
                                     "Leaderboard member with keycloakUserId=" + keycloakUserId + " not found",
                                     HttpStatus.INTERNAL_SERVER_ERROR)
                             );
-                    position.getUserDto().setUsername(userProfile.isInvisibleName() ? userProfile.getNickname() : userProfile.getUsername());
+                    position.getUserDto().setUsername(calculateDisplayedUserNameInLeaderboard(userProfile));
                     position.getUserDto().setImageUrl(userProfile.getImageUrl());
                 }
         );
+    }
+
+    private String calculateDisplayedUserNameInLeaderboard(UserProfile userProfile) {
+        String displayedName;
+        if (isNeedDisplayNickName(userProfile)) {
+            displayedName = userProfile.getNickname();
+        } else if (userProfile.getFirstName() != null && userProfile.getLastName() != null) {
+            displayedName = userProfile.getFirstName() + " " + userProfile.getLastName();
+        } else if (userProfile.getFirstName() != null) {
+            displayedName = userProfile.getFirstName();
+        } else {
+            displayedName = userProfile.getLastName();
+        }
+
+        return displayedName != null ? displayedName : "unknown";
+    }
+
+    private boolean isNeedDisplayNickName(UserProfile userProfile) {
+        return userProfile.isInvisibleName()
+                || (userProfile.getFirstName() == null && userProfile.getLastName() == null);
     }
 }

@@ -37,6 +37,8 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
                 .authorizeRequests().antMatchers(HttpMethod.PUT, "/api/v1/profile-wallet/subscription").permitAll().and()
                 .authorizeRequests().antMatchers("/", "/api").permitAll().and()
                 .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/celebrity/**").permitAll().and()
+                .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/leaderboard").permitAll().and()
+                .authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/periods/**").permitAll().and()
                 .authorizeRequests().antMatchers("/api/**").authenticated();
     }
 
