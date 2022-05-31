@@ -83,7 +83,7 @@ public class PoeTransactionController {
     @GetMapping("/feed-poe")
     @Operation(summary = "Get feed poe")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({RoleConstants.ROLE_USER})
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
     public List<RewardResponseDto> getFeedReward(@RequestParam(name = "feedsId") List<UUID> feedsId, @RequestParam UUID clientId) {
         return poeTransactionService.getFeedReward(feedsId, clientId);
     }

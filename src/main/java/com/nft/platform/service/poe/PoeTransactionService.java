@@ -286,24 +286,24 @@ public class PoeTransactionService {
                         .actionId(feedId)
                         .isReceived(true)
                         .poeAction(poe.getCode())
-                        .coins(poeTransaction.getCoinsReward())
-                        .poe(poeTransaction.getPointsReward())
+                        .coins(CommonUtils.toPrimitive(poeTransaction.getCoinsReward()))
+                        .poe(CommonUtils.toPrimitive(poeTransaction.getPointsReward()))
                         .build());
             } else if (profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity))) {
                 rewardList.add(RewardResponseDto.builder()
                         .actionId(feedId)
                         .isReceived(false)
                         .poeAction(poe.getCode())
-                        .coins(poe.getCoinsReward() + poe.getCoinsRewardSub())
-                        .poe(poe.getPointsReward() + poe.getPointsRewardSub())
+                        .coins(CommonUtils.toPrimitive(poe.getCoinsReward()) + CommonUtils.toPrimitive(poe.getCoinsRewardSub()))
+                        .poe(CommonUtils.toPrimitive(poe.getPointsReward()) + CommonUtils.toPrimitive(poe.getPointsRewardSub()))
                         .build());
             } else
                 rewardList.add(RewardResponseDto.builder()
                         .actionId(feedId)
                         .isReceived(false)
                         .poeAction(poe.getCode())
-                        .coins(poe.getCoinsReward())
-                        .poe(poe.getPointsReward())
+                        .coins(CommonUtils.toPrimitive(poe.getCoinsReward()))
+                        .poe(CommonUtils.toPrimitive(poe.getPointsReward()))
                         .build());
         });
         return rewardList;
