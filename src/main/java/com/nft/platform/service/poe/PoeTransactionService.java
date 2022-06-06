@@ -277,7 +277,9 @@ public class PoeTransactionService {
         Poe poe = poeRepository.findByCode(PoeAction.LIKE).get();
         Map<UUID, PoeTransaction> poeTransactionMap = poeTransactionRepository.
                 findByActionIdInAndUserIdAndPoe(feedsId, clientId, poeRepository.findByCode(PoeAction.LIKE).get())
-                .stream().collect(Collectors.toMap(PoeTransaction::getActionId, poeTransaction -> poeTransaction));
+                .stream().collect(Collectors.toMap(PoeTransaction::getActionId
+                        , poeTransaction -> poeTransaction
+                        , (existing, replacement) -> existing));
         feedsId.forEach(feedId -> {
             PoeTransaction poeTransaction = poeTransactionMap.get(feedId);
             if (poeTransaction != null) {
