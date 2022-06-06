@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="alindemann" id="2022_06-06-modify-index-user-points">
+        <dropIndex tableName="user_points" indexName="user_points_user_unique_idx"/>
+        <createIndex tableName="user_points" indexName="user_points_user_unique_idx">
+            <column name="keycloak_user_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
