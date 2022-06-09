@@ -1,6 +1,5 @@
 package com.nft.platform.controller;
 
-import com.nft.platform.dto.enums.LeaderboardGroup;
 import com.nft.platform.dto.response.LeaderboardV2ResponseDto;
 import com.nft.platform.service.LeaderboardService;
 import com.nft.platform.util.security.RoleConstants;
@@ -33,8 +32,8 @@ public class LeaderboardController {
     @Operation(summary = "Get Current User Cohort")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_USER})
-    public LeaderboardGroup getCurrentUserCohort() {
-        return leaderboardService.calculateCurrentUserCohort();
+    public String getCurrentUserCohort() {
+        return leaderboardService.calculateCurrentUserCohort().name();
     }
 
 }
