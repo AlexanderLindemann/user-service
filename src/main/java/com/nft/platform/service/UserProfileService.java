@@ -226,6 +226,7 @@ public class UserProfileService {
     public String uploadUserProfileImageForCurrent(@NotNull MultipartFile file) {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
+
         UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
         String oldUrl = profile.getImageUrl();
