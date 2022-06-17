@@ -30,7 +30,6 @@ public class PeriodService {
     private final PeriodRepository periodRepository;
     private final PeriodProperties periodProperties;
     private final SyncService syncService;
-
     private final PeriodCreatedEventProducer periodCreatedEventProducer;
 
     @Transactional(readOnly = true)

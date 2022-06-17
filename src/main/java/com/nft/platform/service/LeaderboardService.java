@@ -141,13 +141,13 @@ public class LeaderboardService {
         if (lastRow.getRowNumber() < 11) {
             log.info("Leaderboard size less than 11");
             List<LeaderboardRow> leaderboardRows = rowsWithTop11AndCohorts.stream()
-                    .filter(r -> r.getUserGroup() == LeaderboardGroup.TOP_10_ROWS)
+                    .filter(r -> r.getUserGroup() == LeaderboardGroup.TOP_10)
                     .collect(Collectors.toList());
             return calculateAndSetCohortsWhenLess11(leaderboardRows);
         }
         log.info("Leaderboard size more than 10");
         List<LeaderboardRow> leaderboardRows = rowsWithTop11AndCohorts.stream()
-                .filter(r -> r.getUserGroup() != LeaderboardGroup.TOP_10_ROWS)
+                .filter(r -> r.getUserGroup() != LeaderboardGroup.TOP_10)
                 .collect(Collectors.toList());
         return calculateAndSetCohortsWhen11AndMore(leaderboardRows, lastRow);
 

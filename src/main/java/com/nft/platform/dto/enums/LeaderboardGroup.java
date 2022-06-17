@@ -9,7 +9,6 @@ import java.util.Arrays;
 @Getter
 public enum LeaderboardGroup {
 
-    TOP_10_ROWS(0),
     TOP_10(1),
     TOP_20(2),
     TOP_30(3),
