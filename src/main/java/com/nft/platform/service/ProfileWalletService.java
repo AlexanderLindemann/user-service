@@ -229,27 +229,36 @@ public class ProfileWalletService {
                 requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
     }
 
+    @Transactional
     public void handleWheelReward(WheelRewardKafkaEvent wheelRewardKafkaEvent) {
+        if (wheelRewardKafkaEvent.getRewardType() == RewardType.NFT_VOTES) {
+            profileWalletRepository.updateProfileWalletNftVoteBalance(
+                wheelRewardKafkaEvent.getUserId(),
+                wheelRewardKafkaEvent.getCelebrityId(),
+                wheelRewardKafkaEvent.getQuantity()
+            );
+        }
         if (wheelRewardKafkaEvent.getRewardType() == RewardType.COINS) {
             profileWalletRepository.updateProfileWalletCoinBalance(
-                    wheelRewardKafkaEvent.getUserId(),
-                    wheelRewardKafkaEvent.getCelebrityId(),
-                    wheelRewardKafkaEvent.getQuantity()
+                wheelRewardKafkaEvent.getUserId(),
+                wheelRewardKafkaEvent.getCelebrityId(),
+                wheelRewardKafkaEvent.getQuantity()
             );
         }
         if (wheelRewardKafkaEvent.getRewardType() == RewardType.VOTES) {
             profileWalletRepository.updateProfileWalletVoteBalance(
-                    wheelRewardKafkaEvent.getUserId(),
-                    wheelRewardKafkaEvent.getCelebrityId(),
-                    wheelRewardKafkaEvent.getQuantity()
+                wheelRewardKafkaEvent.getUserId(),
+                wheelRewardKafkaEvent.getCelebrityId(),
+                wheelRewardKafkaEvent.getQuantity()
             );
         }
         if (wheelRewardKafkaEvent.getRewardType() == RewardType.GOLD_STATUS) {
             profileWalletRepository.updateProfileWalletSubscription(
-                    wheelRewardKafkaEvent.getUserId(),
-                    wheelRewardKafkaEvent.getCelebrityId(),
-                    true
+                wheelRewardKafkaEvent.getUserId(),
+                wheelRewardKafkaEvent.getCelebrityId(),
+                true
             );
         }
     }
+
 }

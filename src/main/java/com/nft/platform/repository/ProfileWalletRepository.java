@@ -1,19 +1,19 @@
 package com.nft.platform.repository;
 
 import com.nft.platform.domain.ProfileWallet;
+
 import lombok.NonNull;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
 import javax.persistence.LockModeType;
+
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
 public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UUID> {
 
     Optional<ProfileWallet> findByUserProfileIdAndCelebrityId(@NonNull UUID userId, @NonNull UUID celebrityId);
@@ -32,25 +32,7 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
     )
     Optional<ProfileWallet> findByKeycloakUserIdAndCelebrityIdForUpdate(@NonNull UUID keycloakUserId, @NonNull UUID celebrityId);
 
-    @Query(value = "select voteBalance"
-            + " from ProfileWallet pW"
-            + " where pW.userProfile.keycloakUserId = :keycloakUserId"
-            + " and pW.celebrity.id = :celebrityId")
-    Optional<Integer> findVoteBalance(
-            @Param("keycloakUserId") UUID keycloakUserId,
-            @Param("celebrityId") UUID celebrityId
-    );
-
-    @Query(value = "select wheelBalance"
-            + " from ProfileWallet pW"
-            + " where pW.userProfile.keycloakUserId = :keycloakUserId"
-            + " and pW.celebrity.id = :celebrityId")
-    Optional<Integer> findWheelBalance(
-            @Param("keycloakUserId") UUID keycloakUserId,
-            @Param("celebrityId") UUID celebrityId
-    );
-
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE profile_wallet AS pw"
             + " SET coin_balance = coin_balance + :coins"
             + " FROM user_profile AS up"
@@ -109,4 +91,5 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
             + " AND pw.user_profile_id = up.id",
             nativeQuery = true)
     void updateProfileWalletExperienceBalance(UUID keycloakUserId, UUID celebrityId, int experience);
+
 }
