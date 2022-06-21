@@ -72,5 +72,5 @@ public interface PoeTransactionRepository extends JpaRepository<PoeTransaction, 
     )
     long countDistinctUserIdByPeriodId(UUID periodId);
 
-    List<PoeTransaction> findByActionIdInAndUserIdAndPoe(List<UUID> actionId, UUID userId, Poe poe);
+    List<PoeTransaction> findByActionIdInAndPoeInAndUserId(List<UUID> actionId, List<Poe> poe, UUID userId);
 }
