@@ -1,5 +1,6 @@
 package com.nft.platform.service;
 
+import com.nft.platform.consts.Icons;
 import com.nft.platform.domain.CryptoWallet;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
@@ -23,7 +24,6 @@ import java.util.stream.IntStream;
 @Slf4j
 @AllArgsConstructor
 public class FanService {
-    private static final String AGGREGATION_AVATAR = "";
 
     private final CryptoWalletService cryptoWalletService;
     private final EntityManagerFactory entityManagerFactory;
@@ -44,7 +44,7 @@ public class FanService {
     static TopFansDto createTopFansDto(List<CelebrityFanDto> fans, int topNumber, int sumNumber) {
         var initialSum = CelebrityFanDto.builder()
                 .top(sumNumber)
-                .avatar(AGGREGATION_AVATAR)
+                .avatar(Icons.TOP_100_FANS_AVATAR)
                 .token(BigDecimal.ZERO)
                 .build();
         CelebrityFanDto sum = fans.stream()
