@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 @Service
@@ -104,4 +105,9 @@ public class PeriodService {
                 .build();
         periodCreatedEventProducer.handle(periodCreatedEvent);
     }
+
+    public OffsetDateTime getEndPeriod() {
+        return periodRepository.findEndTimeByActiveStatus();
+    }
+
 }
