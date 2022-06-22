@@ -47,15 +47,17 @@ public abstract class CurrentUserProfileWithWalletsDecorator implements CurrentU
         if (userProfile.getCryptoWallets() != null) {
             dto.setCryptoWalletDtos(userProfile.getCryptoWallets().stream().map(cryptoWalletMapper::toDto).collect(Collectors.toList()));
         }
+
         String defaultWallet = userProfile.getDefaultCryptoWallet().map(CryptoWallet::getExternalCryptoWalletId).orElse(null);
+        // trying to get balance for wallet
+        BigDecimal balance = cryptoWalletService.getCryptoWalletBalanceForUser(userProfile);
         if (!StringUtils.isEmpty(defaultWallet)) {
-            // trying to get balance for wallet
-            BigDecimal balance = cryptoWalletService.getCryptoWalletBalance(defaultWallet);
             dto.getCryptoWalletDtos().stream().filter(c -> c.getExternalCryptoWalletId().equals(defaultWallet))
                     .findFirst()
                     .ifPresent(cryptoWalletResponseDto -> cryptoWalletResponseDto.setBalance(balance));
+        } else {
+            dto.setTmpFanTokenBalance(balance);
         }
-
         return dto;
     }
 

@@ -104,4 +104,9 @@ public class UserProfile extends BaseEntity {
                 ? cryptoWallets.stream().filter(CryptoWallet::isDefaultWallet).findFirst()
                 : Optional.empty();
     }
+
+    @Transient
+    public boolean isHasCryptoWallets() {
+        return cryptoWallets != null && !cryptoWallets.isEmpty();
+    }
 }

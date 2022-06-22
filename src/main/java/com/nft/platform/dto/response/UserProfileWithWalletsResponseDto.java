@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,4 +25,6 @@ public class UserProfileWithWalletsResponseDto extends UserProfileResponseDto {
     @Schema(description = "Crypto Wallets List")
     List<CryptoWalletResponseDto> cryptoWalletDtos;
 
+    @Schema(description = "Tmp Fan Token Balance (if cryptoWallets is empty)")
+    BigDecimal tmpFanTokenBalance;
 }

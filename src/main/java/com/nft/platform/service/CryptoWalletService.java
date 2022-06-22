@@ -5,20 +5,24 @@ import com.nft.platform.domain.CryptoWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.request.CryptoWalletRequestDto;
 import com.nft.platform.dto.response.CryptoWalletResponseDto;
+import com.nft.platform.event.TmpFanTokenDistributionEvent;
 import com.nft.platform.exception.BadRequestException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.feign.client.SolanaAdapterClient;
-import com.nft.platform.feign.client.dto.WalletBalanceResponse;
+import com.nft.platform.feign.client.dto.WalletFanTokenBalanceResponse;
 import com.nft.platform.mapper.CryptoWalletMapper;
 import com.nft.platform.repository.CryptoWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
+import com.nft.platform.util.CryptoConstants;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -43,6 +47,8 @@ public class CryptoWalletService {
     private final CryptoWalletMapper mapper;
     private final SolanaAdapterClient solanaAdapterClient;
     private final SecurityUtil securityUtil;
+    private final FanTokenDistributionTransactionService fanTokenDistributionTransactionService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @NonNull
     @Transactional(readOnly = true)
@@ -64,7 +70,7 @@ public class CryptoWalletService {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
         UserProfile userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
-                    .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
 
         if (ObjectUtils.isEmpty(requestDto.getBlockchain())) {
             // TODO now only SOLANA
@@ -83,6 +89,10 @@ public class CryptoWalletService {
         if (CollectionUtils.isEmpty(existedWallets)) {
             // if it is first wallet = default
             wallet.setDefaultWallet(true);
+            TmpFanTokenDistributionEvent event = TmpFanTokenDistributionEvent.builder()
+                    .keycloakUserId(keycloakUserId)
+                    .build();
+            applicationEventPublisher.publishEvent(event);
         } else if (requestDto.isDefaultWallet()) {
             // if new wallet is default, old wallets need to be marked as default = false
             List<UUID> ids = existedWallets.stream().map(CryptoWallet::getId).collect(Collectors.toList());
@@ -159,12 +169,26 @@ public class CryptoWalletService {
 
     @Valid
     @Transactional
+    public BigDecimal getCryptoWalletBalanceForUser(@NotNull UserProfile userProfile) {
+        BigDecimal balance = BigDecimal.ZERO;
+
+        String defaultWallet = userProfile.getDefaultCryptoWallet().map(CryptoWallet::getExternalCryptoWalletId).orElse(null);
+        if (!StringUtils.isEmpty(defaultWallet)) {
+            // trying to get balance for wallet
+            balance = getCryptoWalletBalance(defaultWallet);
+        } else if (!userProfile.isHasCryptoWallets()) {
+            balance = BigDecimal.valueOf(fanTokenDistributionTransactionService.getTmpFanTokenBalanceForUser(userProfile));
+        }
+        return balance.multiply(CryptoConstants.TRANSFER_FROM_LAMP_TO_FAN_TOKEN);
+    }
+
+    @Valid
     public BigDecimal getCryptoWalletBalance(@NotNull String walletId) {
-        BigDecimal balance = null;
+        BigDecimal balance = BigDecimal.ZERO;
         try {
             // TODO now only for SOLANA
-            ResponseEntity<WalletBalanceResponse> balanceResponse = solanaAdapterClient.getWalletBalance(walletId);
-            balance = balanceResponse.getBody().getBalance();
+            ResponseEntity<WalletFanTokenBalanceResponse> balanceResponse = solanaAdapterClient.getWalletFanBalance(walletId);
+            balance = balanceResponse.getBody() != null ? balanceResponse.getBody().getTokenBalance() : BigDecimal.ZERO;
         } catch (Exception e) {
             log.error("CAN'T get Crypto Balance for Wallet = {} \n Error = {}", walletId, e.getMessage());
         }

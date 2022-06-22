@@ -1,6 +1,7 @@
 package com.nft.platform.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.nft.platform.audit.starter.listener.AuditServiceEntityListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(value = {
+        AuditServiceEntityListener.class,
+        AuditingEntityListener.class
+})
 public abstract class BaseEntity implements Serializable {
 
     @CreatedDate

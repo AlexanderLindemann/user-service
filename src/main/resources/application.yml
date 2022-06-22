@@ -36,6 +36,8 @@ spring:
         topic: quiz-service
       platform-activity-service:
         topic: platform-activity-service
+      token-management-service:
+        topic: token-management-service
 
 redis:
   enabled: true
@@ -96,7 +98,11 @@ nft:
     logstash:
       enabled: true
       address: localhost:5000
-
+  audit:
+    kafka:
+      topic: audit-record-topic
+    enabled: false
+    provider: kafka
   stand:
     base-url: https://nftdev.nnmdev.ru
   tech:
@@ -105,8 +111,17 @@ nft:
         clientId: account
         username: nftbackend@no.no
         password: 8yfz537z3yr7h99w
+  token-management:
+    enable: false
   period:
     cronExpression: "0 0 */8 * * *"
+  tmpfantokens:
+    cronExpression: "0 0 1 * * *"
+    olderThanDays: 30
+  retrydistribute:
+    retrycronExpression: "0 0 */8 * * *"
+    clearcronExpression: "0 0 2 * * *"
+    olderThanDays: 2
   celebrity:
     default-uuid: "d212e77f-3057-4db5-80f2-14d52d4dae35"
 

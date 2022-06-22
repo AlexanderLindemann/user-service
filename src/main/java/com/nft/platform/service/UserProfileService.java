@@ -178,8 +178,13 @@ public class UserProfileService {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
         // For Mobile Users celebrityId gets from clientId
-        UUID celebrityId = UUID.fromString(currentUser.getCurrentCelebrityId() != null ? currentUser.getCurrentCelebrityId() : defaultCelebrity);
-        Optional<UserProfile> userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, celebrityId);
+        UUID celebrityId = currentUser.getCurrentCelebrityId() != null ? UUID.fromString(currentUser.getCurrentCelebrityId()) : null;
+        Optional<UserProfile> userProfileO;
+        if (celebrityId == null) {
+            userProfileO = userProfileRepository.findByKeycloakIdWithCryptoWallets(keycloakUserId);
+        } else {
+            userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, celebrityId);
+        }
         if (userProfileO.isEmpty()) {
             return Optional.empty();
         }

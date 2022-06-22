@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet author="esenkovskaya" id="2022-05-08-create-fan-token-distribution-transaction">
+        <createTable tableName="fan_token_distribution_transaction">
+            <column name="transaction_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="fan_token_distribution_transaction_pkey"/>
+            </column>
+
+            <column name="lamports_amount" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="keycloak_user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+
+        <createTable tableName="retry_blockchain_token_distribution_transaction">
+            <column name="transaction_id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="retry_blockchain_token_distribution_transaction_pkey"/>
+            </column>
+
+            <column name="lamports_amount" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(256)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="period_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="keycloak_user_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="blockchain" type="varchar(1024)" defaultValue="SOLANA"/>
+
+            <column defaultValueComputed="now()" name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="created_by" type="varchar(1024)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by" type="varchar(1024)"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
