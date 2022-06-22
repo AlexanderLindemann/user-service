@@ -57,6 +57,9 @@ public class ProfileWallet extends BaseEntity {
     @Column(name = "coin_balance", nullable = false)
     private long coinBalance;
 
+    @Column(name = "nft_votes_balance", nullable = false)
+    private int nftVotesBalance;
+
     @Column(name = "subscriber", nullable = false)
     private boolean subscriber;
 

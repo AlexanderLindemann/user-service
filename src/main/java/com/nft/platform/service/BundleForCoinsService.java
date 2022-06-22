@@ -56,6 +56,9 @@ public class BundleForCoinsService {
         if (bundle.getType() == BundleType.WHEEL_SPIN) {
             profileWallet.setWheelBalance(profileWallet.getWheelBalance() + bundle.getBundleSize());
         }
+        if (bundle.getType() == BundleType.NFT_VOTE) {
+            profileWallet.setNftVotesBalance(profileWallet.getNftVotesBalance() + bundle.getBundleSize());
+        }
         profileWallet.setCoinBalance(profileWallet.getCoinBalance() - coins);
         profileWalletRepository.save(profileWallet);
     }
