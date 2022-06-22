@@ -32,4 +32,7 @@ public abstract class AbstractProfileWalletDto {
 
     @Schema(description = "Wheel balance")
     private int wheelBalance;
+
+    @Schema(description = "Nft Votes balance")
+    private int nftVotesBalance;
 }
