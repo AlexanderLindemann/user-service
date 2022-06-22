@@ -13,6 +13,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import java.util.UUID;
 
@@ -22,6 +24,14 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "profile_wallet")
+@NamedQueries({
+        @NamedQuery(name = "ProfileWallet.findAllCelebrityFans", query = "SELECT up " +
+                "            FROM ProfileWallet up " +
+                "            JOIN FETCH up.celebrity " +
+                "            JOIN FETCH up.userProfile " +
+                "            WHERE up.subscriber = true " +
+                "            AND up.celebrity.id = :celebrityId")
+})
 public class ProfileWallet extends BaseEntity {
 
     public ProfileWallet() {

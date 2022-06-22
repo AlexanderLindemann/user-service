@@ -174,7 +174,6 @@
             <artifactId>shedlock-provider-jdbc-template</artifactId>
             <version>${shedlock.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>
