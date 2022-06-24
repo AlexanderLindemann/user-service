@@ -14,6 +14,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @EnableAsync
 @Slf4j
 @RequiredArgsConstructor
@@ -30,11 +32,11 @@ public class TmpFanTokenDistributionEventHandler {
         var keycloakUserId = event.getKeycloakUserId();
         UserProfile userProfile = userProfileRepository.findByKeycloakIdWithCryptoWallets(keycloakUserId)
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
-        var amount = distributionTransactionService.getTmpFanTokenBalanceForUser(userProfile);
+        Optional<Long> amount = distributionTransactionService.getTmpFanTokenBalanceForUser(userProfile);
         String defaultWallet = userProfile.getDefaultCryptoWallet().map(CryptoWallet::getExternalCryptoWalletId).orElse(null);
         if (!StringUtils.isEmpty(defaultWallet)) {
-            log.info("sending amount = {} to wallet = {}", amount, defaultWallet);
-            distributionTransactionService.sendTransferToChain(defaultWallet, amount);
+            log.info("sending amount = {} to wallet = {}", amount.orElse(0L), defaultWallet);
+            distributionTransactionService.sendTransferToChain(defaultWallet, amount.orElse(0L));
         }
         log.info("handle TmpFanTokenDistributionEvent finished");
     }

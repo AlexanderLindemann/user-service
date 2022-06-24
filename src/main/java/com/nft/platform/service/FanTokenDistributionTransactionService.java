@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -100,10 +101,10 @@ public class FanTokenDistributionTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public long getTmpFanTokenBalanceForUser(UserProfile userProfile) {
+    public Optional<Long> getTmpFanTokenBalanceForUser(UserProfile userProfile) {
         log.debug("getFanTokenBalanceForUser started");
-        var balance = distributionTransactionRepository.getFanTokenBalance(userProfile.getKeycloakUserId());
+        Long balance = distributionTransactionRepository.getFanTokenBalance(userProfile.getKeycloakUserId());
         log.debug("getFanTokenBalanceForUser finished, balance = {}", balance);
-        return balance;
+        return Optional.ofNullable(balance);
     }
 }

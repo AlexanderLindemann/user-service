@@ -177,7 +177,8 @@ public class CryptoWalletService {
             // trying to get balance for wallet
             balance = getCryptoWalletBalance(defaultWallet);
         } else if (!userProfile.isHasCryptoWallets()) {
-            balance = BigDecimal.valueOf(fanTokenDistributionTransactionService.getTmpFanTokenBalanceForUser(userProfile));
+            balance = BigDecimal.valueOf(
+                    fanTokenDistributionTransactionService.getTmpFanTokenBalanceForUser(userProfile).orElse(0L));
         }
         return balance.multiply(CryptoConstants.TRANSFER_FROM_LAMP_TO_FAN_TOKEN);
     }
