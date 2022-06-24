@@ -1,5 +1,6 @@
 package com.nft.platform.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -65,6 +66,7 @@ public class ProfileWallet extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "celebrity_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Celebrity celebrity;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
