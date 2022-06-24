@@ -275,18 +275,15 @@ public class PoeTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<RewardResponseDto> getFeedReward(List<UUID> feedsId, UUID clientId) {
+    public List<RewardResponseDto> getActionReward(List<UUID> feedsId, UUID clientId) {
         List<RewardResponseDto> rewardList = new ArrayList<>();
         List<Poe> likeAndSharePoe = poeRepository.findAll().stream()
                 .filter(poe -> poe.getCode() == PoeAction.LIKE || poe.getCode() == PoeAction.SHARE)
                 .collect(Collectors.toList());
-
         List<PoeTransaction> byActionIdInPoeInAndUserId = poeTransactionRepository.
                 findByActionIdInAndPoeInAndUserId(feedsId, likeAndSharePoe, clientId);
-
         Map<UUID, List<PoeTransaction>> feedPoeTransactionMap = new HashMap<>();
         feedsId.forEach(id -> feedPoeTransactionMap.put(id, getListFeedRewards(id, byActionIdInPoeInAndUserId)));
-
         for (UUID feedId : feedsId) {
             setReceivedAwards(rewardList, feedPoeTransactionMap, feedId);
             setUnclaimedAwards(clientId, rewardList, feedId);
@@ -297,7 +294,7 @@ public class PoeTransactionService {
     private void setUnclaimedAwards(UUID clientId, List<RewardResponseDto> rewardList, UUID feedId) {
         for (PoeAction poeAction : Arrays.asList(PoeAction.LIKE, PoeAction.SHARE)) {
             if (!rewardList.stream()
-                    .anyMatch(reward -> reward.getPoeAction().equals(poeAction))) {
+                    .anyMatch(reward -> reward.getPoeAction().equals(poeAction) && reward.getActionId().equals(feedId))) {
                 if (profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity))) {
                     Poe poe = poeRepository.findByCode(poeAction).get();
                     rewardList.add(RewardResponseDto.builder()

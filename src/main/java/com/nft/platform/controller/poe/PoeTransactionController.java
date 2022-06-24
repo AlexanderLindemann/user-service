@@ -80,11 +80,11 @@ public class PoeTransactionController {
         return poeTransactionService.findLastPoeHistory(celebrityId);
     }
 
-    @GetMapping("/feed-poe")
-    @Operation(summary = "Get feed poe")
+    @GetMapping("/action-poe")
+    @Operation(summary = "Get action poe")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_TECH_TOKEN})
-    public List<RewardResponseDto> getFeedReward(@RequestParam(name = "feedsId") List<UUID> feedsId, @RequestParam UUID clientId) {
-        return poeTransactionService.getFeedReward(feedsId, clientId);
+    public List<RewardResponseDto> getActionReward(@RequestParam(name = "actionId") List<UUID> actionId, @RequestParam UUID clientId) {
+        return poeTransactionService.getActionReward(actionId, clientId);
     }
 }
