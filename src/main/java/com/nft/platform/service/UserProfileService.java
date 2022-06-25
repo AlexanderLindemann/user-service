@@ -10,6 +10,7 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
@@ -331,4 +332,37 @@ public class UserProfileService {
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
+
+    public NftOwnerDto getOwnerInfo(UUID keycloakUserId, List<UUID> userIds) {
+        return NftOwnerDto.builder()
+                    .name(setFullName(userProfileRepository
+                            .findByKeycloakUserId(keycloakUserId)
+                            .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId)))
+                    )
+                    .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
+                .build();
+    }
+
+    private String setFullName(UserProfile profile) {
+
+        String fullName;
+        String firstName = profile.getFirstName();
+        String lastName = profile.getLastName();
+        if (profile.isInvisibleName()) {
+            fullName = profile.getNickname();
+        } else {
+            if (firstName.equals(null) || firstName.isEmpty() && lastName.equals(null) || lastName.isEmpty()) {
+                fullName = "Unnamed";
+            } else if (firstName.equals(null) || firstName.isEmpty()) {
+                fullName = lastName;
+            } else if (lastName.equals(null) || lastName.isEmpty()) {
+                fullName = firstName;
+            } else {
+                fullName = profile.getFirstName() + " " + profile.getLastName();
+            }
+        }
+
+        return fullName;
+    }
+
 }

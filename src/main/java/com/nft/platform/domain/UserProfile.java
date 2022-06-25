@@ -26,30 +26,24 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "user_profile")
 public class UserProfile extends BaseEntity {
+
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "keycloak_user_id")
     private UUID keycloakUserId;
 
-    // updated from keycloak
-    @Column(name = "username")
     private String username;
 
-    @Column(name = "email")
     private String email;
 
     @Column(name = "is_invisible_email")
     private boolean invisibleEmail;
 
-    @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "phone")
     private String phone;
 
     @Column(name = "is_verified_phone")
@@ -64,31 +58,22 @@ public class UserProfile extends BaseEntity {
     @Column(name = "is_two_factor_auth")
     private boolean twoFactoAuth;
 
-    @Column(name = "google_id")
     private String googleId;
 
-    @Column(name = "facebook_id")
     private String facebookId;
 
-    @Column(name = "twitter_id")
     private String twitterId;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "site")
     private String site;
 
-    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "nickname")
     private String nickname;
 
-    @Column(name = "image_promo_banner_url")
     private String imagePromoBannerUrl;
 
     @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -109,4 +94,5 @@ public class UserProfile extends BaseEntity {
     public boolean isHasCryptoWallets() {
         return cryptoWallets != null && !cryptoWallets.isEmpty();
     }
+
 }
