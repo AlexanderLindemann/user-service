@@ -1,6 +1,5 @@
 package com.nft.platform.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +32,6 @@ import java.util.UUID;
                 "            WHERE up.subscriber = true " +
                 "            AND up.celebrity.id = :celebrityId")
 })
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ProfileWallet extends BaseEntity {
 
     public ProfileWallet() {
