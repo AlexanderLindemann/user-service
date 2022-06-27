@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -37,15 +38,28 @@ public class ProfileWallet extends BaseEntity {
 
     @Id
     @GeneratedValue
+    @Column(name = "id", nullable = false)
     private UUID id;
+
+    @Column(name = "experience_count", nullable = false)
     private int experienceCount;
+
+    @Column(name = "vote_balance", nullable = false)
     private int voteBalance;
+
+    @Column(name = "wheel_balance", nullable = false)
     private int wheelBalance;
+
+    @Column(name = "coin_balance", nullable = false)
     private long coinBalance;
+
+    @Column(name = "nft_votes_balance", nullable = false)
     private int nftVotesBalance;
+
+    @Column(name = "subscriber", nullable = false)
     private boolean subscriber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "celebrity_id", nullable = false)
     private Celebrity celebrity;
 
