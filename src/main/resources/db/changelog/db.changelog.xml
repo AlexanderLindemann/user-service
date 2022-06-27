@@ -44,4 +44,5 @@
     <include file="create/2022-05-25-create-user-points-table-and-leaderboard-view.xml" relativeToChangelogFile="true"/>
     <include file="create/2022-05-08-create-fan-token-distribution-transaction.xml" relativeToChangelogFile="true"/>
     <include file="update/2022_06-06-modify-index-user-points.xml" relativeToChangelogFile="true"/>
+    <include file="update/2022_06_27-drop_jsonb_column.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>
