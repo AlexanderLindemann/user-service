@@ -14,7 +14,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.io.Serializable;
 import java.util.UUID;
 
 @NoArgsConstructor
@@ -24,9 +23,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "bundle_for_coins")
-public class BundleForCoins extends BaseEntity implements Serializable {
-
-    public static final long serialVersionUID = 2L;
+public class BundleForCoins extends BaseEntity {
 
     @Id
     @GeneratedValue
