@@ -130,7 +130,8 @@ public class LeaderboardService {
         return leaderboardV2ResponseDto;
     }
 
-    private Set<LeaderboardRow> calculateLeaderboardRowsWithCohort(UUID userId) {
+    @Transactional
+    public Set<LeaderboardRow> calculateLeaderboardRowsWithCohort(UUID userId) {
         List<LeaderboardRow> rowsWithTop11AndCohorts = findLeaderboardRowsWithCohortsCurrentUserAndTop11Users(userId);
         if (rowsWithTop11AndCohorts.size() == 0) {
             log.info("Leaderboard calculateLeaderboardRowsWithCohort is empty");
