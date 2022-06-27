@@ -131,7 +131,7 @@ public class CelebrityService {
     public CelebrityThemeResponseDto uploadCelebrityTheme(UUID celebrityId, String celebrityTheme) {
         Celebrity celebrity = celebrityRepository.findById(celebrityId)
                 .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, celebrityId));
-        celebrity.setJsonTheme(celebrityTheme);
+        //celebrity.setJsonTheme(celebrityTheme);
         celebrityRepository.save(celebrity);
 
         return CelebrityThemeResponseDto.builder()
