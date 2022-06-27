@@ -1,10 +1,13 @@
 package com.nft.platform.domain;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,7 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-//@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 @Table(name = "celebrity")
 public class Celebrity extends BaseEntity {
     @Id
@@ -66,7 +69,7 @@ public class Celebrity extends BaseEntity {
     )
     private List<CelebrityCategory> category;
 
-//    @Type(type = "jsonb")
-//    @Column(name = "theme", columnDefinition = "json")
-//    private Object jsonTheme;
+    @Type(type = "jsonb")
+    @Column(name = "theme", columnDefinition = "json")
+    private Object jsonTheme;
 }

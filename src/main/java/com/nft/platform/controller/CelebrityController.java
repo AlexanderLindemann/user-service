@@ -102,7 +102,7 @@ public class CelebrityController {
     public CelebrityThemeResponseDto uploadCelebrityTheme(@Parameter(name = "id", description = "Celebrity Id")
                                                           @PathVariable("id") UUID celebrityId,
                                                           @Parameter(name = "celebrityTheme", description = "Celebrity Theme")
-                                                          @RequestBody(required = false) String celebrityTheme) {
+                                                          @RequestBody String celebrityTheme) {
         return celebrityService.uploadCelebrityTheme(celebrityId, celebrityTheme);
     }
 
