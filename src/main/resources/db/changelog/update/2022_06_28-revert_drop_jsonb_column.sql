@@ -1,0 +1,1 @@
+ALTER TABLE celebrity ADD theme JSON;
