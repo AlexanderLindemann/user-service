@@ -63,7 +63,7 @@ public class ProfileWallet extends BaseEntity {
     @Column(name = "subscriber", nullable = false)
     private boolean subscriber;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinColumn(name = "celebrity_id", nullable = false)
     private Celebrity celebrity;
 
