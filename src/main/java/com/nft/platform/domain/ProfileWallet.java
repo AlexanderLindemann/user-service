@@ -16,6 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import java.io.Serializable;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -32,7 +33,9 @@ import java.util.UUID;
                 "            WHERE up.subscriber = true " +
                 "            AND up.celebrity.id = :celebrityId")
 })
-public class ProfileWallet extends BaseEntity {
+public class ProfileWallet extends BaseEntity implements Serializable {
+
+    public static final long serialVersionUID = 1L;
 
     public ProfileWallet() {
         this.subscriber = false;
