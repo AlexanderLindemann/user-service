@@ -76,7 +76,7 @@ public class UserProfile extends BaseEntity {
 
     private String imagePromoBannerUrl;
 
-    @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userProfile", fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<ProfileWallet> profileWallets;
 
     @OrderBy("createdAt asc")
