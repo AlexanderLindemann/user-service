@@ -101,7 +101,7 @@ nft:
   audit:
     kafka:
       topic: audit-record-topic
-    enabled: false
+    enabled: true
     provider: kafka
   stand:
     base-url: https://nftdev.nnmdev.ru
