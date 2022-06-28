@@ -25,7 +25,7 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
     Optional<ProfileWallet> findByKeycloakUserIdAndCelebrityId(@NonNull UUID keycloakUserId, @NonNull UUID celebrityId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query(value = "SELECT DISTINCT pW " +
+    @Query(value = "SELECT pW " +
             "FROM ProfileWallet pW " +
             "WHERE pW.userProfile.keycloakUserId = :keycloakUserId " +
             "AND pW.celebrity.id = :celebrityId"
