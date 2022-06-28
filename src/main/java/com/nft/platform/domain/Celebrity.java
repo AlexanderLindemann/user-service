@@ -3,35 +3,29 @@ package com.nft.platform.domain;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Getter
-@Setter
+@Data
 @Entity
+@EqualsAndHashCode(callSuper = true)
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-@Table(name = "celebrity")
 public class Celebrity extends BaseEntity {
     @Id
     @GeneratedValue
@@ -65,9 +59,6 @@ public class Celebrity extends BaseEntity {
     @Column(name = "image_promo_url")
     private String imagePromoUrl;
 
-    @OneToMany(mappedBy = "celebrity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<ProfileWallet> profileWallets;
-
     @ManyToMany
     @JoinTable(
             name = "celebrity_celebrity_category_map",
@@ -79,4 +70,5 @@ public class Celebrity extends BaseEntity {
     @Type(type = "jsonb")
     @Column(name = "theme", columnDefinition = "json")
     private Object jsonTheme;
+
 }

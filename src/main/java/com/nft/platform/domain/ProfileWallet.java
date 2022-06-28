@@ -1,8 +1,11 @@
 package com.nft.platform.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,7 +17,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+
 import java.util.UUID;
+
 
 @AllArgsConstructor
 @Builder
@@ -28,6 +33,8 @@ import java.util.UUID;
                 "            WHERE up.subscriber = true " +
                 "            AND up.celebrity.id = :celebrityId")
 })
+@EqualsAndHashCode(callSuper = true)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "celebrity"})
 public class ProfileWallet extends BaseEntity {
 
     public ProfileWallet() {
@@ -70,4 +77,5 @@ public class ProfileWallet extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "period_id")
     private Period period;
+
 }
