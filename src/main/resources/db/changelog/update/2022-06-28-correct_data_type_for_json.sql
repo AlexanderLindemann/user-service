@@ -1,0 +1,1 @@
+ALTER TABLE celebrity ALTER COLUMN theme TYPE JSONB USING theme::JSONB;
