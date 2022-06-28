@@ -102,11 +102,10 @@ public class ProfileWalletService {
                 );
     }
 
-    @Transactional(readOnly = true)
     public ProfileWallet getProfileWalletForUpdate(UUID keycloakUserId, UUID celebrityId) {
         return profileWalletRepository.findByKeycloakUserIdAndCelebrityIdForUpdate(keycloakUserId, celebrityId)
                 .orElseThrow(() -> new ItemNotFoundException(ProfileWallet.class,
-                        "keycloakUserId=" + keycloakUserId + " celebrityId=" + celebrityId)
+                    "keycloakUserId=" + keycloakUserId + " celebrityId=" + celebrityId)
                 );
     }
 
