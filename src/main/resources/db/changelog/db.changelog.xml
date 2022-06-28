@@ -46,4 +46,5 @@
     <include file="update/2022_06-06-modify-index-user-points.xml" relativeToChangelogFile="true"/>
     <include file="update/2022_06_27-drop_jsonb_column.sql" relativeToChangelogFile="true"/>
     <include file="update/2022_06_28-revert_drop_jsonb_column.sql" relativeToChangelogFile="true"/>
+    <include file="update/2022-06-28-correct_data_type_for_json.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>
