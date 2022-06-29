@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Tag(name = "Period Api")
@@ -43,7 +43,7 @@ public class PeriodController {
     @GetMapping("/endtime")
     @Operation(summary = "Get end time of active Period.")
     @ResponseStatus(HttpStatus.OK)
-    public OffsetDateTime getActivePeriodEndTime() {
+    public LocalDateTime getActivePeriodEndTime() {
         return periodService.getEndPeriod();
     }
 
