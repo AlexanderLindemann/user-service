@@ -30,7 +30,7 @@ env:
   SPRING_DATASOURCE_PASSWORD: users
   SPRING_KAFKA_BOOTSTRAP_SERVERS: b-2.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092,b-1.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092
   NFT_AUDIT_KAFKA-TOPIC: audit-record-topic
-  NFT_AUDIT_ENABLED: true
+  NFT_AUDIT_ENABLED: false
   SPRING_KAFKA_PRODUCER_ENABLED: true
   SPRING_KAFKA_PRODUCER_TOPIC: user-service
   SPRING_KAFKA_CONSUMER_ENABLED: true
