@@ -8,7 +8,7 @@ spring:
     password: users
     hikari:
       pool-name: SpringBootHikariCP
-      maximum-pool-size: 15
+      maximum-pool-size: 30
       minimum-idle: 5
       max-lifetime: 2000000
       connection-timeout: 30000
