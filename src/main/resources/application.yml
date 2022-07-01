@@ -6,17 +6,17 @@ spring:
     url: jdbc:postgresql://localhost:5432/users
     username: users
     password: users
-    hikari:
-      pool-name: SpringBootHikariCP
-      maximum-pool-size: 30
-      minimum-idle: 5
-      max-lifetime: 2000000
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 1000000000
-      dbcp2:
-        test-while-idle: true
-        test-on-borrow: true
+#    hikari:
+#      pool-name: SpringBootHikariCP
+#      maximum-pool-size: 30
+#      minimum-idle: 5
+#      max-lifetime: 2000000
+#      connection-timeout: 30000
+#      idle-timeout: 600000
+#      leak-detection-threshold: 1000000000
+#      dbcp2:
+#        test-while-idle: true
+#        test-on-borrow: true
   jpa:
     hibernate:
       ddl-auto: validate
@@ -171,3 +171,6 @@ management:
         request:
           autotime:
             enabled: true
+jdbc:
+  pool:
+    enabled: false
