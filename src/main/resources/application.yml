@@ -6,14 +6,20 @@ spring:
     url: jdbc:postgresql://localhost:5432/users
     username: users
     password: users
-#    hikari:
+    dbcp2:
+      remove-abandoned-on-maintenance: true
+      remove-abandoned-on-borrow: true
+      remove-abandoned-timeout: 60
+      log-abandoned: true
+      max-total: 30
+  #    hikari:
 #      pool-name: SpringBootHikariCP
-#      maximum-pool-size: 30
+#      maximum-pool-size: 100
 #      minimum-idle: 5
 #      max-lifetime: 2000000
 #      connection-timeout: 30000
 #      idle-timeout: 600000
-#      leak-detection-threshold: 1000000000
+#      leak-detection-threshold: 600000
 #      dbcp2:
 #        test-while-idle: true
 #        test-on-borrow: true
@@ -171,6 +177,3 @@ management:
         request:
           autotime:
             enabled: true
-jdbc:
-  pool:
-    enabled: false

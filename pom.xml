@@ -22,6 +22,7 @@
         <spring.cloud.feign.version>3.1.0</spring.cloud.feign.version>
         <logstash-logback-encoder.version>6.6</logstash-logback-encoder.version>
         <hibernate-types.version>2.12.1</hibernate-types.version>
+        <commons-dbcp2.version>2.9.0</commons-dbcp2.version>
         <test-containers-postgres.version>1.16.2</test-containers-postgres.version>
         <wiremock.version>2.27.2</wiremock.version>
         <redis-starter.version>1.0-SNAPSHOT</redis-starter.version>
@@ -75,6 +76,13 @@
             <artifactId>hibernate-types-55</artifactId>
             <version>${hibernate-types.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-dbcp2</artifactId>
+            <version>${commons-dbcp2.version}</version>
+        </dependency>
+
+
 
         <!-- Spring -->
         <dependency>
