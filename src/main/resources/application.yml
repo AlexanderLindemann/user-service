@@ -6,12 +6,12 @@ spring:
     url: jdbc:postgresql://localhost:5432/users
     username: users
     password: users
-    dbcp2:
-      remove-abandoned-on-maintenance: true
-      remove-abandoned-on-borrow: true
-      remove-abandoned-timeout: 60
-      log-abandoned: true
-      max-total: 30
+#    dbcp2:
+#      remove-abandoned-on-maintenance: true
+#      remove-abandoned-on-borrow: true
+#      remove-abandoned-timeout: 60
+#      log-abandoned: true
+#      max-total: 30
   #    hikari:
 #      pool-name: SpringBootHikariCP
 #      maximum-pool-size: 100

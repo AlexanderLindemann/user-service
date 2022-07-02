@@ -21,8 +21,8 @@ public class ClearTmpFanTokensJob {
 
     private final FanTokenDistributionTransactionService service;
 
-    @SchedulerLock(name = "clear-tmp-fantokens-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
-    @Scheduled(cron = "${nft.tmpfantokens.cronExpression}", zone = "UTC")
+//    @SchedulerLock(name = "clear-tmp-fantokens-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
+//    @Scheduled(cron = "${nft.tmpfantokens.cronExpression}", zone = "UTC")
     public void scheduleClearFanTokensDistributionsOlderThan() {
         log.info("ClearTmpFanTokensJob started, tokenManagementEnable = {}", tokenManagementEnable);
         if (tokenManagementEnable) {

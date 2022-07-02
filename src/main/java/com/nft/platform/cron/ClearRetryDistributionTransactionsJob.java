@@ -21,8 +21,8 @@ public class ClearRetryDistributionTransactionsJob {
 
     private final RetryBlockchainTokenDistributionTransactionService service;
 
-    @SchedulerLock(name = "clear-retry-transaction-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
-    @Scheduled(cron = "${nft.retrydistribute.clearcronExpression}", zone = "UTC")
+//    @SchedulerLock(name = "clear-retry-transaction-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
+//    @Scheduled(cron = "${nft.retrydistribute.clearcronExpression}", zone = "UTC")
     public void scheduleClearRetryDistributionsOlderThan() {
         log.info("ClearRetryDistributionTransactionsJob started, tokenManagementEnable = {}", tokenManagementEnable);
         if (tokenManagementEnable) {

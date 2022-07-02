@@ -16,8 +16,8 @@ public class LeaderboardNumbersRefreshJob {
 
     private final LeaderboardService leaderboardService;
 
-    @Scheduled(cron = "*/10 * * * * *")
-    @SchedulerLock(name = "refresh-leaderboard-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
+//    @Scheduled(cron = "*/10 * * * * *")
+//    @SchedulerLock(name = "refresh-leaderboard-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
     public void refresh() {
         try {
             Instant start = Instant.now();
