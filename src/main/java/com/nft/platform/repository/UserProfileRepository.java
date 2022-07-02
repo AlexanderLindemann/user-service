@@ -45,4 +45,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
     @Query("SELECT up.imageUrl FROM UserProfile up WHERE up.keycloakUserId IN (:userIds)")
     List<String> findImageIdsByUserIds(List<UUID> userIds);
 
+    @Query("SELECT up FROM UserProfile up WHERE (up.username = :name AND :name IS NOT NULL ) " +
+            "OR (up.email = :email AND :email IS NOT NULL) OR (up.phone = :phone AND :phone IS NOT NULL)")
+    Collection<UserProfile> findUserProfileBy(String name, String email, String phone);
 }

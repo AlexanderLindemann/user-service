@@ -13,6 +13,7 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
+import com.nft.platform.dto.request.UserProfileSearchDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
@@ -58,6 +59,14 @@ import javax.validation.Valid;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
+
+    @GetMapping("/search")
+    @Operation(summary = "Search by user profile fields")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
+    public ResponseEntity<List<UserProfileResponseDto>> usersSearch(UserProfileSearchDto searchParams) {
+        return ResponseEntity.ok(userProfileService.search(searchParams));
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get User Profile by Id")

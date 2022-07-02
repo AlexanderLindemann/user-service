@@ -9,6 +9,7 @@ import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
+import com.nft.platform.dto.request.UserProfileSearchDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
@@ -73,6 +74,13 @@ public class UserProfileService {
     public Optional<UserProfileWithWalletsResponseDto> findUserProfileById(@NonNull UUID id) {
         return userProfileRepository.findByIdWithWallets(id)
                 .map(userProfileWithWalletsMapper::toDto);
+    }
+
+    public List<UserProfileResponseDto> search(UserProfileSearchDto params) {
+        return userProfileRepository.findUserProfileBy(params.getName(), params.getEmail(), params.getPhone())
+                .stream()
+                .map(mapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @NonNull
