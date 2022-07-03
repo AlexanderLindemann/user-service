@@ -69,6 +69,7 @@ public class FanService {
                     .setParameter("celebrityId", celebrityId)
                     .getResultList();
             List<CelebrityFanDto> fans = createFans(fanWallets);
+            entityManager.getTransaction().commit();
             return numerate(fans);
         }
         finally {
