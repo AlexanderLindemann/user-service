@@ -209,7 +209,7 @@ public class UserProfileController {
         return ResponseEntity.of(ofNullable(userProfileService.getUsersInfoByKeycloakIds(keycloakUserIds)));
     }
 
-    @GetMapping("/ownerinfo/{userId}")
+    @GetMapping("/owner-infos/{userId}")
     @Secured(ROLE_TECH_TOKEN)
     public NftOwnerDto getNftOwnerInfo(@PathVariable UUID userId, @RequestParam OwnerType type, @RequestParam List<UUID> userIds) {
         return userProfileService.getOwnerInfo(userId, type, userIds);
