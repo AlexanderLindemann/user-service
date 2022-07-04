@@ -18,6 +18,7 @@ import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
+import com.nft.platform.enums.OwnerType;
 import com.nft.platform.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -208,10 +209,10 @@ public class UserProfileController {
         return ResponseEntity.of(ofNullable(userProfileService.getUsersInfoByKeycloakIds(keycloakUserIds)));
     }
 
-    @GetMapping("/ownerinfo/{id}")
+    @GetMapping("/ownerinfo/{userId}")
     @Secured(ROLE_TECH_TOKEN)
-    public NftOwnerDto getNftOwnerInfo(@PathVariable UUID id, @RequestParam List<UUID> userIds) {
-        return userProfileService.getOwnerInfo(id, userIds);
+    public NftOwnerDto getNftOwnerInfo(@PathVariable UUID userId, @RequestParam OwnerType type, @RequestParam List<UUID> userIds) {
+        return userProfileService.getOwnerInfo(userId, type, userIds);
     }
 
 }

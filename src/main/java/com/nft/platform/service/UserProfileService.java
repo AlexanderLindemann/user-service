@@ -14,6 +14,7 @@ import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
+import com.nft.platform.enums.OwnerType;
 import com.nft.platform.exception.FileUploadException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
@@ -52,7 +53,7 @@ import java.util.stream.Collectors;
 public class UserProfileService {
 
     @Value("${nft.celebrity.default-uuid}")
-    private String defaultCelebrity;
+    private String DEFAULT_CELEBRITY;
 
     private final UserProfileRepository userProfileRepository;
     private final CelebrityRepository celebrityRepository;
@@ -333,12 +334,25 @@ public class UserProfileService {
                 .collect(Collectors.toList());
     }
 
-    public NftOwnerDto getOwnerInfo(UUID keycloakUserId, List<UUID> userIds) {
+    public NftOwnerDto getOwnerInfo(UUID userId, OwnerType type, List<UUID> userIds) {
+
+        String fullName = "";
+
+        switch (type) {
+            case CELEBRITY:
+                fullName = celebrityRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId)).getName();
+                break;
+            case FANAT:
+                fullName = setFullName(userProfileRepository
+                        .findByKeycloakUserId(userId)
+                        .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, userId)));
+                break;
+        }
+
         return NftOwnerDto.builder()
-                    .name(setFullName(userProfileRepository
-                            .findByKeycloakUserId(keycloakUserId)
-                            .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId)))
-                    )
+                    .name(fullName)
                     .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
                 .build();
     }
