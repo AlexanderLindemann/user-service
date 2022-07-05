@@ -14,8 +14,8 @@ public class PeriodJob {
 
     private final PeriodService periodService;
 
-//    @SchedulerLock(name = "period-publication-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
-//    @Scheduled(cron = "${nft.period.cronExpression}", zone = "UTC")
+    @SchedulerLock(name = "period-publication-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT30S")
+    @Scheduled(cron = "${nft.period.cronExpression}", zone = "UTC")
     public void createNewPeriodIfNeeded() {
         log.info("Start PeriodJob");
         periodService.createNewPeriodIfNeeded();

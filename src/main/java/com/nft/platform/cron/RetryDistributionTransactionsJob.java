@@ -18,8 +18,8 @@ public class RetryDistributionTransactionsJob {
 
     private final RetryBlockchainTokenDistributionTransactionService service;
 
-//    @SchedulerLock(name = "retry-distribution-transaction-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT60S")
-//    @Scheduled(cron = "${nft.retrydistribute.retrycronExpression}", zone = "UTC")
+    @SchedulerLock(name = "retry-distribution-transaction-lock", lockAtLeastFor = "PT10S", lockAtMostFor = "PT60S")
+    @Scheduled(cron = "${nft.retrydistribute.retrycronExpression}", zone = "UTC")
     public void scheduleRetryDistributions() {
         log.info("RetryDistributionTransactionsJob started, tokenManagementEnable = {}", tokenManagementEnable);
         if (tokenManagementEnable) {
