@@ -83,6 +83,7 @@ security:
     resource:
       id: account
       jwt:
+# key for JWT token decoding
         key-value: |-
           -----BEGIN PUBLIC KEY-----
           MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAueLGRjSeI3hw4E7FsUH1ag3+PE00bZBEKBZJSR2FGOjVteXVn8CexFJjFCW7Phg/CtjSI6dzZFdX912zIsy40wyH76updH0cIPYygih9xVzRjZzXmAV979nq8umWOICl/E5R2uI5ORJ8KvkwA5124RuuUALCF7rm0kaUqMyKEK0JK42GsDfpBMflLOP1o/75VuG//sfvNj+Bl/IYunUesYCcvwX49i+9whEBjUbBHGFXO6YZ47K4JFtc4rQcLM6p27F8JNzoiuwyheSzuKqLYW9RW/0iG1NutC9cFHOrSKYN1VIg93vVIpDCnrBDzIbWYsCZkB1V4b9XXlnXSyK01QIDAQAB
