@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -102,16 +103,23 @@ public class CelebrityService {
     }
 
     @Transactional(readOnly = true)
-    public List<CelebrityResponseDto> getPopular(String searchName) {
-        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContains(searchName);
+    public Page<CelebrityResponseDto> getPopular(String searchName , Pageable pageable) {
+
+        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContainsIgnoreCase(searchName);
 
         List<NftCountResponseDto> nftCountList = nftServiceApiClient.getNftCount(celebrities.stream()
-                .map(Celebrity::getId)
-                .collect(toList()));
+            .map(Celebrity::getId)
+            .collect(toList()));
 
-        return sortCelebritiesByNftCountList(celebrities, nftCountList).stream()
-                .map(mapper::toDto)
-                .collect(toList());
+        List<CelebrityResponseDto> sortedCelebritiesPopular = sortCelebritiesByNftCountList(celebrities, nftCountList).stream()
+            .map(mapper::toDto)
+            .collect(toList());
+
+        final int start = (int)pageable.getOffset();
+        final int end = Math.min((start + pageable.getPageSize()), sortedCelebritiesPopular.size());
+
+        return new PageImpl<>(sortedCelebritiesPopular.subList(start, end), pageable, sortedCelebritiesPopular.size());
+
     }
 
     private List<Celebrity> sortCelebritiesByNftCountList(List<Celebrity> celebrities,

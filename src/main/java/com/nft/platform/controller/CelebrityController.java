@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
+
 @Tag(name = "Celebrity Api")
 @RestController
 @RequiredArgsConstructor
@@ -92,8 +94,8 @@ public class CelebrityController {
     @GetMapping(path = "/popular")
     @Operation(summary = "Get popular celebrities")
     @ResponseStatus(HttpStatus.OK)
-    public List<CelebrityResponseDto> getPopular(@RequestParam(defaultValue = "", required = false) String searchName) {
-        return celebrityService.getPopular(searchName);
+    public Page<CelebrityResponseDto> getPopular(@RequestParam(defaultValue = "", required = false) String searchName, @PageableDefault(direction = ASC) Pageable pageable) {
+        return celebrityService.getPopular(searchName, pageable);
     }
 
     @PutMapping("/{id}/theme")
