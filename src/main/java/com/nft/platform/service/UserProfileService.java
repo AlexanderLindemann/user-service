@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 public class UserProfileService {
 
     @Value("${nft.celebrity.default-uuid}")
-    private String DEFAULT_CELEBRITY;
+    private String defaultCelebrity;
 
     private final UserProfileRepository userProfileRepository;
     private final CelebrityRepository celebrityRepository;
