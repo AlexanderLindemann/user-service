@@ -5,6 +5,7 @@ import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityThemeResponseDto;
+import com.nft.platform.dto.response.LinkCelebrityResponseDto;
 import com.nft.platform.dto.response.NftCountResponseDto;
 import com.nft.platform.dto.response.ShowcaseResponseDto;
 import com.nft.platform.exception.ItemConflictException;
@@ -50,6 +51,22 @@ public class CelebrityService {
         return celebrityRepository.findByIdAndActiveTrue(id)
                 .map(mapper::toDto);
     }
+
+    @Transactional(readOnly = true)
+    public LinkCelebrityResponseDto getCelebrityLink(@NonNull UUID id) {
+        Optional<Celebrity> celebrity = celebrityRepository.findById(id);
+        if (celebrity.isPresent()) {
+            return LinkCelebrityResponseDto.builder()
+                    .android_link(celebrity.get().getAndroidLink())
+                    .ios_link(celebrity.get().getIosLink())
+                    .build();
+        }
+        return LinkCelebrityResponseDto.builder()
+                .android_link("message for link android multiapp")
+                .ios_link("message for link ios multiapp")
+                .build();
+    }
+
 
     @NonNull
     @Transactional(readOnly = true)
@@ -103,19 +120,19 @@ public class CelebrityService {
     }
 
     @Transactional(readOnly = true)
-    public Page<CelebrityResponseDto> getPopular(String searchName , Pageable pageable) {
+    public Page<CelebrityResponseDto> getPopular(String searchName, Pageable pageable) {
 
         List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContainsIgnoreCaseAndActiveTrue(searchName);
 
         List<NftCountResponseDto> nftCountList = nftServiceApiClient.getNftCount(celebrities.stream()
-            .map(Celebrity::getId)
-            .collect(toList()));
+                .map(Celebrity::getId)
+                .collect(toList()));
 
         List<CelebrityResponseDto> sortedCelebritiesPopular = sortCelebritiesByNftCountList(celebrities, nftCountList).stream()
-            .map(mapper::toDto)
-            .collect(toList());
+                .map(mapper::toDto)
+                .collect(toList());
 
-        final int start = (int)pageable.getOffset();
+        final int start = (int) pageable.getOffset();
         final int end = Math.min((start + pageable.getPageSize()), sortedCelebritiesPopular.size());
 
         return new PageImpl<>(sortedCelebritiesPopular.subList(start, end), pageable, sortedCelebritiesPopular.size());

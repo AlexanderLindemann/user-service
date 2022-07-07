@@ -4,6 +4,7 @@ import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityThemeResponseDto;
+import com.nft.platform.dto.response.LinkCelebrityResponseDto;
 import com.nft.platform.service.CelebrityService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,6 +52,16 @@ public class CelebrityController {
     ) {
         Optional<CelebrityResponseDto> celebrityResponseDtoO = celebrityService.findCelebrityById(celebrityId);
         return ResponseEntity.of(celebrityResponseDtoO);
+    }
+
+    @GetMapping("/links/{id}")
+    @Operation(summary = "Get Celebrity Link")
+    @ResponseStatus(HttpStatus.OK)
+    public LinkCelebrityResponseDto getLinkCelebrity(
+            @Parameter(name = "id", description = "Celebrity Id")
+            @PathVariable(name = "id") UUID celebrityId
+    ) {
+        return celebrityService.getCelebrityLink(celebrityId);
     }
 
     @GetMapping
