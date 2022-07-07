@@ -57,10 +57,7 @@ public class CelebrityController {
     @GetMapping("/links/{id}")
     @Operation(summary = "Get Celebrity Link")
     @ResponseStatus(HttpStatus.OK)
-    public LinkCelebrityResponseDto getLinkCelebrity(
-            @Parameter(name = "id", description = "Celebrity Id")
-            @PathVariable(name = "id") UUID celebrityId
-    ) {
+    public LinkCelebrityResponseDto getLinkCelebrity(@RequestParam(name = "celebrityId", required = false) UUID celebrityId){
         return celebrityService.getCelebrityLink(celebrityId);
     }
 

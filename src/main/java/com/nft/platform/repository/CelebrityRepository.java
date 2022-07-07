@@ -21,7 +21,7 @@ public interface CelebrityRepository extends JpaRepository<Celebrity, UUID> {
 
     boolean existsByNameIgnoreCase(@NonNull String name);
 
-    List<Celebrity> findCelebritiesByNameContainsAndActiveTrueIgnoreCase(String searchName);
+    List<Celebrity> findCelebritiesByNameContainsIgnoreCaseAndActiveTrue(@NonNull String searchName);
 
     Optional<Celebrity> findById(UUID id);
 

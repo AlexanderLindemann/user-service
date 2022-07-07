@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -53,17 +54,19 @@ public class CelebrityService {
     }
 
     @Transactional(readOnly = true)
-    public LinkCelebrityResponseDto getCelebrityLink(@NonNull UUID id) {
-        Optional<Celebrity> celebrity = celebrityRepository.findById(id);
-        if (celebrity.isPresent()) {
-            return LinkCelebrityResponseDto.builder()
-                    .android_link(celebrity.get().getAndroidLink())
-                    .ios_link(celebrity.get().getIosLink())
-                    .build();
+    public LinkCelebrityResponseDto getCelebrityLink(UUID id) {
+        if (Objects.nonNull(id)) {
+            Optional<Celebrity> celebrity = celebrityRepository.findById(id);
+            if (celebrity.isPresent()) {
+                return LinkCelebrityResponseDto.builder()
+                        .android_link(celebrity.get().getAndroidLink())
+                        .ios_link(celebrity.get().getIosLink())
+                        .build();
+            }
         }
         return LinkCelebrityResponseDto.builder()
-                .android_link("message for link android multiapp")
-                .ios_link("message for link ios multiapp")
+                .android_link("message for link android multi-app")
+                .ios_link("message for link ios multi-app")
                 .build();
     }
 
