@@ -1,7 +1,7 @@
 package com.nft.platform.service;
 
 import com.nft.platform.challengeservice.api.dto.enums.AwardType;
-import com.nft.platform.challengeservice.api.dto.response.RewardResponseDto;
+import com.nft.platform.challengeservice.api.dto.response.AdditionalRewardsResponseDto;
 import com.nft.platform.challengeservice.api.event.KafkaChallengeCompletedEvent;
 import com.nft.platform.repository.ProfileWalletRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class ChallengeRewardService {
     @Transactional
     public void handleRewards(KafkaChallengeCompletedEvent event) {
         log.info("Will handle challenge rewards");
-        for (RewardResponseDto rewardResponseDto : event.getRewards()) {
+        for (AdditionalRewardsResponseDto rewardResponseDto : event.getRewards()) {
             if (rewardResponseDto.getAwardType() == AwardType.COINS) {
                 profileWalletRepository.updateProfileWalletCoinBalance(
                         event.getUserId(),
