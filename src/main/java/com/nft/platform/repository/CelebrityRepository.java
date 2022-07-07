@@ -13,10 +13,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface CelebrityRepository extends JpaRepository<Celebrity, UUID> {
-    Optional<Celebrity> findByName(@NonNull String name);
     Optional<Celebrity> findByIdAndActiveTrue(UUID id);
     Page<Celebrity> findAllByActiveTrue(Pageable pageable);
     boolean existsByNameIgnoreCase(@NonNull String name);
-    List<Celebrity> findCelebritiesByNameContainsAndActiveTrueIgnoreCase(String searchName);
+    List<Celebrity> findCelebritiesByNameContainsIgnoreCaseAndActiveTrue(@NonNull String searchName);
 
 }
