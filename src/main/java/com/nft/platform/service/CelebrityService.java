@@ -46,14 +46,14 @@ public class CelebrityService {
     @NonNull
     @Transactional(readOnly = true)
     public Optional<CelebrityResponseDto> findCelebrityById(@NonNull UUID id) {
-        return celebrityRepository.findById(id)
+        return celebrityRepository.findByIdAndActiveTrue(id)
                 .map(mapper::toDto);
     }
 
     @NonNull
     @Transactional(readOnly = true)
     public Page<CelebrityResponseDto> getCelebrityPage(@NonNull Pageable pageable) {
-        Page<Celebrity> celebrityPage = celebrityRepository.findAll(pageable);
+        Page<Celebrity> celebrityPage = celebrityRepository.findAllByActiveTrue(pageable);
         return celebrityPage.map(mapper::toDto);
     }
 
@@ -103,7 +103,7 @@ public class CelebrityService {
 
     @Transactional(readOnly = true)
     public List<CelebrityResponseDto> getPopular(String searchName) {
-        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContains(searchName);
+        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContainsAndActiveTrue(searchName);
 
         List<NftCountResponseDto> nftCountList = nftServiceApiClient.getNftCount(celebrities.stream()
                 .map(Celebrity::getId)
