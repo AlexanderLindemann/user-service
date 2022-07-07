@@ -71,4 +71,28 @@ public class Celebrity extends BaseEntity {
     @Column(name = "theme", columnDefinition = "json")
     private Object jsonTheme;
 
+    @Column(name = "last_name")
+    private String lastName;
+
+    @Column(name = "image_card_mp")
+    private String imageCardMp;
+
+    @Column(name = "image_card_app")
+    private String imageCardApp;
+
+    @Column(name = "image_promo_app")
+    private String imagePromoApp;
+
+    @Column(name = "image_login")
+    private String imageLogin;
+
+    @Column(name = "image_nft_owner")
+    private String imageNftOwner;
+
+    @Column(name = "image_screen")
+    private String imageScreen;
+
+    @Column(name = "active")
+    private boolean active;
+
 }

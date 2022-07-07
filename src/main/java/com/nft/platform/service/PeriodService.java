@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
@@ -106,7 +107,19 @@ public class PeriodService {
     }
 
     public LocalDateTime getEndPeriod() {
-        return periodRepository.findEndTimeByActiveStatus();
+
+        LocalDateTime period = periodRepository.findEndTimeByActiveStatus();
+
+        int hour = period.getHour();
+
+        if (hour <= 7) {
+            return period.truncatedTo(ChronoUnit.DAYS).plusHours(8);
+        } else if (hour <= 15) {
+            return period.truncatedTo(ChronoUnit.DAYS).plusHours(16);
+        } else {
+            return period.truncatedTo(ChronoUnit.DAYS).plusDays(1);
+        }
+
     }
 
 }

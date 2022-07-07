@@ -56,4 +56,28 @@ public abstract class AbstractCelebrityDto {
 
     @Schema(description = "Celebrity theme", required = true)
     private Object jsonTheme;
+
+    @Schema(description = "Celebrity last name")
+    private String lastName;
+
+    @Schema(description = "Celebrity image card mp")
+    private String imageCardMp;
+
+    @Schema(description = "Celebrity image card app")
+    private String imageCardApp;
+
+    @Schema(description = "Celebrity image promo app")
+    private String imagePromoApp;
+
+    @Schema(description = "Celebrity image login")
+    private String imageLogin;
+
+    @Schema(description = "Celebrity image nft owner")
+    private String imageNftOwner;
+
+    @Schema(description = "Celebrity image screen")
+    private String imageScreen;
+
+    @Schema(description = "Celebrity active status")
+    private boolean active;
 }

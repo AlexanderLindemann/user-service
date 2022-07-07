@@ -47,14 +47,14 @@ public class CelebrityService {
     @NonNull
     @Transactional(readOnly = true)
     public Optional<CelebrityResponseDto> findCelebrityById(@NonNull UUID id) {
-        return celebrityRepository.findById(id)
+        return celebrityRepository.findByIdAndActiveTrue(id)
                 .map(mapper::toDto);
     }
 
     @NonNull
     @Transactional(readOnly = true)
     public Page<CelebrityResponseDto> getCelebrityPage(@NonNull Pageable pageable) {
-        Page<Celebrity> celebrityPage = celebrityRepository.findAll(pageable);
+        Page<Celebrity> celebrityPage = celebrityRepository.findAllByActiveTrue(pageable);
         return celebrityPage.map(mapper::toDto);
     }
 
