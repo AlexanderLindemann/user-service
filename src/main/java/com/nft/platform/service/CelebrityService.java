@@ -105,7 +105,7 @@ public class CelebrityService {
     @Transactional(readOnly = true)
     public Page<CelebrityResponseDto> getPopular(String searchName , Pageable pageable) {
 
-        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContainsIgnoreCase(searchName);
+        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContainsAndActiveTrueIgnoreCase(searchName);
 
         List<NftCountResponseDto> nftCountList = nftServiceApiClient.getNftCount(celebrities.stream()
             .map(Celebrity::getId)
