@@ -135,7 +135,7 @@ nft:
   token-management:
     enable: false
   period:
-    cronExpression: "0 0 */8 * * *"
+    cronExpression: "0 0,8,16 * * *"
   tmpfantokens:
     cronExpression: "0 0 1 * * *"
     olderThanDays: 30
