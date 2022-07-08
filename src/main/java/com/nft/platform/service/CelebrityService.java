@@ -65,8 +65,8 @@ public class CelebrityService {
             }
         }
         return LinkCelebrityResponseDto.builder()
-                .android_link("message for link android multi-app")
-                .ios_link("message for link ios multi-app")
+                .android_link("https://ru.wikipedia.org/wiki")
+                .ios_link("https://ru.wikipedia.org/wiki")
                 .build();
     }
 
