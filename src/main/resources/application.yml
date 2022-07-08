@@ -38,7 +38,10 @@ spring:
     bootstrap-servers: tswf.io:9092
     producer:
       enabled: false
-      topic: user-service
+      group:
+        id: user-service
+      income-history:
+        topic: income-history
     consumer:
       enabled: false
       group:

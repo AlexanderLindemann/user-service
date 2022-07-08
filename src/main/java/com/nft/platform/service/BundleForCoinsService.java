@@ -1,5 +1,7 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.enums.EventType;
+import com.nft.platform.common.event.BundleTransactionEvent;
 import com.nft.platform.domain.BundleForCoins;
 import com.nft.platform.domain.BundleForCoins_;
 import com.nft.platform.domain.ProfileWallet;
@@ -15,6 +17,7 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,6 +36,7 @@ public class BundleForCoinsService {
     @Value("${nft.celebrity.default-uuid}")
     private String defaultCelebrity;
 
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final BundleForCoinsMapper bundleForCoinsMapper;
     private final BundleForCoinsRepository bundleForCoinsRepository;
     private final ProfileWalletRepository profileWalletRepository;
@@ -61,6 +65,16 @@ public class BundleForCoinsService {
         }
         profileWallet.setCoinBalance(profileWallet.getCoinBalance() - coins);
         profileWalletRepository.save(profileWallet);
+        applicationEventPublisher.publishEvent(
+            BundleTransactionEvent.builder()
+                .celebrityId(celebrityId)
+                .userId(keycloakUserId)
+                .bundleId(bundle.getId())
+                .cost(bundle.getCoins())
+                .quantity(bundle.getBundleSize())
+                .eventType(EventType.BUNDLE_TRANSACTION_CREATED)
+            .build()
+        );
     }
 
     @Transactional(readOnly = true)
