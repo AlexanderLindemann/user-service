@@ -39,13 +39,14 @@ public class CelebrityMapperTest {
         Celebrity celebrity = createDummyCelebrity();
         CelebrityResponseDto dto = celebrityMapper.toDto(celebrity);
         assertEquals(celebrity.getImageUrl(), dto.getImageUrl());
-        assertEquals(celebrity.getName(), dto.getName());
+        assertEquals(celebrity.getName() + " " + celebrity.getLastName(), dto.getName());
     }
 
     private Celebrity createDummyCelebrity() {
         return Celebrity.builder()
                 .imageUrl("image")
                 .name("name")
+                .lastName("lastname")
                 .build();
     }
 
