@@ -10,7 +10,9 @@ import com.nft.platform.dto.response.ShowcaseResponseDto;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.repository.CelebrityCategoryRepository;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,7 @@ public abstract class CelebrityMapper {
 
     public abstract Celebrity toEntity(CelebrityRequestDto requestDto, @MappingTarget Celebrity celebrity);
 
+    @Mapping(target = "name", expression = "java(celebrity.getName() + \" \" + celebrity.getLastName())")
     public abstract CelebrityResponseDto toDto(Celebrity celebrity);
 
     public abstract CelebrityNftResponseDto toNftDto(Celebrity celebrity, Integer nftCount);
@@ -46,6 +49,11 @@ public abstract class CelebrityMapper {
 
         return new CelebrityShowcaseResponseDto(celebrity, nft);
     }
+
+//    @Named("getFullName")
+//    static String getFullName(Celebrity celebrity) {
+//        return celebrity.getName() + " " + celebrity.getLastName();
+//    }
 
     private Celebrity getCelebrity(List<Celebrity> celebrities, UUID celebrityId) {
         return celebrities.stream()
