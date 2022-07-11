@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring")
@@ -33,7 +34,7 @@ public abstract class CelebrityMapper {
 
     public abstract Celebrity toEntity(CelebrityRequestDto requestDto, @MappingTarget Celebrity celebrity);
 
-    @Mapping(target = "name", expression = "java(celebrity.getName() + \" \" + celebrity.getLastName())")
+    @Mapping(target = "name", qualifiedByName = "getFullName")
     public abstract CelebrityResponseDto toDto(Celebrity celebrity);
 
     public abstract CelebrityNftResponseDto toNftDto(Celebrity celebrity, Integer nftCount);
@@ -50,10 +51,10 @@ public abstract class CelebrityMapper {
         return new CelebrityShowcaseResponseDto(celebrity, nft);
     }
 
-//    @Named("getFullName")
-//    static String getFullName(Celebrity celebrity) {
-//        return celebrity.getName() + " " + celebrity.getLastName();
-//    }
+    @Named("getFullName")
+    static String getFullName(Celebrity celebrity) {
+        return celebrity.getName() + " " + (Objects.nonNull(celebrity.getLastName()) ? celebrity.getLastName() : "");
+    }
 
     private Celebrity getCelebrity(List<Celebrity> celebrities, UUID celebrityId) {
         return celebrities.stream()
