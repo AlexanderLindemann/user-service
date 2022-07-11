@@ -19,7 +19,7 @@ public class TokenDistributionTransactionChangedImpl implements TokenDistributio
 
     private final KafkaEventSender kafkaEventSender;
 
-    @Value("${spring.kafka.producer.topic}")
+    @Value("${spring.kafka.producer.income-history.topic}")
     private String topic;
 
     @Override
