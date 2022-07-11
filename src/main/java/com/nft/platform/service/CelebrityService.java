@@ -59,14 +59,14 @@ public class CelebrityService {
             Optional<Celebrity> celebrity = celebrityRepository.findById(id);
             if (celebrity.isPresent()) {
                 return LinkCelebrityResponseDto.builder()
-                        .android_link(celebrity.get().getAndroidLink())
-                        .ios_link(celebrity.get().getIosLink())
+                        .androidLink(celebrity.get().getAndroidLink())
+                        .iosLink(celebrity.get().getIosLink())
                         .build();
             }
         }
         return LinkCelebrityResponseDto.builder()
-                .android_link("https://ru.wikipedia.org/wiki")
-                .ios_link("https://ru.wikipedia.org/wiki")
+                .androidLink("https://ru.wikipedia.org/wiki")
+                .iosLink("https://ru.wikipedia.org/wiki")
                 .build();
     }
 
