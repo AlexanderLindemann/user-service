@@ -12,6 +12,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LinkCelebrityResponseDto {
-    private String ios_link;
-    private String android_link;
+    private String iosLink;
+    private String androidLink;
 }
