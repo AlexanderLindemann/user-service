@@ -39,7 +39,7 @@ public class CelebrityMapperTest {
         Celebrity celebrity = createDummyCelebrity();
         CelebrityResponseDto dto = celebrityMapper.toDto(celebrity);
         assertEquals(celebrity.getImageUrl(), dto.getImageUrl());
-        assertEquals(celebrity.getName() + " " + celebrity.getLastName(), dto.getName());
+        assertEquals(celebrity.getName(), dto.getName());
     }
 
     private Celebrity createDummyCelebrity() {
