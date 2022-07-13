@@ -34,7 +34,7 @@ public abstract class CelebrityMapper {
 
     public abstract Celebrity toEntity(CelebrityRequestDto requestDto, @MappingTarget Celebrity celebrity);
 
-    @Mapping(target = "name", source = "celebrity", qualifiedByName = "getFullName")
+//    @Mapping(target = "name", source = "celebrity", qualifiedByName = "getFullName")
     public abstract CelebrityResponseDto toDto(Celebrity celebrity);
 
     public abstract CelebrityNftResponseDto toNftDto(Celebrity celebrity, Integer nftCount);
@@ -51,10 +51,10 @@ public abstract class CelebrityMapper {
         return new CelebrityShowcaseResponseDto(celebrity, nft);
     }
 
-    @Named(value = "getFullName")
-    static String getFullName(Celebrity celebrity) {
-        return celebrity.getName() + " " + (Objects.nonNull(celebrity.getLastName()) ? celebrity.getLastName() : "");
-    }
+//    @Named(value = "getFullName")
+//    static String getFullName(Celebrity celebrity) {
+//        return celebrity.getName() + " " + (Objects.nonNull(celebrity.getLastName()) ? celebrity.getLastName() : "");
+//    }
 
     private Celebrity getCelebrity(List<Celebrity> celebrities, UUID celebrityId) {
         return celebrities.stream()
