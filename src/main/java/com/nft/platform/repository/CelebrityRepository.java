@@ -25,4 +25,6 @@ public interface CelebrityRepository extends JpaRepository<Celebrity, UUID> {
 
     Optional<Celebrity> findById(UUID id);
 
+    List<Celebrity> findAllByActiveIsTrue();
+
 }
