@@ -67,7 +67,6 @@ public class UserProfileService {
     private final CurrentUserProfileWithWalletsMapper currentUserProfileWithWalletsMapper;
     private final SecurityUtil securityUtil;
     private final ProfileWalletService profileWalletService;
-
     private final FileServiceClient fileServiceClient;
 
     @NonNull
@@ -362,8 +361,8 @@ public class UserProfileService {
         }
 
         return NftOwnerDto.builder()
-                    .name(fullName)
-                    .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
+                .name(fullName)
+                .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
                 .build();
     }
 
