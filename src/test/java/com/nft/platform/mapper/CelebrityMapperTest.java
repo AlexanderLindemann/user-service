@@ -46,6 +46,7 @@ public class CelebrityMapperTest {
         return Celebrity.builder()
                 .imageUrl("image")
                 .name("name")
+                .lastName("lastname")
                 .build();
     }
 

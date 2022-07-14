@@ -281,7 +281,9 @@ public class PoeTransactionService {
                 .filter(poe -> poe.getCode() == PoeAction.LIKE ||
                         poe.getCode() == PoeAction.SHARE ||
                         poe.getCode() == PoeAction.QUIZ ||
-                        poe.getCode() == PoeAction.CHALLENGE)
+                        poe.getCode() == PoeAction.CHALLENGE ||
+                        poe.getCode() == PoeAction.WHEEL_ROLLED ||
+                        poe.getCode() == PoeAction.VOTE)
                 .collect(Collectors.toList());
         List<PoeTransaction> byActionIdInPoeInAndUserId = poeTransactionRepository.
                 findByActionIdInAndPoeInAndUserId(actionId, likeAndSharePoe, clientId);
@@ -295,7 +297,13 @@ public class PoeTransactionService {
     }
 
     private void setUnclaimedAwards(UUID clientId, List<RewardResponseDto> rewardList, UUID feedId) {
-        for (PoeAction poeAction : Arrays.asList(PoeAction.LIKE, PoeAction.SHARE, PoeAction.QUIZ, PoeAction.CHALLENGE)) {
+        List<PoeAction> poeActionList = Arrays.asList(PoeAction.LIKE,
+                PoeAction.SHARE,
+                PoeAction.QUIZ,
+                PoeAction.CHALLENGE,
+                PoeAction.VOTE,
+                PoeAction.WHEEL_ROLLED);
+        for (PoeAction poeAction : poeActionList) {
             if (!rewardList.stream()
                     .anyMatch(reward -> reward.getPoeAction().equals(poeAction) && reward.getActionId().equals(feedId))) {
                 if (profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity))) {

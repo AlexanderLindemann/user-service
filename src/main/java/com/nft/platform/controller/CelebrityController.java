@@ -54,7 +54,7 @@ public class CelebrityController {
         return ResponseEntity.of(celebrityResponseDtoO);
     }
 
-    @GetMapping("/links/{id}")
+    @GetMapping("/links")
     @Operation(summary = "Get Celebrity Link")
     @ResponseStatus(HttpStatus.OK)
     public LinkCelebrityResponseDto getLinkCelebrity(@RequestParam(name = "celebrityId", required = false) UUID celebrityId){

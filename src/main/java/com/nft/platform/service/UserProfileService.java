@@ -44,6 +44,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -348,9 +349,10 @@ public class UserProfileService {
 
         switch (type) {
             case CELEBRITY:
-                fullName = celebrityRepository
+                Celebrity celebrity = celebrityRepository
                         .findById(userId)
-                        .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId)).getName();
+                        .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId));
+                fullName = celebrity.getName() + (Objects.nonNull(celebrity.getLastName()) ? (" " + celebrity.getLastName()) : "");
                 break;
             case FANAT:
                 fullName = setFullName(userProfileRepository
