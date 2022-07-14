@@ -174,4 +174,11 @@ public class CelebrityService {
                 .map(mapper::toDto)
                 .collect(Collectors.toSet());
     }
+
+    @Transactional(readOnly = true)
+    public List<UUID> getActiveCelebrityIds() {
+        return celebrityRepository.findAllByActiveIsTrue().stream()
+                .map(Celebrity::getId)
+                .collect(toList());
+    }
 }

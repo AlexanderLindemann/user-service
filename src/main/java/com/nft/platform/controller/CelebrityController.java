@@ -123,4 +123,12 @@ public class CelebrityController {
     public Set<CelebrityResponseDto> getCelebrities(@RequestParam(name = "celebrityIds") Set<UUID> celebrityIds) {
         return celebrityService.getCelebrities(celebrityIds);
     }
+
+    @GetMapping(path = "/active")
+    @Operation(summary = "Get active celebrities Ids")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UUID> getActiveCelebrityIds() {
+        return celebrityService.getActiveCelebrityIds();
+    }
+
 }
