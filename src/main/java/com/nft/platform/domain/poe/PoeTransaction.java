@@ -1,11 +1,11 @@
 package com.nft.platform.domain.poe;
 
 import com.nft.platform.domain.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,14 +15,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.util.UUID;
 
+import java.util.UUID;
+@Data
+@Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Getter
-@Setter
-@Entity
 @Table(name = "poe_transaction")
 public class PoeTransaction extends BaseEntity {
 
@@ -52,4 +51,5 @@ public class PoeTransaction extends BaseEntity {
 
     @Column(name = "coins_reward")
     private Integer coinsReward;
+
 }
