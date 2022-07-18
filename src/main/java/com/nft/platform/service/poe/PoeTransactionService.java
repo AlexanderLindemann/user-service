@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -275,62 +276,68 @@ public class PoeTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<RewardResponseDto> getActionReward(List<UUID> actionId, UUID clientId) {
+    public List<RewardResponseDto> getActionReward(List<UUID> actionIds, UUID clientId) {
+        List<PoeAction> poeActionList = getPoeActions();
         List<RewardResponseDto> rewardList = new ArrayList<>();
-        List<Poe> likeAndSharePoe = poeRepository.findAll().stream()
-                .filter(poe -> poe.getCode() == PoeAction.LIKE ||
-                        poe.getCode() == PoeAction.SHARE ||
-                        poe.getCode() == PoeAction.QUIZ ||
-                        poe.getCode() == PoeAction.CHALLENGE ||
-                        poe.getCode() == PoeAction.WHEEL_ROLLED ||
-                        poe.getCode() == PoeAction.VOTE)
+        List<Poe> actionPoe = poeRepository.findAll().stream()
+                .filter(poe -> poeActionList.contains(poe.getCode()))
                 .collect(Collectors.toList());
         List<PoeTransaction> byActionIdInPoeInAndUserId = poeTransactionRepository.
-                findByActionIdInAndPoeInAndUserId(actionId, likeAndSharePoe, clientId);
-        Map<UUID, List<PoeTransaction>> feedPoeTransactionMap = new HashMap<>();
-        actionId.forEach(id -> feedPoeTransactionMap.put(id, getListFeedRewards(id, byActionIdInPoeInAndUserId)));
-        for (UUID action : actionId) {
-            setReceivedAwards(rewardList, feedPoeTransactionMap, action);
-            setUnclaimedAwards(clientId, rewardList, action);
+                findByActionIdInAndPoeInAndUserId(actionIds, actionPoe, clientId);
+        Map<UUID, List<PoeTransaction>> PoeTransactionMap = new HashMap<>();
+        actionIds.forEach(id -> PoeTransactionMap.put(id, getListActionRewards(id, byActionIdInPoeInAndUserId)));
+        for (UUID action : actionIds) {
+            setReceivedRewards(rewardList, PoeTransactionMap, action);
+            setUnclaimedRewards(clientId, rewardList, action);
         }
         return rewardList;
     }
 
-    private void setUnclaimedAwards(UUID clientId, List<RewardResponseDto> rewardList, UUID feedId) {
-        List<PoeAction> poeActionList = Arrays.asList(PoeAction.LIKE,
-                PoeAction.SHARE,
-                PoeAction.QUIZ,
-                PoeAction.CHALLENGE,
-                PoeAction.VOTE,
-                PoeAction.WHEEL_ROLLED);
+    private void setUnclaimedRewards(UUID clientId, List<RewardResponseDto> rewardList, UUID feedId) {
+        List<PoeAction> poeActionList = getPoeActions();
+        boolean userSubscriber = profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity));
+        Map<PoeAction, Poe> actionPoeMap = poeRepository.findAll().stream().collect(Collectors.toMap(Poe::getCode, poe -> poe));
         for (PoeAction poeAction : poeActionList) {
-            if (!rewardList.stream()
-                    .anyMatch(reward -> reward.getPoeAction().equals(poeAction) && reward.getActionId().equals(feedId))) {
-                if (profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity))) {
-                    Poe poe = poeRepository.findByCode(poeAction).get();
-                    rewardList.add(RewardResponseDto.builder()
-                            .actionId(feedId)
-                            .isReceived(false)
-                            .poeAction(poeAction)
-                            .coins(CommonUtils.toPrimitive(poe.getCoinsReward()) + CommonUtils.toPrimitive(poe.getCoinsRewardSub()))
-                            .poe(CommonUtils.toPrimitive(poe.getPointsReward()) + CommonUtils.toPrimitive(poe.getPointsRewardSub()))
-                            .build());
+            if (rewardList.stream()
+                    .noneMatch(reward -> reward.getPoeAction().equals(poeAction) && reward.getActionId().equals(feedId))) {
+                if (userSubscriber) {
+                    Poe poe = actionPoeMap.get(poeAction);
+                    if (Objects.nonNull(poe)) {
+                        rewardList.add(RewardResponseDto.builder()
+                                .actionId(feedId)
+                                .isReceived(false)
+                                .poeAction(poeAction)
+                                .coins(CommonUtils.toPrimitive(poe.getCoinsReward()) + CommonUtils.toPrimitive(poe.getCoinsRewardSub()))
+                                .poe(CommonUtils.toPrimitive(poe.getPointsReward()) + CommonUtils.toPrimitive(poe.getPointsRewardSub()))
+                                .build());
+                    }
                 } else {
-                    Poe poe = poeRepository.findByCode(poeAction).get();
-                    rewardList.add(RewardResponseDto.builder()
-                            .actionId(feedId)
-                            .isReceived(false)
-                            .poeAction(poeAction)
-                            .coins(CommonUtils.toPrimitive(poe.getCoinsReward()))
-                            .poe(CommonUtils.toPrimitive(poe.getPointsReward()))
-                            .build());
+                    Poe poe = actionPoeMap.get(poeAction);
+                    if (Objects.nonNull(poe)) {
+                        rewardList.add(RewardResponseDto.builder()
+                                .actionId(feedId)
+                                .isReceived(false)
+                                .poeAction(poeAction)
+                                .coins(CommonUtils.toPrimitive(poe.getCoinsReward()))
+                                .poe(CommonUtils.toPrimitive(poe.getPointsReward()))
+                                .build());
+                    }
                 }
             }
         }
     }
 
-    private void setReceivedAwards(List<RewardResponseDto> rewardList, Map<UUID, List<PoeTransaction>> feedPoeTransactionMap, UUID feedId) {
-        List<PoeTransaction> poeTransactions = feedPoeTransactionMap.get(feedId);
+    private List<PoeAction> getPoeActions() {
+        return Arrays.asList(PoeAction.LIKE,
+                PoeAction.SHARE,
+                PoeAction.QUIZ,
+                PoeAction.CHALLENGE,
+                PoeAction.VOTE,
+                PoeAction.WHEEL_ROLLED);
+    }
+
+    private void setReceivedRewards(List<RewardResponseDto> rewardList, Map<UUID, List<PoeTransaction>> PoeTransactionMap, UUID feedId) {
+        List<PoeTransaction> poeTransactions = PoeTransactionMap.get(feedId);
         if (poeTransactions != null) {
             for (PoeTransaction poeTransaction : poeTransactions) {
                 rewardList.add(RewardResponseDto.builder()
@@ -345,12 +352,38 @@ public class PoeTransactionService {
         }
     }
 
-    private List<PoeTransaction> getListFeedRewards(UUID id, List<PoeTransaction> listPoe) {
-        Map<Poe, PoeTransaction> collect = listPoe.stream()
-                .filter(poeTransaction -> poeTransaction.getActionId().equals(id))
+    private List<PoeTransaction> getListActionRewards(UUID id, List<PoeTransaction> listPoe) {
+        List<PoeTransaction> rewardList = new ArrayList<>();
+        Map<Poe, PoeTransaction> poeTransactionMap = listPoe.stream()
+                .filter(poeTransaction -> poeTransaction.getActionId().equals(id) && poeTransaction.getPoe().getCode() != PoeAction.VOTE)
                 .collect(Collectors.toMap(PoeTransaction::getPoe, poeTransaction -> poeTransaction, (existing, replacement) -> existing));
+        Map<UUID, PoeTransaction> voteRewardMap = getCountPointCoinVoteReward(id, listPoe);
+        rewardList.addAll(poeTransactionMap.values());
+        rewardList.addAll(voteRewardMap.values());
+        return rewardList;
+    }
 
-        return new ArrayList<>(collect.values());
+    private Map<UUID, PoeTransaction> getCountPointCoinVoteReward(UUID id, List<PoeTransaction> listPoe) {
+        List<PoeTransaction> voteRewards = listPoe.stream()
+                .filter(poe -> poe.getPoe().getCode() == PoeAction.VOTE && poe.getActionId().equals(id))
+                .collect(Collectors.toList());
+        Map<UUID, PoeTransaction> voteRewardMap = new HashMap<>();
+        if (!voteRewards.isEmpty()) {
+            if (voteRewards.size() > 1) {
+                for (PoeTransaction poeTransaction : voteRewards) {
+                    if (voteRewardMap.containsKey(poeTransaction.getActionId())) {
+                        PoeTransaction poeTransactionFromMap = voteRewardMap.get(poeTransaction.getActionId());
+                        voteRewardMap.get(poeTransaction.getActionId())
+                                .setCoinsReward(poeTransactionFromMap.getCoinsReward() + poeTransaction.getCoinsReward());
+                        voteRewardMap.get(poeTransaction.getActionId())
+                                .setPointsReward(poeTransactionFromMap.getPointsReward() + poeTransaction.getPointsReward());
+                    } else {
+                        voteRewardMap.put(poeTransaction.getActionId(), poeTransaction);
+                    }
+                }
+            } else voteRewardMap.put(voteRewards.get(0).getActionId(), voteRewards.get(0));
+        }
+        return voteRewardMap;
     }
 
 

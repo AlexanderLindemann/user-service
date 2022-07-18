@@ -5,8 +5,8 @@ import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
 import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
-import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
+import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.RewardResponseDto;
 import com.nft.platform.service.poe.PoeTransactionService;
 import com.nft.platform.util.security.RoleConstants;
@@ -84,7 +84,7 @@ public class PoeTransactionController {
     @Operation(summary = "Get action poe")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_TECH_TOKEN})
-    public List<RewardResponseDto> getActionReward(@RequestParam(name = "actionId") List<UUID> actionId, @RequestParam UUID clientId) {
-        return poeTransactionService.getActionReward(actionId, clientId);
+    public List<RewardResponseDto> getActionReward(@RequestParam(name = "actionIds") List<UUID> actionIds, @RequestParam UUID clientId) {
+        return poeTransactionService.getActionReward(actionIds, clientId);
     }
 }
