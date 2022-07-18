@@ -19,6 +19,7 @@ import com.nft.platform.enums.OwnerType;
 import com.nft.platform.exception.FileUploadException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
+import com.nft.platform.exception.RestException;
 import com.nft.platform.feign.client.FileServiceClient;
 import com.nft.platform.mapper.CurrentUserProfileWithWalletsMapper;
 import com.nft.platform.mapper.EditUserProfileMapper;
@@ -38,6 +39,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -364,6 +367,15 @@ public class UserProfileService {
                 .name(fullName)
                 .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
                 .build();
+    }
+
+    @Transactional
+    public void attachUserToCelebrity(String userName, UUID celebrityId) {
+        var user = userProfileRepository.findByUsername(userName).orElseThrow(() ->
+                new RestException(String.format("User %s was not found", userName), HttpStatus.NOT_FOUND));
+        var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
+                new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
+        profileWalletService.createAndSaveProfileWallet(user, celebrity);
     }
 
     private String setFullName(UserProfile profile) {
