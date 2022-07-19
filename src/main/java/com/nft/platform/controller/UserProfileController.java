@@ -24,6 +24,8 @@ import com.nft.platform.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
@@ -224,4 +226,16 @@ public class UserProfileController {
         return userProfileService.getOwnerInfo(userId, type, userIds);
     }
 
+    @PostMapping("/attachments/users-to-celebrities")
+    @Operation(summary = "Attach User to a celebrity")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "404", description = "User or celebrity was not found")
+    })
+    @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
+            ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
+    public ResponseEntity<?> attachUserToCelebrity(@RequestParam String userName, @RequestParam UUID celebrityId) {
+       userProfileService.attachUserToCelebrity(userName, celebrityId);
+       return ResponseEntity.ok().build();
+    }
 }
