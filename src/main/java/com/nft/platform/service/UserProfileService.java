@@ -351,8 +351,8 @@ public class UserProfileService {
         switch (type) {
             case CELEBRITY:
                 Celebrity celebrity = celebrityRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId));
+                    .findById(userId)
+                    .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId));
                 fullName = celebrity.getName() + (Objects.nonNull(celebrity.getLastName()) ? (" " + celebrity.getLastName()) : "");
                 break;
             case FANAT:
@@ -365,7 +365,7 @@ public class UserProfileService {
         return NftOwnerDto.builder()
                 .name(fullName)
                 .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
-                .build();
+            .build();
     }
 
     @Transactional

@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -18,5 +18,5 @@ public class NftOwnerDto {
     private UUID id;
     private String name;
     private OwnerType type;
-    private List<String> avatars;
+    private Set<String> avatars;
 }
