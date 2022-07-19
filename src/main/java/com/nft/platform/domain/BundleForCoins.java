@@ -1,6 +1,7 @@
 package com.nft.platform.domain;
 
-import com.nft.platform.dto.enums.BundleType;
+import com.nft.platform.common.enums.BundleType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

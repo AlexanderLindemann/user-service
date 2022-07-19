@@ -1,10 +1,11 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.common.event.VoteTransactionEvent;
 import com.nft.platform.domain.BundleForCoins;
 import com.nft.platform.domain.poe.Poe;
-import com.nft.platform.dto.enums.BundleType;
 import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.request.*;
 import com.nft.platform.domain.Celebrity;
@@ -26,8 +27,10 @@ import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.util.RLockKeys;
 import com.nft.platform.util.security.SecurityUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -165,6 +168,15 @@ public class ProfileWalletService {
             handleLotsForCoins(profileWallet, BundleType.WHEEL_SPIN, wheelBalance, requestDto);
         }
         profileWalletRepository.save(profileWallet);
+        applicationEventPublisher.publishEvent(
+            VoteTransactionEvent.builder()
+                .celebrityId(requestDto.getCelebrityId())
+                .userId(requestDto.getKeycloakUserId())
+                .expenses(requestDto.getAmount())
+                .type(BundleType.WHEEL_SPIN)
+                .eventType(EventType.VOTE_CREATED)
+            .build()
+        );
     }
 
     @Transactional
@@ -178,6 +190,15 @@ public class ProfileWalletService {
             handleLotsForCoins(profileWallet, BundleType.VOTE, voteBalance, requestDto);
         }
         profileWalletRepository.save(profileWallet);
+        applicationEventPublisher.publishEvent(
+            VoteTransactionEvent.builder()
+                .celebrityId(requestDto.getCelebrityId())
+                .userId(requestDto.getKeycloakUserId())
+                .expenses(requestDto.getAmount())
+                .type(BundleType.VOTE)
+                .eventType(EventType.VOTE_CREATED)
+            .build()
+        );
     }
 
     private void handleLotsForCoins(

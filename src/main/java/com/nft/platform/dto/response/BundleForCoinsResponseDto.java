@@ -1,6 +1,7 @@
 package com.nft.platform.dto.response;
 
-import com.nft.platform.dto.enums.BundleType;
+import com.nft.platform.common.enums.BundleType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
