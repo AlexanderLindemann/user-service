@@ -1,7 +1,8 @@
 package com.nft.platform.repository;
 
 import com.nft.platform.domain.BundleForCoins;
-import com.nft.platform.dto.enums.BundleType;
+import com.nft.platform.common.enums.BundleType;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -1,6 +1,6 @@
 package com.nft.platform.controller;
 
-import com.nft.platform.dto.enums.BundleType;
+import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.dto.request.PurchaseForCoinsRequestDto;
 import com.nft.platform.dto.response.BundleForCoinsResponseDto;
 import com.nft.platform.service.BundleForCoinsService;

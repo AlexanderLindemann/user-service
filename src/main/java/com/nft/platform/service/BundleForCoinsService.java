@@ -1,11 +1,11 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.event.BundleTransactionEvent;
 import com.nft.platform.domain.BundleForCoins;
 import com.nft.platform.domain.BundleForCoins_;
 import com.nft.platform.domain.ProfileWallet;
-import com.nft.platform.dto.enums.BundleType;
 import com.nft.platform.dto.request.PurchaseForCoinsRequestDto;
 import com.nft.platform.dto.response.BundleForCoinsResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
@@ -14,8 +14,10 @@ import com.nft.platform.mapper.BundleForCoinsMapper;
 import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.BundleForCoinsRepository;
 import com.nft.platform.util.security.SecurityUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
