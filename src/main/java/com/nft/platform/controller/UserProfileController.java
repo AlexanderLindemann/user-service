@@ -209,6 +209,14 @@ public class UserProfileController {
     public ResponseEntity<List<UserProfileResponseDto>> getUsersInfo(@RequestParam(name = "userIds") List<UUID> userIds) {
         return ResponseEntity.of(ofNullable(userProfileService.getUsersInfo(userIds)));
     }
+    @GetMapping("/avatars")
+    @ResponseStatus(HttpStatus.OK)
+    @Hidden
+    @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
+            ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
+    public ResponseEntity<List<String>> getUsersAvatars(@RequestParam(name = "userIds") List<UUID> userIds) {
+        return ResponseEntity.of(ofNullable(userProfileService.getUsersAvatars(userIds)));
+    }
 
     @GetMapping("/info-by-kk-ids")
     @ResponseStatus(HttpStatus.OK)

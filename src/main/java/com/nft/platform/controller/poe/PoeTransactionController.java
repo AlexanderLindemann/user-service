@@ -1,5 +1,6 @@
 package com.nft.platform.controller.poe;
 
+import com.nft.platform.common.dto.RewardResponseDto;
 import com.nft.platform.dto.poe.request.LeaderboardRequestDto;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
@@ -7,7 +8,6 @@ import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
 import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
-import com.nft.platform.dto.poe.response.RewardResponseDto;
 import com.nft.platform.service.poe.PoeTransactionService;
 import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
