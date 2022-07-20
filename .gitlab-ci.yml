@@ -1,13 +1,13 @@
-####№№#
+####№№##
 include:
   - project: 'nft-platform/devops/ci-box'
     file: 'variables.yaml'
-  - project: 'nft-platform/devops/ci-box'
-    file: 'maven-test.yaml'
+#  - project: 'nft-platform/devops/ci-box'
+#    file: 'maven-test.yaml'
   - project: 'nft-platform/devops/ci-box'
     file: 'build-variables.yaml'
-  - project: 'nft-platform/devops/ci-box'
-    file: 'maven-build.yaml'
+#  - project: 'nft-platform/devops/ci-box'
+#    file: 'maven-build.yaml'
   - project: 'nft-platform/devops/ci-box'
     file: 'docker-build.yaml'
   - project: 'nft-platform/devops/ci-box'
@@ -18,11 +18,90 @@ include:
 variables:
   CI_PROJECT_NAME: user-service
   PROJECT_PREFIX: nft-platform
+  # We have 2 jwt token keys now: JWT_TOKEN_KEY_develop, JWT_TOKEN_KEY_staging,
+  JWT_TOKEN_KEY: "$JWT_TOKEN_KEY_develop"  # default key
+  ENV_URL: "nftdev.nnmdev.ru"  # default ENV_URL
 
 stages:
   - variables
+  - preconfigure
   - maven:test
   - maven:build
   - docker:build
   - helm:lint
   - helm:package-push-deploy
+
+configure-env:
+  stage: preconfigure
+  script:
+    ## Configure $ENV_URL for next.js & JWT_TOKEN_KEY for src/main/resources/application.yml
+    # We use $ENV_URL=nftstage.nnmdev.ru & JWT_TOKEN_KEY_staging if it's main branch
+    # We use $ENV_URL=nftdev.nnmdev.ru & JWT_TOKEN_KEY_develop if it's any other branch
+    - >
+      if [ "$CI_COMMIT_REF_NAME" == "main" ];
+      then
+        echo 'export ENV_URL='"nftstage.nnmdev.ru" >> variables_env
+        echo 'export JWT_TOKEN_KEY='$JWT_TOKEN_KEY_staging >> variables_env
+      else
+        echo 'export ENV_URL='"nftdev.nnmdev.ru" >> variables_env
+        echo 'export JWT_TOKEN_KEY='$JWT_TOKEN_KEY_develop >> variables_env
+      fi
+  artifacts:
+    paths:
+      - variables_env
+    expire_in: 1 hour
+  rules:
+    - when: always
+
+maven-test:
+  stage: maven:test
+  image: dockerhub.nexus.nnmdev.ru/maven:3-adoptopenjdk-11
+  services:
+    - name: dockerhub.nexus.nnmdev.ru/docker:20.10.12-dind
+      entrypoint: ["dockerd-entrypoint.sh", "--tls=false"]
+      alias: docker       
+  variables:
+    MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  cache:
+    paths:
+      - .m2/repository
+  script:
+    - source variables
+    - source variables_env
+    - echo 'ENV_URL='$ENV_URL
+    - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./token.http
+    - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./src/main/resources/application.yml
+    - sed -i "s@JWT_TOKEN_KEY_PLACEHOLDER@$JWT_TOKEN_KEY@g" ./src/main/resources/application.yml
+    - mvn $MAVEN_CLI_OPTS test -U
+  rules:
+    - if: '$CI_COMMIT_REF_NAME != "main"'
+      when: always
+
+maven-build:
+  stage: maven:build
+  image: dockerhub.nexus.nnmdev.ru/maven:3-adoptopenjdk-11
+  services:
+    - name: dockerhub.nexus.nnmdev.ru/docker:20.10.12-dind
+      entrypoint: ["dockerd-entrypoint.sh", "--tls=false"]
+      alias: docker       
+  variables:
+    MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  cache:
+    paths:
+      - .m2/repository
+  script:
+    - source variables
+    - source variables_env
+    - echo 'ENV_URL='$ENV_URL
+    - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./token.http
+    - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./src/main/resources/application.yml
+    - sed -i "s@JWT_TOKEN_KEY_PLACEHOLDER@$JWT_TOKEN_KEY@g" ./src/main/resources/application.yml
+    - mvn $MAVEN_CLI_OPTS clean install -U
+  artifacts:
+    paths:
+      - /builds/*/*/target/*.jar
+      - /builds/*/*/*/target/*.jar
+      - /builds/*/*/*/*/target/*.jar
+    expire_in: 1h
