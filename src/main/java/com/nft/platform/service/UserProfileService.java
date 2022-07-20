@@ -40,7 +40,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -400,4 +399,7 @@ public class UserProfileService {
         return fullName;
     }
 
+    public List<String> getUsersAvatars(List<UUID> userIds) {
+        return userProfileRepository.findImageIdsByUserIds(userIds);
+    }
 }
