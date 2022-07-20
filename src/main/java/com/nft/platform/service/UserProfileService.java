@@ -48,6 +48,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -399,7 +400,7 @@ public class UserProfileService {
         return fullName;
     }
 
-    public List<String> getUsersAvatars(List<UUID> userIds) {
+    public Set<String> getUsersAvatars(List<UUID> userIds) {
         return userProfileRepository.findImageIdsByUserIds(userIds);
     }
 }
