@@ -14,6 +14,7 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserProfileSearchDto;
+import com.nft.platform.dto.request.UserToCelebrityAttachmentRequestDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
@@ -251,8 +252,8 @@ public class UserProfileController {
     })
     @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
             ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
-    public ResponseEntity<?> attachUserToCelebrity(@RequestParam String userName, @RequestParam UUID celebrityId) {
-       userProfileService.attachUserToCelebrity(userName, celebrityId);
+    public ResponseEntity<?> attachUserToCelebrity(@RequestBody UserToCelebrityAttachmentRequestDto body) {
+       userProfileService.attachUserToCelebrity(body.getUserName(), body.getCelebrityId());
        return ResponseEntity.ok().build();
     }
 }
