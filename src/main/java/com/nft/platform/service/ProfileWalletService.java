@@ -113,12 +113,13 @@ public class ProfileWalletService {
     }
 
 
-    public void createAndSaveProfileWallet(UserProfile userProfile, Celebrity celebrity) {
+    public ProfileWallet createAndSaveProfileWallet(UserProfile userProfile, Celebrity celebrity) {
         ProfileWallet profileWallet = new ProfileWallet();
         profileWallet.setUserProfile(userProfile);
         profileWallet.setCelebrity(celebrity);
-        profileWalletRepository.save(profileWallet);
+        var wallet = profileWalletRepository.save(profileWallet);
         publishProfileWalletCreatedEvent(profileWallet);
+        return wallet;
     }
 
     private void publishFirstAppOpenOnPeriod(UUID celebrityId, UUID keycloakUserId) {
