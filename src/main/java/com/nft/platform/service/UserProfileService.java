@@ -52,6 +52,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.nft.platform.consts.Consts.TECH_CELEBRITY_ID;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -199,7 +201,7 @@ public class UserProfileService {
             userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, celebrityId);
         }
         if (userProfileO.isEmpty()) {
-            return Optional.empty();
+            attachUserToCelebrity(currentUser.getPreferredUsername(), TECH_CELEBRITY_ID);
         }
         return userProfileRepository.findByKeycloakUserId(keycloakUserId)
                 .stream()
