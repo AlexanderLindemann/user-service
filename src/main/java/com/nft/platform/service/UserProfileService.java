@@ -201,17 +201,10 @@ public class UserProfileService {
             userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, celebrityId);
         }
         if (userProfileO.isEmpty()) {
-            return Optional.empty();
+            attachUserToCelebrity(currentUser.getPreferredUsername(), TECH_CELEBRITY_ID);
         }
-
-        var userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId);
-        userProfile.ifPresent(profile -> {
-            if (profile.getProfileWallets().isEmpty()) {
-                profile.setProfileWallets(Set.of(attachUserToCelebrity(profile.getUsername(), TECH_CELEBRITY_ID)));
-            }
-        });
-
-        return userProfile.stream()
+        return userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .stream()
                 .map(currentUserProfileWithWalletsMapper::toDto)
                 .peek((e) -> e.setRoles(currentUser.getRoles()))
                 .findAny();
@@ -379,12 +372,12 @@ public class UserProfileService {
     }
 
     @Transactional
-    public ProfileWallet attachUserToCelebrity(String userName, UUID celebrityId) {
+    public void attachUserToCelebrity(String userName, UUID celebrityId) {
         var user = userProfileRepository.findByUsername(userName).orElseThrow(() ->
                 new RestException(String.format("User %s was not found", userName), HttpStatus.NOT_FOUND));
         var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
                 new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
-        return profileWalletService.createAndSaveProfileWallet(user, celebrity);
+        profileWalletService.createAndSaveProfileWallet(user, celebrity);
     }
 
     private String setFullName(UserProfile profile) {
