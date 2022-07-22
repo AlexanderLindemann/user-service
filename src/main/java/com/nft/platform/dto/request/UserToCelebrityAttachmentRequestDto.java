@@ -14,7 +14,7 @@ import java.util.UUID;
 @Schema(description = "Bundle for Coins Request DTO")
 public class UserToCelebrityAttachmentRequestDto {
     @NotNull
-    private String userName;
+    private String login;
 
     @NotNull
     private UUID celebrityId;
