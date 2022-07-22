@@ -70,7 +70,6 @@ maven-test:
     - source variables
     - source variables_env
     - echo 'ENV_URL='$ENV_URL
-    - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./token.http
     - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./src/main/resources/application.yml
     - sed -i "s@JWT_TOKEN_KEY_PLACEHOLDER@$JWT_TOKEN_KEY@g" ./src/main/resources/application.yml
     - mvn $MAVEN_CLI_OPTS test -U
@@ -95,7 +94,6 @@ maven-build:
     - source variables
     - source variables_env
     - echo 'ENV_URL='$ENV_URL
-    - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./token.http
     - sed -i "s/nftdev.nnmdev.ru/$ENV_URL/g" ./src/main/resources/application.yml
     - sed -i "s@JWT_TOKEN_KEY_PLACEHOLDER@$JWT_TOKEN_KEY@g" ./src/main/resources/application.yml
     - mvn $MAVEN_CLI_OPTS clean install -U
