@@ -378,9 +378,10 @@ public class UserProfileService {
             .build();
     }
 
-    public ProfileWallet attachUserToCelebrity(String userName, UUID celebrityId) {
-        var user = userProfileRepository.findByUsername(userName).orElseThrow(() ->
-                new RestException(String.format("User %s was not found", userName), HttpStatus.NOT_FOUND));
+    public ProfileWallet attachUserToCelebrity(String login, UUID celebrityId) {
+        var user = userProfileRepository.findUserProfileBy(login, login, login)
+                .stream().findFirst()
+                .orElseThrow(() -> new RestException(String.format("User %s was not found", login), HttpStatus.NOT_FOUND));
         var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
                 new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
         return profileWalletService.createAndSaveProfileWallet(user, celebrity);

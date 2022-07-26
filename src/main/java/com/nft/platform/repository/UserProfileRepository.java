@@ -49,6 +49,4 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
     @Query("SELECT up FROM UserProfile up WHERE (up.username = :name AND :name IS NOT NULL ) " +
             "OR (up.email = :email AND :email IS NOT NULL) OR (up.phone = :phone AND :phone IS NOT NULL)")
     Collection<UserProfile> findUserProfileBy(String name, String email, String phone);
-
-    Optional<UserProfile> findByUsername(String userName);
 }
