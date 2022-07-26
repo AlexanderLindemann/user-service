@@ -188,7 +188,7 @@ public class UserProfileService {
         profileWalletService.createAndSaveProfileWallet(userProfile, celebrity);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<CurrentUserProfileWithWalletsResponseDto> findCurrentUserProfile() {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
@@ -203,8 +203,15 @@ public class UserProfileService {
         if (userProfileO.isEmpty()) {
             attachUserToCelebrity(currentUser.getPreferredUsername(), TECH_CELEBRITY_ID);
         }
-        return userProfileRepository.findByKeycloakUserId(keycloakUserId)
-                .stream()
+
+        var userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId);
+        userProfile.ifPresent(profile -> {
+            if (profile.getProfileWallets().isEmpty()) {
+                profile.setProfileWallets(Set.of(attachUserToCelebrity(profile.getUsername(), TECH_CELEBRITY_ID)));
+            }
+        });
+
+        return userProfile.stream()
                 .map(currentUserProfileWithWalletsMapper::toDto)
                 .peek((e) -> e.setRoles(currentUser.getRoles()))
                 .findAny();
@@ -371,13 +378,12 @@ public class UserProfileService {
             .build();
     }
 
-    @Transactional
-    public void attachUserToCelebrity(String userName, UUID celebrityId) {
+    public ProfileWallet attachUserToCelebrity(String userName, UUID celebrityId) {
         var user = userProfileRepository.findByUsername(userName).orElseThrow(() ->
                 new RestException(String.format("User %s was not found", userName), HttpStatus.NOT_FOUND));
         var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
                 new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
-        profileWalletService.createAndSaveProfileWallet(user, celebrity);
+        return profileWalletService.createAndSaveProfileWallet(user, celebrity);
     }
 
     private String setFullName(UserProfile profile) {
