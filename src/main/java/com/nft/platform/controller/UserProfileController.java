@@ -82,8 +82,8 @@ public class UserProfileController {
     @Operation(summary = "Get Current User Profile")
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_USER, ROLE_MARKETPLACE_USER})
-    public ResponseEntity<CurrentUserProfileWithWalletsResponseDto> findMeByKeycloakId() {
-        Optional<CurrentUserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile();
+    public ResponseEntity<CurrentUserProfileWithWalletsResponseDto> findMeByKeycloakId(@RequestParam(required = false) UUID celebrityId) {
+        Optional<CurrentUserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile(celebrityId);
         return ResponseEntity.of(userProfileResponseDtoO);
     }
 

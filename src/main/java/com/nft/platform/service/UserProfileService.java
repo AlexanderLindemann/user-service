@@ -40,6 +40,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +54,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.nft.platform.consts.Consts.TECH_CELEBRITY_ID;
+import static java.util.Objects.isNull;
 
 @Service
 @Slf4j
@@ -189,16 +191,15 @@ public class UserProfileService {
     }
 
     @Transactional
-    public Optional<CurrentUserProfileWithWalletsResponseDto> findCurrentUserProfile() {
+    public Optional<CurrentUserProfileWithWalletsResponseDto> findCurrentUserProfile(@Nullable UUID activeCelebrityId) {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
         // For Mobile Users celebrityId gets from clientId
-        UUID celebrityId = currentUser.getCurrentCelebrityId() != null ? UUID.fromString(currentUser.getCurrentCelebrityId()) : null;
         Optional<UserProfile> userProfileO;
-        if (celebrityId == null) {
+        if (isNull(activeCelebrityId)) {
             userProfileO = userProfileRepository.findByKeycloakIdWithCryptoWallets(keycloakUserId);
         } else {
-            userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, celebrityId);
+            userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, activeCelebrityId);
         }
         if (userProfileO.isEmpty()) {
             attachUserToCelebrity(currentUser.getPreferredUsername(), TECH_CELEBRITY_ID);
