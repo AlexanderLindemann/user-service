@@ -378,6 +378,7 @@ public class UserProfileService {
             .build();
     }
 
+    @Transactional
     public ProfileWallet attachUserToCelebrity(String login, UUID celebrityId) {
         var user = userProfileRepository.findUserProfileBy(login, login, login)
                 .stream().findFirst()
