@@ -41,7 +41,7 @@ spring:
       group:
         id: user-service
       income-history:
-        topic: income-history
+        topic: income-history-service
     consumer:
       enabled: false
       group:
