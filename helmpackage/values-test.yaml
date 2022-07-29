@@ -24,7 +24,7 @@ env:
   SERVER_SERVLET_CONTEXTPATH: "/user-service"
   SPRING_LIQUIBASE_CONTEXTS: "dev"
   SERVER_PORT: 8080
-  TZ: "Europe/Moscow"
+  TZ: "UTC"
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgrestest.cwol7reviywm.eu-central-1.rds.amazonaws.com/user_service?&ssl=true&sslrootcert=/tmp/rdsssl/global-bundle.pem
   SPRING_DATASOURCE_USERNAME: postgrestest
   SPRING_DATASOURCE_PASSWORD: UiETnEBW8rll0Mp@hza1
