@@ -202,13 +202,13 @@ public class UserProfileService {
             userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, activeCelebrityId);
         }
         if (userProfileO.isEmpty()) {
-            attachUserToCelebrity(currentUser.getPreferredUsername(), TECH_CELEBRITY_ID);
+            attachUserToCelebrity(keycloakUserId, TECH_CELEBRITY_ID);
         }
 
         var userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId);
         userProfile.ifPresent(profile -> {
             if (profile.getProfileWallets().isEmpty()) {
-                profile.setProfileWallets(Set.of(attachUserToCelebrity(profile.getUsername(), TECH_CELEBRITY_ID)));
+                profile.setProfileWallets(Set.of(attachUserToCelebrity(keycloakUserId, TECH_CELEBRITY_ID)));
             }
         });
 
@@ -380,10 +380,15 @@ public class UserProfileService {
     }
 
     @Transactional
-    public ProfileWallet attachUserToCelebrity(String login, UUID celebrityId) {
-        var user = userProfileRepository.findUserProfileBy(login, login, login)
-                .stream().findFirst()
-                .orElseThrow(() -> new RestException(String.format("User %s was not found", login), HttpStatus.NOT_FOUND));
+    public ProfileWallet attachCurrentUserToCelebrity(UUID celebrityId) {
+        var currentUserId = UUID.fromString(securityUtil.getCurrentUser().getId());
+        return attachUserToCelebrity(currentUserId, celebrityId);
+    }
+
+    @Transactional
+    public ProfileWallet attachUserToCelebrity(UUID keycloakUserId, UUID celebrityId) {
+        var user = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new RestException("User %s was not found", HttpStatus.NOT_FOUND));
         var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
                 new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
         return profileWalletService.createAndSaveProfileWallet(user, celebrity);

@@ -241,7 +241,7 @@ public class UserProfileController {
     @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
             ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
     public ResponseEntity<?> attachUserToCelebrity(@RequestBody UserToCelebrityAttachmentRequestDto body) {
-       userProfileService.attachUserToCelebrity(body.getLogin(), body.getCelebrityId());
+       userProfileService.attachCurrentUserToCelebrity(body.getCelebrityId());
        return ResponseEntity.ok().build();
     }
 }
