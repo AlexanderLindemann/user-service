@@ -24,7 +24,7 @@ env:
   SERVER_SERVLET_CONTEXTPATH: "/user-service"
   SPRING_LIQUIBASE_CONTEXTS: "dev"
   SERVER_PORT: 8080
-  TZ: "Europe/Moscow"
+  TZ: "UTC"
   SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdev.cwol7reviywm.eu-central-1.rds.amazonaws.com/users
   SPRING_DATASOURCE_USERNAME: users
   SPRING_DATASOURCE_PASSWORD: users

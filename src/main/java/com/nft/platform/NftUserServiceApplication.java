@@ -13,16 +13,16 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 @EnableOAuth2Client
 @EnableFeignClients
 @EnableConfigurationProperties({
-		LoggingProperties.class,
-		NftTechUserAuthProperties.class,
-		PeriodProperties.class
+        LoggingProperties.class,
+        NftTechUserAuthProperties.class,
+        PeriodProperties.class
 })
 @EnableGlobalMethodSecurity(jsr250Enabled = true, prePostEnabled = true, securedEnabled = true)
 @SpringBootApplication
 public class NftUserServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NftUserServiceApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(NftUserServiceApplication.class, args);
+    }
 
 }
