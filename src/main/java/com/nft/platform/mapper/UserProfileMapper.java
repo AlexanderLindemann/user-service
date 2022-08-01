@@ -4,6 +4,7 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.poe.response.UserLeaderboardResponseDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
+import com.nft.platform.dto.response.PoorUserProfileResponseDto;
 import com.nft.platform.dto.response.ProfileWalletResponseDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletResponseDto;
@@ -24,6 +25,10 @@ public interface UserProfileMapper {
     UserProfile toEntity(UserProfileRequestDto requestDto, @MappingTarget UserProfile userProfile);
 
     UserProfileResponseDto toDto(UserProfile userProfile);
+
+    @Mapping(target = "keycloakUserId", source = "keycloakUserId")
+    @Mapping(target = "imagePromoBannerUrl", source = "imagePromoBannerUrl")
+    PoorUserProfileResponseDto toPoorDto(UserProfile userProfile);
 
     @Mappings({
             @Mapping(target = "roles", ignore = true)
