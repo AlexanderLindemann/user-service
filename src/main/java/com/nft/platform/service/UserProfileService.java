@@ -380,15 +380,22 @@ public class UserProfileService {
     }
 
     @Transactional
-    public ProfileWallet attachCurrentUserToCelebrity(UUID celebrityId) {
+    public void attachCurrentUserToCelebrity(UUID celebrityId) {
         var currentUserId = UUID.fromString(securityUtil.getCurrentUser().getId());
-        return attachUserToCelebrity(currentUserId, celebrityId);
+        attachUserToCelebrity(currentUserId, celebrityId);
     }
 
     @Transactional
     public ProfileWallet attachUserToCelebrity(UUID keycloakUserId, UUID celebrityId) {
         var user = userProfileRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new RestException("User %s was not found", HttpStatus.NOT_FOUND));
+        Optional<ProfileWallet> alreadySubscribedCelebrity = user
+                .getProfileWallets().stream()
+                .filter(pw -> Objects.equals(celebrityId, pw.getCelebrity().getId()))
+                .findFirst();
+        if (alreadySubscribedCelebrity.isPresent()) {
+            return alreadySubscribedCelebrity.get();
+        }
         var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
                 new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
         return profileWalletService.createAndSaveProfileWallet(user, celebrity);
