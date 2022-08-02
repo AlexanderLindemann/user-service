@@ -26,7 +26,6 @@ public interface UserProfileMapper {
 
     UserProfileResponseDto toDto(UserProfile userProfile);
 
-    @Mapping(target = "keycloakUserId", source = "keycloakUserId")
     @Mapping(target = "imagePromoBannerUrl", source = "imagePromoBannerUrl")
     PoorUserProfileResponseDto toPoorDto(UserProfile userProfile);
 

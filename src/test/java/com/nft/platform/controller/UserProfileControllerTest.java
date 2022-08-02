@@ -52,16 +52,13 @@ public class UserProfileControllerTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[1].lastName").value(expectedResult.getLastName()))
                 .andExpect(jsonPath("$[2].nickname").value(expectedResult.getNickname()))
                 .andExpect(jsonPath("$[3].description").value(expectedResult.getDescription()))
-                .andExpect(jsonPath("$[4].invisibleEmail").value(expectedResult.getInvisibleEmail()))
-                .andExpect(jsonPath("$[5].invisiblePhone").value(expectedResult.getInvisiblePhone()))
-                .andExpect(jsonPath("$[6].site").value(expectedResult.getSite()))
-                .andExpect(jsonPath("$[7].facebookId").value(expectedResult.getFacebookId()))
-                .andExpect(jsonPath("$[8].twitterId").value(expectedResult.getTwitterId()))
-                .andExpect(jsonPath("$[9].googleId").value(expectedResult.getGoogleId()))
-                .andExpect(jsonPath("$[10].imageUrl").value(expectedResult.getImageUrl()))
-                .andExpect(jsonPath("$[11].imagePromoBannerUrl").value(expectedResult.getImagePromoBannerUrl()))
-                .andExpect(jsonPath("$[12].keycloakUserId").value(expectedResult.getKeycloakUserId()))
-                .andExpect(jsonPath("$[13].createdAt").value(expectedResult.getCreatedAt()));
+                .andExpect(jsonPath("$[4].site").value(expectedResult.getSite()))
+                .andExpect(jsonPath("$[5].facebookId").value(expectedResult.getFacebookId()))
+                .andExpect(jsonPath("$[6].twitterId").value(expectedResult.getTwitterId()))
+                .andExpect(jsonPath("$[7].googleId").value(expectedResult.getGoogleId()))
+                .andExpect(jsonPath("$[8].imageUrl").value(expectedResult.getImageUrl()))
+                .andExpect(jsonPath("$[9].imagePromoBannerUrl").value(expectedResult.getImagePromoBannerUrl()))
+                .andExpect(jsonPath("$[10].createdAt").value(expectedResult.getCreatedAt()));
 
     }
 
