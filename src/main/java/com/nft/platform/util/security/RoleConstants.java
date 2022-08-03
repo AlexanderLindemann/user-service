@@ -8,4 +8,5 @@ public class RoleConstants {
     public final static String ROLE_ADMIN_PLATFORM = "ROLE_ADMIN_PLATFORM";
     public final static String ROLE_TECH_TOKEN = "ROLE_TECH_TOKEN";
     public final static String ROLE_CONTENT_MODERATOR = "ROLE_CONTENT_MODERATOR";
+    public final static String ROLE_SUPER_MODERATOR = "ROLE_SUPER_MODERATOR";
 }
