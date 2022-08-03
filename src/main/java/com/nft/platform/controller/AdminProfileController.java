@@ -22,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.nft.platform.util.security.RoleConstants.ROLE_SUPER_MODERATOR;
+
 @Tag(name = "Admin Profile Api")
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class AdminProfileController {
     @GetMapping("/me")
     @Operation(summary = "Get Current Admin Profile")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_CONTENT_MODERATOR})
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_CONTENT_MODERATOR, ROLE_SUPER_MODERATOR})
     public ResponseEntity<UserProfileWithCelebrityIdsResponseDto> findMeAdminByKeycloakId() {
         Optional<UserProfileWithCelebrityIdsResponseDto> adminProfileResponseDto = userProfileService.findCurrentAdminProfile();
         return ResponseEntity.of(adminProfileResponseDto);
