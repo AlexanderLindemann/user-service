@@ -1,8 +1,8 @@
 package com.nft.platform.domain.poe;
 
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.common.enums.PoeGroup;
 import com.nft.platform.domain.BaseEntity;
-import com.nft.platform.enums.PoeGroup;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
