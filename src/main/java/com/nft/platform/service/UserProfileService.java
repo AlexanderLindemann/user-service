@@ -10,11 +10,7 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserProfileSearchDto;
-import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
-import com.nft.platform.dto.response.NftOwnerDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
-import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
-import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.response.*;
 import com.nft.platform.enums.OwnerType;
 import com.nft.platform.exception.FileUploadException;
 import com.nft.platform.exception.ItemConflictException;
@@ -81,6 +77,12 @@ public class UserProfileService {
     public Optional<UserProfileWithWalletsResponseDto> findUserProfileById(@NonNull UUID id) {
         return userProfileRepository.findByIdWithWallets(id)
                 .map(userProfileWithWalletsMapper::toDto);
+    }
+
+    @NonNull
+    public Optional<PoorUserProfileResponseDto> findPoorUserProfile(@NonNull UUID id) {
+        return userProfileRepository.findById(id)
+                .map(mapper::toPoorDto);
     }
 
     public List<UserProfileResponseDto> search(UserProfileSearchDto params) {
@@ -202,13 +204,13 @@ public class UserProfileService {
             userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, activeCelebrityId);
         }
         if (userProfileO.isEmpty()) {
-            attachUserToCelebrity(currentUser.getPreferredUsername(), TECH_CELEBRITY_ID);
+            attachUserToCelebrity(keycloakUserId, TECH_CELEBRITY_ID);
         }
 
         var userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId);
         userProfile.ifPresent(profile -> {
             if (profile.getProfileWallets().isEmpty()) {
-                profile.setProfileWallets(Set.of(attachUserToCelebrity(profile.getUsername(), TECH_CELEBRITY_ID)));
+                profile.setProfileWallets(Set.of(attachUserToCelebrity(keycloakUserId, TECH_CELEBRITY_ID)));
             }
         });
 
@@ -380,10 +382,22 @@ public class UserProfileService {
     }
 
     @Transactional
-    public ProfileWallet attachUserToCelebrity(String login, UUID celebrityId) {
-        var user = userProfileRepository.findUserProfileBy(login, login, login)
-                .stream().findFirst()
-                .orElseThrow(() -> new RestException(String.format("User %s was not found", login), HttpStatus.NOT_FOUND));
+    public void attachCurrentUserToCelebrity(UUID celebrityId) {
+        var currentUserId = UUID.fromString(securityUtil.getCurrentUser().getId());
+        attachUserToCelebrity(currentUserId, celebrityId);
+    }
+
+    @Transactional
+    public ProfileWallet attachUserToCelebrity(UUID keycloakUserId, UUID celebrityId) {
+        var user = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new RestException("User %s was not found", HttpStatus.NOT_FOUND));
+        Optional<ProfileWallet> alreadySubscribedCelebrity = user
+                .getProfileWallets().stream()
+                .filter(pw -> Objects.equals(celebrityId, pw.getCelebrity().getId()))
+                .findFirst();
+        if (alreadySubscribedCelebrity.isPresent()) {
+            return alreadySubscribedCelebrity.get();
+        }
         var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
                 new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
         return profileWalletService.createAndSaveProfileWallet(user, celebrity);

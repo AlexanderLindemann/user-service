@@ -7,11 +7,7 @@ import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserProfileSearchDto;
 import com.nft.platform.dto.request.UserToCelebrityAttachmentRequestDto;
-import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
-import com.nft.platform.dto.response.NftOwnerDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
-import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
-import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.response.*;
 import com.nft.platform.enums.OwnerType;
 import com.nft.platform.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -76,6 +72,15 @@ public class UserProfileController {
                                                                           @PathVariable(name = "id") UUID userProfileId) {
         Optional<UserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findUserProfileById(userProfileId);
         return ResponseEntity.of(userProfileResponseDtoO);
+    }
+
+    @GetMapping("{id}/poor")
+    @Operation(summary = "Get poor User Profile by Id")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<PoorUserProfileResponseDto> findOtherUserById(@Parameter(name = "id", description = "User Profile Id")
+                                                                         @PathVariable(name = "id") UUID userProfileId) {
+        Optional<PoorUserProfileResponseDto> poorUserProfileResponseDto = userProfileService.findPoorUserProfile(userProfileId);
+        return ResponseEntity.of(poorUserProfileResponseDto);
     }
 
     @GetMapping("/me")
@@ -241,7 +246,7 @@ public class UserProfileController {
     @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
             ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
     public ResponseEntity<?> attachUserToCelebrity(@RequestBody UserToCelebrityAttachmentRequestDto body) {
-       userProfileService.attachUserToCelebrity(body.getLogin(), body.getCelebrityId());
+       userProfileService.attachCurrentUserToCelebrity(body.getCelebrityId());
        return ResponseEntity.ok().build();
     }
 }

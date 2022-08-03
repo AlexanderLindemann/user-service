@@ -87,7 +87,6 @@ public class CelebrityService {
             Optional<CurrentUserProfileWithWalletsResponseDto> currentUserProfile = userProfileService.findCurrentUserProfile(null);
             if (currentUserProfile.isPresent()) {
                 List<UUID> userSubscriptions = profileWalletRepository.findAllByUserProfileId(currentUserProfile.get().getId()).stream()
-                        .filter(ProfileWallet::isSubscriber)
                         .map(ProfileWallet::getCelebrity)
                         .map(Celebrity::getId)
                         .collect(Collectors.toList());

@@ -4,9 +4,11 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.poe.response.UserLeaderboardResponseDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
+import com.nft.platform.dto.response.PoorUserProfileResponseDto;
 import com.nft.platform.dto.response.ProfileWalletResponseDto;
 import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletResponseDto;
+import liquibase.pro.packaged.M;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,6 +26,11 @@ public interface UserProfileMapper {
     UserProfile toEntity(UserProfileRequestDto requestDto, @MappingTarget UserProfile userProfile);
 
     UserProfileResponseDto toDto(UserProfile userProfile);
+
+    @Mapping(target = "imagePromoBannerUrl", source = "imagePromoBannerUrl")
+    @Mapping(target = "firstName", source = "userProfile", qualifiedByName = "firstNameAccordingInvisibleName")
+    @Mapping(target = "lastName", source = "userProfile", qualifiedByName = "lastNameAccordingInvisibleName")
+    PoorUserProfileResponseDto toPoorDto(UserProfile userProfile);
 
     @Mappings({
             @Mapping(target = "roles", ignore = true)
@@ -47,4 +54,23 @@ public interface UserProfileMapper {
     ProfileWalletResponseDto toDto(ProfileWallet profileWallet);
 
     UserLeaderboardResponseDto toUserLeaderboardDto(UserProfile userProfile);
+
+    @Named("firstNameAccordingInvisibleName")
+    default String firstNameAccordingInvisibleName(UserProfile userProfile) {
+        if (userProfile.isInvisibleName()) {
+            return null;
+        } else {
+            return userProfile.getFirstName();
+        }
+    }
+
+    @Named("lastNameAccordingInvisibleName")
+    default String lastNameAccordingInvisibleName(UserProfile userProfile) {
+        if (userProfile.isInvisibleName()) {
+            return null;
+        } else {
+            return userProfile.getLastName();
+        }
+    }
+
 }

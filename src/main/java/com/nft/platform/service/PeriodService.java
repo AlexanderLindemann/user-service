@@ -10,6 +10,7 @@ import com.nft.platform.mapper.PeriodMapper;
 import com.nft.platform.properties.PeriodProperties;
 import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.PeriodRepository;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -19,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.module.ResolutionException;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -33,6 +34,8 @@ public class PeriodService {
     private final SyncService syncService;
 
     private final PeriodCreatedEventProducer periodCreatedEventProducer;
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     @Transactional(readOnly = true)
     public Optional<PeriodResponseDto> findPeriod(PeriodStatus status) {
@@ -93,8 +96,8 @@ public class PeriodService {
         periodRepository.save(period);
     }
 
-    private boolean isPeriodExpired(LocalDateTime now, Period period) {
-        return !now.isBefore(period.getEndTime());
+    private boolean isPeriodExpired(@NonNull LocalDateTime now, @NonNull Period period) {
+        return now.isAfter(period.getEndTime());
     }
 
     private void sendPeriodCreatedEvent(Period previous, Period created) {
@@ -106,20 +109,7 @@ public class PeriodService {
         periodCreatedEventProducer.handle(periodCreatedEvent);
     }
 
-    public LocalDateTime getEndPeriod() {
-
-        LocalDateTime period = periodRepository.findEndTimeByActiveStatus();
-
-        int hour = period.getHour();
-
-        if (hour <= 7) {
-            return period.truncatedTo(ChronoUnit.DAYS).plusHours(8);
-        } else if (hour <= 15) {
-            return period.truncatedTo(ChronoUnit.DAYS).plusHours(16);
-        } else {
-            return period.truncatedTo(ChronoUnit.DAYS).plusDays(1);
-        }
-
+    public String getEndPeriod() {
+        return FORMATTER.format(periodRepository.findEndTimeByActiveStatus());
     }
-
 }
