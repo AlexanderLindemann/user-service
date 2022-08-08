@@ -184,7 +184,7 @@ public class ProfileWalletService {
                 .userId(requestDto.getKeycloakUserId())
                 .expenses(requestDto.getAmount())
                 .type(BundleType.WHEEL_SPIN)
-                .eventType(EventType.VOTE_CREATED)
+                .eventType(EventType.VOTE_TRANSACTION_CREATED)
             .build()
         );
     }
@@ -206,7 +206,7 @@ public class ProfileWalletService {
                 .userId(requestDto.getKeycloakUserId())
                 .expenses(requestDto.getAmount())
                 .type(BundleType.VOTE)
-                .eventType(EventType.VOTE_CREATED)
+                .eventType(EventType.VOTE_TRANSACTION_CREATED)
             .build()
         );
     }
