@@ -1,7 +1,7 @@
 package com.nft.platform.dto.request;
 
-import com.nft.platform.platformactivityservice.api.dto.enums.RewardType;
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +17,7 @@ import java.util.UUID;
 @Builder
 @Schema(description = "UserRewardIncreaseDto")
 public class UserRewardIncreaseDto {
+
     @Schema(description = "Celebrity Id", required = true)
     @NotNull
     private UUID celebrityId;
@@ -29,4 +30,5 @@ public class UserRewardIncreaseDto {
     @Positive
     @NotNull
     private Integer amount;
+
 }
