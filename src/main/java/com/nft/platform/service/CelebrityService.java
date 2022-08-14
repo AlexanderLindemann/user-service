@@ -4,13 +4,8 @@ import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.view.CelebrityView;
 import com.nft.platform.dto.request.CelebrityRequestDto;
-import com.nft.platform.dto.response.CelebrityResponseDto;
-import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
-import com.nft.platform.dto.response.CelebrityThemeResponseDto;
-import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
-import com.nft.platform.dto.response.LinkCelebrityResponseDto;
-import com.nft.platform.dto.response.NftCountResponseDto;
-import com.nft.platform.dto.response.ShowcaseResponseDto;
+import com.nft.platform.dto.request.CelebrityUpdateRequestDto;
+import com.nft.platform.dto.response.*;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.feign.client.NftServiceApiClient;
@@ -104,16 +99,18 @@ public class CelebrityService {
 
     @NonNull
     @Transactional
-    public CelebrityResponseDto updateCelebrity(@NonNull UUID id, @NonNull CelebrityRequestDto requestDto) {
+    public CelebrityUpdateResponseDto updateCelebrity(@NonNull UUID id, @NonNull CelebrityUpdateRequestDto requestDto) {
         Celebrity celebrity = celebrityRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, id));
+        Object jsonTheme = celebrity.getJsonTheme();
         if (!celebrity.getName().equalsIgnoreCase(requestDto.getName())) {
             log.info("Try update Celebrity name from {} to {}", celebrity.getName(), requestDto.getName());
             throwIfCelebrityNameExists(requestDto);
         }
         celebrity = mapper.toEntity(requestDto, celebrity);
+        celebrity.setJsonTheme(jsonTheme);
         celebrityRepository.save(celebrity);
-        return mapper.toDto(celebrity);
+        return mapper.toUpdateDto(celebrity);
     }
 
     @NonNull
@@ -127,6 +124,12 @@ public class CelebrityService {
     }
 
     private void throwIfCelebrityNameExists(@NonNull CelebrityRequestDto requestDto) {
+        if (celebrityRepository.existsByNameIgnoreCase(requestDto.getName())) {
+            throw new ItemConflictException(Celebrity.class, requestDto.getName());
+        }
+    }
+
+    private void throwIfCelebrityNameExists(@NonNull CelebrityUpdateRequestDto requestDto) {
         if (celebrityRepository.existsByNameIgnoreCase(requestDto.getName())) {
             throw new ItemConflictException(Celebrity.class, requestDto.getName());
         }

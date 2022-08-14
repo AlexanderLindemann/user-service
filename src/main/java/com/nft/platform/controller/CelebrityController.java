@@ -1,10 +1,8 @@
 package com.nft.platform.controller;
 
 import com.nft.platform.dto.request.CelebrityRequestDto;
-import com.nft.platform.dto.response.CelebrityResponseDto;
-import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
-import com.nft.platform.dto.response.CelebrityThemeResponseDto;
-import com.nft.platform.dto.response.LinkCelebrityResponseDto;
+import com.nft.platform.dto.request.CelebrityUpdateRequestDto;
+import com.nft.platform.dto.response.*;
 import com.nft.platform.service.CelebrityService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,7 +58,7 @@ public class CelebrityController {
     @GetMapping("/links")
     @Operation(summary = "Get Celebrity Link")
     @ResponseStatus(HttpStatus.OK)
-    public LinkCelebrityResponseDto getLinkCelebrity(@RequestParam(name = "celebrityId", required = false) UUID celebrityId){
+    public LinkCelebrityResponseDto getLinkCelebrity(@RequestParam(name = "celebrityId", required = false) UUID celebrityId) {
         return celebrityService.getCelebrityLink(celebrityId);
     }
 
@@ -76,11 +74,11 @@ public class CelebrityController {
     @PutMapping("/{id}")
     @Operation(summary = "Update Celebrity")
     @ResponseStatus(HttpStatus.OK)
-    public CelebrityResponseDto updateCelebrityProfile(
+    public CelebrityUpdateResponseDto updateCelebrityProfile(
             @Parameter(name = "id", description = "Celebrity Id")
             @PathVariable("id") UUID celebrityId,
             @Parameter(name = "celebrityRequestDto", description = "Celebrity Request Dto")
-            @Valid @RequestBody CelebrityRequestDto celebrityRequestDto
+            @Valid @RequestBody CelebrityUpdateRequestDto celebrityRequestDto
     ) {
         return celebrityService.updateCelebrity(celebrityId, celebrityRequestDto);
     }
