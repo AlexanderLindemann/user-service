@@ -35,7 +35,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog.xml
   kafka:
-    bootstrap-servers: tswf.io:9092
+    bootstrap-servers: localhost:9092
     producer:
       enabled: false
       group:
@@ -43,7 +43,7 @@ spring:
       income-history:
         topic: income-history-service
     consumer:
-      enabled: false
+      enabled: true
       group:
         id: user-service
       poll-service:
@@ -58,6 +58,8 @@ spring:
         topic: platform-activity-service
       token-management-service:
         topic: token-management-service
+      content-service:
+        topic: content-service
 
 redis:
   enabled: true

@@ -1,8 +1,8 @@
 package com.nft.platform.service.poe;
 
 import com.nft.platform.common.dto.RewardResponseDto;
-import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.common.util.EnumUtil;
 import com.nft.platform.domain.Period;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
@@ -19,6 +19,7 @@ import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
 import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
 import com.nft.platform.dto.poe.response.UserIdActivityBalancePositionResponseDto;
+import com.nft.platform.exception.InvalidPoeTransactionException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
@@ -35,6 +36,7 @@ import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.service.UserPointsService;
 import com.nft.platform.util.CommonUtils;
 import com.nft.platform.util.security.SecurityUtil;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,12 +46,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
-import org.springframework.lang.Nullable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -92,14 +95,19 @@ public class PoeTransactionService {
     @Retryable(value = DataIntegrityViolationException.class, backoff = @Backoff(delay = 100, maxDelay = 300))
     public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto requestDto) {
         log.info("Try to create PoeTransaction from dto={}", requestDto);
-        PoeAction poeAction = mapEventToPoeAction(requestDto.getEventType());
+        PoeAction poeAction = EnumUtil.EVENT_TO_POE_MAP.get(requestDto.getEventType());
         if (poeAction == null) {
             throw new ItemNotFoundException(Poe.class, "can not find poe for event=" + requestDto.getEventType());
         }
         Poe poe = poeRepository.findByCode(poeAction)
                 .orElseThrow(() -> new ItemNotFoundException(Poe.class, "code=" + poeAction.getActionCode()));
+        var period = periodRepository.findByStatus(PeriodStatus.ACTIVE)
+                .orElseThrow(() -> new ItemNotFoundException(Period.class, "can not find active period"));
+        if (isPoeInvalidForPeriod(period.getId(), requestDto.getUserId(), poeAction)) {
+            throw new InvalidPoeTransactionException(poeAction, requestDto.getUserId(), period.getId());
+        }
         PoeTransaction poeTransaction = poeTransactionMapper.toEntity(requestDto, new PoeTransaction());
-        poeTransaction.setPeriodId(periodRepository.findByStatus(PeriodStatus.ACTIVE).get().getId());
+        poeTransaction.setPeriodId(period.getId());
         poeTransaction.setPoe(poe);
         ProfileWallet profileWallet = profileWalletRepository
                 .findByKeycloakUserIdAndCelebrityId(requestDto.getUserId(), requestDto.getCelebrityId())
@@ -127,32 +135,6 @@ public class PoeTransactionService {
                 poeTransaction.getPointsReward()
         );
         return poeTransactionMapper.toDto(poeTransaction);
-    }
-
-    @Nullable
-    private PoeAction mapEventToPoeAction(EventType eventType) {
-        if (eventType == EventType.VOTE_CREATED) {
-            return PoeAction.VOTE;
-        }
-        if (eventType == EventType.PROFILE_WALLET_CREATED) {
-            return PoeAction.REGISTRATION;
-        }
-        if (eventType == EventType.LIKE_ADDED) {
-            return PoeAction.LIKE;
-        }
-        if (eventType == EventType.CHALLENGE_COMPLETED) {
-            return PoeAction.CHALLENGE;
-        }
-        if (eventType == EventType.QUIZ_COMPLETED) {
-            return PoeAction.QUIZ;
-        }
-        if (eventType == EventType.FIRST_TIME_PERIOD_APP_OPEN) {
-            return PoeAction.PERIOD_ENTRY;
-        }
-        if (eventType == EventType.WHEEL_ROLLED) {
-            return PoeAction.WHEEL_ROLLED;
-        }
-        return null;
     }
 
     @Transactional(readOnly = true)
@@ -293,6 +275,21 @@ public class PoeTransactionService {
         return rewardList;
     }
 
+    /**
+     * Checks if user already has a once-per-period poe transaction in specific period.
+     *
+     * @param periodId - period UUID
+     * @param userId - user UUID
+     * @param poeAction - poe action
+     * @return - whether if poe action is invalid for specific period
+     */
+    public boolean isPoeInvalidForPeriod(@NonNull UUID periodId, @NonNull UUID userId, @NonNull PoeAction poeAction) {
+        if (EnumUtil.ONCE_FOR_ACTIVE_PERIOD_POE.contains(poeAction)) {
+            return poeTransactionRepository.existsByPeriodIdAndUserIdAndPoe_Code(periodId, userId, poeAction);
+        }
+        return false;
+    }
+
     private void setUnclaimedRewards(UUID clientId, List<RewardResponseDto> rewardList, UUID feedId) {
         List<PoeAction> poeActionList = getPoeActions();
         boolean userSubscriber = profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity));
@@ -385,6 +382,4 @@ public class PoeTransactionService {
         }
         return voteRewardMap;
     }
-
-
 }
