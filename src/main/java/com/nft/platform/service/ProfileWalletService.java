@@ -4,6 +4,7 @@ import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.common.enums.RewardType;
+import com.nft.platform.common.event.RewardTransactionEvent;
 import com.nft.platform.common.event.VoteTransactionEvent;
 import com.nft.platform.common.event.WheelRewardKafkaEvent;
 import com.nft.platform.domain.BundleForCoins;
@@ -13,6 +14,7 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.enums.PeriodStatus;
+import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.request.SubscriptionRequestDto;
 import com.nft.platform.dto.request.UserRewardIncreaseDto;
 import com.nft.platform.dto.request.UserVoteReductionDto;
@@ -261,15 +263,25 @@ public class ProfileWalletService {
                 requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
     }
 
+    /**
+     * Send {@link PoeTransactionResponseDto} to Kafka queue in order to fill up database in income-history-service and update {@link ProfileWallet} entity.
+     *
+     * @param wheelRewardKafkaEvent This dto comes from platform-activity-service (kafka topic);
+     * @param responseDto           This dto comes after processing {@link Poe} data for exact user;
+     */
     @Transactional
-    public void handleWheelReward(WheelRewardKafkaEvent wheelRewardKafkaEvent) {
+    public void handleWheelReward(WheelRewardKafkaEvent wheelRewardKafkaEvent, PoeTransactionResponseDto responseDto) {
         for (RewardType rewardType : wheelRewardKafkaEvent.getRewards().keySet()) {
+            Integer rewardAmount = wheelRewardKafkaEvent.getRewards().get(rewardType);
             switch (rewardType) {
                 case COINS:
                     profileWalletRepository.updateProfileWalletCoinBalance(
                         wheelRewardKafkaEvent.getUserId(),
                         wheelRewardKafkaEvent.getCelebrityId(),
-                        wheelRewardKafkaEvent.getRewards().get(rewardType)
+                        rewardAmount
+                    );
+                    applicationEventPublisher.publishEvent(
+                        formRewardTransactionEvent(responseDto, rewardAmount,0,0,0,0,0)
                     );
                     break;
                 case GOLD_STATUS:
@@ -278,12 +290,18 @@ public class ProfileWalletService {
                         wheelRewardKafkaEvent.getCelebrityId(),
                 true
                     );
+                    applicationEventPublisher.publishEvent(
+                        formRewardTransactionEvent(responseDto, 0,0,0,0,0,1)
+                    );
                     break;
                 case NFT_VOTES:
                     profileWalletRepository.updateProfileWalletNftVoteBalance(
                         wheelRewardKafkaEvent.getUserId(),
                         wheelRewardKafkaEvent.getCelebrityId(),
                         wheelRewardKafkaEvent.getRewards().get(rewardType)
+                    );
+                    applicationEventPublisher.publishEvent(
+                        formRewardTransactionEvent(responseDto, 0,0,0,rewardAmount,0,0)
                     );
                     break;
                 case VOTES:
@@ -292,9 +310,36 @@ public class ProfileWalletService {
                         wheelRewardKafkaEvent.getCelebrityId(),
                         wheelRewardKafkaEvent.getRewards().get(rewardType)
                     );
+                    applicationEventPublisher.publishEvent(
+                        formRewardTransactionEvent(responseDto, 0,0, rewardAmount,0,0,0)
+                    );
                     break;
             }
         }
+    }
+
+    private RewardTransactionEvent formRewardTransactionEvent(
+        PoeTransactionResponseDto responseDto,
+        Integer coins,
+        Integer spins,
+        Integer votes,
+        Integer nft,
+        Integer collectible,
+        Integer goldStatus
+    ) {
+        return RewardTransactionEvent.builder()
+            .actionId(responseDto.getActionId())
+            .celebrityId(responseDto.getCelebrityId())
+            .userId(responseDto.getUserId())
+            .periodId(responseDto.getPeriodId())
+            .coinsReward(coins)
+            .spinReward(spins)
+            .votesReward(votes)
+            .nftReward(nft)
+            .collectibleReward(collectible)
+            .gsReward(goldStatus)
+            .eventType(EventType.REWARD_TRANSACTION_CREATED)
+        .build();
     }
 
 }

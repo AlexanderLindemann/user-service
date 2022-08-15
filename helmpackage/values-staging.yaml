@@ -31,6 +31,7 @@ env:
   SPRING_KAFKA_BOOTSTRAP_SERVERS: b-1.kafkastage.8jcavr.c5.kafka.eu-central-1.amazonaws.com:9092,b-2.kafkastage.8jcavr.c5.kafka.eu-central-1.amazonaws.com:9092
   SPRING_KAFKA_PRODUCER_ENABLED: true
   SPRING_KAFKA_PRODUCER_TOPIC: user-service
+  SPRING_KAFKA_PRODUCER_INCOME_HISTORY_SERVICE: income-history-service
   SPRING_KAFKA_CONSUMER_ENABLED: true
   SPRING_KAFKA_CONSUMER_GROUP_ID: user-service
   SPRING_KAFKA_CONSUMER_POLL_SERVICE_TOPIC: poll-service
