@@ -24,4 +24,7 @@ public class CelebrityResponseDto extends AbstractCelebrityDto {
 
     @Schema(description = "Celebrity categories", required = true)
     private List<CelebrityCategoryResponseDto> category;
+
+    @Schema(description = "User is subscriber", required = true)
+    private boolean isSubscribed = false;
 }

@@ -10,11 +10,7 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserProfileSearchDto;
-import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
-import com.nft.platform.dto.response.NftOwnerDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
-import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
-import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.response.*;
 import com.nft.platform.enums.OwnerType;
 import com.nft.platform.exception.FileUploadException;
 import com.nft.platform.exception.ItemConflictException;
@@ -49,8 +45,12 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.nft.platform.consts.Consts.TECH_CELEBRITY_ID;
+import static java.util.Objects.isNull;
 
 @Service
 @Slf4j
@@ -77,6 +77,12 @@ public class UserProfileService {
     public Optional<UserProfileWithWalletsResponseDto> findUserProfileById(@NonNull UUID id) {
         return userProfileRepository.findByIdWithWallets(id)
                 .map(userProfileWithWalletsMapper::toDto);
+    }
+
+    @NonNull
+    public Optional<PoorUserProfileResponseDto> findPoorUserProfile(@NonNull UUID id) {
+        return userProfileRepository.findById(id)
+                .map(mapper::toPoorDto);
     }
 
     public List<UserProfileResponseDto> search(UserProfileSearchDto params) {
@@ -186,23 +192,29 @@ public class UserProfileService {
         profileWalletService.createAndSaveProfileWallet(userProfile, celebrity);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<CurrentUserProfileWithWalletsResponseDto> findCurrentUserProfile() {
+    @Transactional
+    public Optional<CurrentUserProfileWithWalletsResponseDto> findCurrentUserProfile(@Nullable UUID activeCelebrityId) {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
         // For Mobile Users celebrityId gets from clientId
-        UUID celebrityId = currentUser.getCurrentCelebrityId() != null ? UUID.fromString(currentUser.getCurrentCelebrityId()) : null;
         Optional<UserProfile> userProfileO;
-        if (celebrityId == null) {
+        if (isNull(activeCelebrityId)) {
             userProfileO = userProfileRepository.findByKeycloakIdWithCryptoWallets(keycloakUserId);
         } else {
-            userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, celebrityId);
+            userProfileO = userProfileRepository.findByKeycloakIdAndCelebrityIdWithWallets(keycloakUserId, activeCelebrityId);
         }
         if (userProfileO.isEmpty()) {
-            return Optional.empty();
+            attachUserToCelebrity(keycloakUserId, TECH_CELEBRITY_ID);
         }
-        return userProfileRepository.findByKeycloakUserId(keycloakUserId)
-                .stream()
+
+        var userProfile = userProfileRepository.findByKeycloakUserId(keycloakUserId);
+        userProfile.ifPresent(profile -> {
+            if (profile.getProfileWallets().isEmpty()) {
+                profile.setProfileWallets(Set.of(attachUserToCelebrity(keycloakUserId, TECH_CELEBRITY_ID)));
+            }
+        });
+
+        return userProfile.stream()
                 .map(currentUserProfileWithWalletsMapper::toDto)
                 .peek((e) -> e.setRoles(currentUser.getRoles()))
                 .findAny();
@@ -352,8 +364,8 @@ public class UserProfileService {
         switch (type) {
             case CELEBRITY:
                 Celebrity celebrity = celebrityRepository
-                        .findById(userId)
-                        .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId));
+                    .findById(userId)
+                    .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId));
                 fullName = celebrity.getName() + (Objects.nonNull(celebrity.getLastName()) ? (" " + celebrity.getLastName()) : "");
                 break;
             case FANAT:
@@ -366,16 +378,29 @@ public class UserProfileService {
         return NftOwnerDto.builder()
                 .name(fullName)
                 .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
-                .build();
+            .build();
     }
 
     @Transactional
-    public void attachUserToCelebrity(String userName, UUID celebrityId) {
-        var user = userProfileRepository.findByUsername(userName).orElseThrow(() ->
-                new RestException(String.format("User %s was not found", userName), HttpStatus.NOT_FOUND));
+    public void attachCurrentUserToCelebrity(UUID celebrityId) {
+        var currentUserId = UUID.fromString(securityUtil.getCurrentUser().getId());
+        attachUserToCelebrity(currentUserId, celebrityId);
+    }
+
+    @Transactional
+    public ProfileWallet attachUserToCelebrity(UUID keycloakUserId, UUID celebrityId) {
+        var user = userProfileRepository.findByKeycloakUserId(keycloakUserId)
+                .orElseThrow(() -> new RestException("User %s was not found", HttpStatus.NOT_FOUND));
+        Optional<ProfileWallet> alreadySubscribedCelebrity = user
+                .getProfileWallets().stream()
+                .filter(pw -> Objects.equals(celebrityId, pw.getCelebrity().getId()))
+                .findFirst();
+        if (alreadySubscribedCelebrity.isPresent()) {
+            return alreadySubscribedCelebrity.get();
+        }
         var celebrity = celebrityRepository.findById(celebrityId).orElseThrow(() ->
                 new RestException(String.format("Celebrity %s was not found", celebrityId.toString()), HttpStatus.NOT_FOUND));
-        profileWalletService.createAndSaveProfileWallet(user, celebrity);
+        return profileWalletService.createAndSaveProfileWallet(user, celebrity);
     }
 
     private String setFullName(UserProfile profile) {
@@ -400,4 +425,7 @@ public class UserProfileService {
         return fullName;
     }
 
+    public Set<String> getUsersAvatars(List<UUID> userIds) {
+        return userProfileRepository.findImageIdsByUserIds(userIds);
+    }
 }

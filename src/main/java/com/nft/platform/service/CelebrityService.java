@@ -1,10 +1,12 @@
 package com.nft.platform.service;
 
 import com.nft.platform.domain.Celebrity;
+import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
 import com.nft.platform.dto.response.CelebrityThemeResponseDto;
+import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.LinkCelebrityResponseDto;
 import com.nft.platform.dto.response.NftCountResponseDto;
 import com.nft.platform.dto.response.ShowcaseResponseDto;
@@ -13,6 +15,8 @@ import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.feign.client.NftServiceApiClient;
 import com.nft.platform.mapper.CelebrityMapper;
 import com.nft.platform.repository.CelebrityRepository;
+import com.nft.platform.repository.ProfileWalletRepository;
+import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +47,11 @@ import static java.util.stream.IntStream.range;
 public class CelebrityService {
 
     private final CelebrityRepository celebrityRepository;
+    private final ProfileWalletRepository profileWalletRepository;
+    private final UserProfileService userProfileService;
     private final CelebrityMapper mapper;
     private final NftServiceApiClient nftServiceApiClient;
+    private final SecurityUtil securityUtil;
 
     @NonNull
     @Transactional(readOnly = true)
@@ -74,8 +81,23 @@ public class CelebrityService {
     @NonNull
     @Transactional(readOnly = true)
     public Page<CelebrityResponseDto> getCelebrityPage(@NonNull Pageable pageable) {
-        Page<Celebrity> celebrityPage = celebrityRepository.findAllByActiveTrue(pageable);
-        return celebrityPage.map(mapper::toDto);
+        Page<Celebrity> allCelebrity = celebrityRepository.findAllByActiveTrue(pageable);
+        Page<CelebrityResponseDto> celebrityResponseDtos = allCelebrity.map(mapper::toDto);
+        if (Objects.nonNull(securityUtil.getCurrentUserOrNull())) {
+            Optional<CurrentUserProfileWithWalletsResponseDto> currentUserProfile = userProfileService.findCurrentUserProfile(null);
+            if (currentUserProfile.isPresent()) {
+                List<UUID> userSubscriptions = profileWalletRepository.findAllByUserProfileId(currentUserProfile.get().getId()).stream()
+                        .map(ProfileWallet::getCelebrity)
+                        .map(Celebrity::getId)
+                        .collect(Collectors.toList());
+                for (CelebrityResponseDto celebrityResponseDto : celebrityResponseDtos.getContent()) {
+                    if (userSubscriptions.contains(celebrityResponseDto.getId())) {
+                        celebrityResponseDto.setSubscribed(true);
+                    }
+                }
+            }
+        }
+        return celebrityResponseDtos;
     }
 
     @NonNull

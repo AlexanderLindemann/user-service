@@ -1,16 +1,14 @@
 package com.nft.platform.repository;
 
 import com.nft.platform.domain.ProfileWallet;
-
 import lombok.NonNull;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.persistence.LockModeType;
-
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -91,5 +89,7 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
             + " AND pw.user_profile_id = up.id",
             nativeQuery = true)
     void updateProfileWalletExperienceBalance(UUID keycloakUserId, UUID celebrityId, int experience);
+
+    List<ProfileWallet> findAllByUserProfileId(UUID userId);
 
 }

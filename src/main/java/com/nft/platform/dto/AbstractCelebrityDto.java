@@ -1,6 +1,7 @@
 package com.nft.platform.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -80,4 +81,8 @@ public abstract class AbstractCelebrityDto {
 
     @Schema(description = "Celebrity active status")
     private boolean active;
+
+    @Schema(description = "Celebrity application screen.")
+    private String appScreen;
+
 }

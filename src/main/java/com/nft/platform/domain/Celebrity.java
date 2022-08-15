@@ -59,6 +59,9 @@ public class Celebrity extends BaseEntity {
     @Column(name = "image_promo_url")
     private String imagePromoUrl;
 
+    @Column(name = "app_screen")
+    private String appScreen;
+
     @ManyToMany
     @JoinTable(
             name = "celebrity_celebrity_category_map",

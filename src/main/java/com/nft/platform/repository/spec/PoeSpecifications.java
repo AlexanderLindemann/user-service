@@ -1,10 +1,10 @@
 package com.nft.platform.repository.spec;
 
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.common.enums.PoeGroup;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.domain.poe.Poe_;
 import com.nft.platform.dto.poe.request.PoeFilterDto;
-import com.nft.platform.enums.PoeGroup;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.CollectionUtils;

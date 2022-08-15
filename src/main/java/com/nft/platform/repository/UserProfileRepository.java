@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Repository
@@ -42,12 +43,10 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
     @Query("select up from UserProfile up where up.id in :userIds")
     List<UserProfile> findAllByIds(List<UUID> userIds);
 
-    @Query("SELECT up.imageUrl FROM UserProfile up WHERE up.keycloakUserId IN (:userIds)")
-    List<String> findImageIdsByUserIds(List<UUID> userIds);
+    @Query("SELECT DISTINCT up.imageUrl FROM UserProfile up WHERE up.keycloakUserId IN (:userIds)")
+    Set<String> findImageIdsByUserIds(List<UUID> userIds);
 
     @Query("SELECT up FROM UserProfile up WHERE (up.username = :name AND :name IS NOT NULL ) " +
             "OR (up.email = :email AND :email IS NOT NULL) OR (up.phone = :phone AND :phone IS NOT NULL)")
     Collection<UserProfile> findUserProfileBy(String name, String email, String phone);
-
-    Optional<UserProfile> findByUsername(String userName);
 }

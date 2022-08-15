@@ -41,7 +41,7 @@ spring:
       group:
         id: user-service
       income-history:
-        topic: income-history
+        topic: income-history-service
     consumer:
       enabled: false
       group:
@@ -135,7 +135,7 @@ nft:
   token-management:
     enable: false
   period:
-    cronExpression: "0 0,8,16 * * *"
+    cronExpression: "0 0 */8 * * *"
   tmpfantokens:
     cronExpression: "0 0 1 * * *"
     olderThanDays: 30

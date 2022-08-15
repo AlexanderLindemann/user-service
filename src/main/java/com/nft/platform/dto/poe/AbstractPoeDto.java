@@ -1,7 +1,7 @@
 package com.nft.platform.dto.poe;
 
 import com.nft.platform.common.enums.PoeAction;
-import com.nft.platform.enums.PoeGroup;
+import com.nft.platform.common.enums.PoeGroup;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;

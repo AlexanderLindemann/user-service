@@ -1,24 +1,13 @@
 package com.nft.platform.controller;
 
-import static com.nft.platform.util.security.RoleConstants.ROLE_ADMIN_CELEBRITY;
-import static com.nft.platform.util.security.RoleConstants.ROLE_ADMIN_PLATFORM;
-import static com.nft.platform.util.security.RoleConstants.ROLE_CONTENT_MODERATOR;
-import static com.nft.platform.util.security.RoleConstants.ROLE_MARKETPLACE_USER;
-import static com.nft.platform.util.security.RoleConstants.ROLE_TECH_TOKEN;
-import static com.nft.platform.util.security.RoleConstants.ROLE_USER;
-import static java.util.Optional.ofNullable;
-
 import com.nft.platform.dto.request.EditUserProfileRequestDto;
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserProfileSearchDto;
-import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
-import com.nft.platform.dto.response.NftOwnerDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
-import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
-import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.request.UserToCelebrityAttachmentRequestDto;
+import com.nft.platform.dto.response.*;
 import com.nft.platform.enums.OwnerType;
 import com.nft.platform.service.UserProfileService;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -49,10 +38,15 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
-import javax.validation.Valid;
+
+import static com.nft.platform.util.security.RoleConstants.*;
+import static java.util.Optional.ofNullable;
 
 @Tag(name = "User Profile Api")
 @RestController
@@ -80,12 +74,21 @@ public class UserProfileController {
         return ResponseEntity.of(userProfileResponseDtoO);
     }
 
+    @GetMapping("{id}/poor")
+    @Operation(summary = "Get poor User Profile by Id")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<PoorUserProfileResponseDto> findOtherUserById(@Parameter(name = "id", description = "User Profile Id")
+                                                                         @PathVariable(name = "id") UUID userProfileId) {
+        Optional<PoorUserProfileResponseDto> poorUserProfileResponseDto = userProfileService.findPoorUserProfile(userProfileId);
+        return ResponseEntity.of(poorUserProfileResponseDto);
+    }
+
     @GetMapping("/me")
     @Operation(summary = "Get Current User Profile")
     @ResponseStatus(HttpStatus.OK)
     @Secured({ROLE_USER, ROLE_MARKETPLACE_USER})
-    public ResponseEntity<CurrentUserProfileWithWalletsResponseDto> findMeByKeycloakId() {
-        Optional<CurrentUserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile();
+    public ResponseEntity<CurrentUserProfileWithWalletsResponseDto> findMeByKeycloakId(@RequestParam(required = false) UUID celebrityId) {
+        Optional<CurrentUserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile(celebrityId);
         return ResponseEntity.of(userProfileResponseDtoO);
     }
 
@@ -209,6 +212,14 @@ public class UserProfileController {
     public ResponseEntity<List<UserProfileResponseDto>> getUsersInfo(@RequestParam(name = "userIds") List<UUID> userIds) {
         return ResponseEntity.of(ofNullable(userProfileService.getUsersInfo(userIds)));
     }
+    @GetMapping("/avatars")
+    @ResponseStatus(HttpStatus.OK)
+    @Hidden
+    @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
+            ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
+    public ResponseEntity<Set<String>> getUsersAvatars(@RequestParam(name = "userIds") List<UUID> userIds) {
+        return ResponseEntity.of(ofNullable(userProfileService.getUsersAvatars(userIds)));
+    }
 
     @GetMapping("/info-by-kk-ids")
     @ResponseStatus(HttpStatus.OK)
@@ -234,8 +245,8 @@ public class UserProfileController {
     })
     @Secured({ROLE_USER, ROLE_MARKETPLACE_USER,
             ROLE_ADMIN_CELEBRITY, ROLE_ADMIN_PLATFORM, ROLE_TECH_TOKEN})
-    public ResponseEntity<?> attachUserToCelebrity(@RequestParam String userName, @RequestParam UUID celebrityId) {
-       userProfileService.attachUserToCelebrity(userName, celebrityId);
+    public ResponseEntity<?> attachUserToCelebrity(@RequestBody UserToCelebrityAttachmentRequestDto body) {
+       userProfileService.attachCurrentUserToCelebrity(body.getCelebrityId());
        return ResponseEntity.ok().build();
     }
 }

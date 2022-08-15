@@ -1,0 +1,1 @@
+ALTER TABLE celebrity ADD app_screen VARCHAR(255);
