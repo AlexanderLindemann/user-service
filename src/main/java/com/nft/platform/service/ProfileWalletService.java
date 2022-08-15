@@ -3,7 +3,9 @@ package com.nft.platform.service;
 import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.common.enums.RewardType;
 import com.nft.platform.common.event.VoteTransactionEvent;
+import com.nft.platform.common.event.WheelRewardKafkaEvent;
 import com.nft.platform.domain.BundleForCoins;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.Period;
@@ -18,8 +20,6 @@ import com.nft.platform.event.FirstAppOpenOnPeriodEvent;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
-import com.nft.platform.platformactivityservice.api.dto.enums.RewardType;
-import com.nft.platform.platformactivityservice.api.event.WheelRewardKafkaEvent;
 import com.nft.platform.redis.starter.service.SyncService;
 import com.nft.platform.repository.BundleForCoinsRepository;
 import com.nft.platform.repository.PeriodRepository;
@@ -27,8 +27,10 @@ import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.util.RLockKeys;
 import com.nft.platform.util.security.SecurityUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -184,7 +186,7 @@ public class ProfileWalletService {
                 .userId(requestDto.getKeycloakUserId())
                 .expenses(requestDto.getAmount())
                 .type(BundleType.WHEEL_SPIN)
-                .eventType(EventType.VOTE_CREATED)
+                .eventType(EventType.VOTE_TRANSACTION_CREATED)
             .build()
         );
     }
@@ -206,7 +208,7 @@ public class ProfileWalletService {
                 .userId(requestDto.getKeycloakUserId())
                 .expenses(requestDto.getAmount())
                 .type(BundleType.VOTE)
-                .eventType(EventType.VOTE_CREATED)
+                .eventType(EventType.VOTE_TRANSACTION_CREATED)
             .build()
         );
     }
@@ -261,33 +263,37 @@ public class ProfileWalletService {
 
     @Transactional
     public void handleWheelReward(WheelRewardKafkaEvent wheelRewardKafkaEvent) {
-        if (wheelRewardKafkaEvent.getRewardType() == RewardType.NFT_VOTES) {
-            profileWalletRepository.updateProfileWalletNftVoteBalance(
-                wheelRewardKafkaEvent.getUserId(),
-                wheelRewardKafkaEvent.getCelebrityId(),
-                wheelRewardKafkaEvent.getQuantity()
-            );
-        }
-        if (wheelRewardKafkaEvent.getRewardType() == RewardType.COINS) {
-            profileWalletRepository.updateProfileWalletCoinBalance(
-                wheelRewardKafkaEvent.getUserId(),
-                wheelRewardKafkaEvent.getCelebrityId(),
-                wheelRewardKafkaEvent.getQuantity()
-            );
-        }
-        if (wheelRewardKafkaEvent.getRewardType() == RewardType.VOTES) {
-            profileWalletRepository.updateProfileWalletVoteBalance(
-                wheelRewardKafkaEvent.getUserId(),
-                wheelRewardKafkaEvent.getCelebrityId(),
-                wheelRewardKafkaEvent.getQuantity()
-            );
-        }
-        if (wheelRewardKafkaEvent.getRewardType() == RewardType.GOLD_STATUS) {
-            profileWalletRepository.updateProfileWalletSubscription(
-                wheelRewardKafkaEvent.getUserId(),
-                wheelRewardKafkaEvent.getCelebrityId(),
+        for (RewardType rewardType : wheelRewardKafkaEvent.getRewards().keySet()) {
+            switch (rewardType) {
+                case COINS:
+                    profileWalletRepository.updateProfileWalletCoinBalance(
+                        wheelRewardKafkaEvent.getUserId(),
+                        wheelRewardKafkaEvent.getCelebrityId(),
+                        wheelRewardKafkaEvent.getRewards().get(rewardType)
+                    );
+                    break;
+                case GOLD_STATUS:
+                    profileWalletRepository.updateProfileWalletSubscription(
+                        wheelRewardKafkaEvent.getUserId(),
+                        wheelRewardKafkaEvent.getCelebrityId(),
                 true
-            );
+                    );
+                    break;
+                case NFT_VOTES:
+                    profileWalletRepository.updateProfileWalletNftVoteBalance(
+                        wheelRewardKafkaEvent.getUserId(),
+                        wheelRewardKafkaEvent.getCelebrityId(),
+                        wheelRewardKafkaEvent.getRewards().get(rewardType)
+                    );
+                    break;
+                case VOTES:
+                    profileWalletRepository.updateProfileWalletVoteBalance(
+                        wheelRewardKafkaEvent.getUserId(),
+                        wheelRewardKafkaEvent.getCelebrityId(),
+                        wheelRewardKafkaEvent.getRewards().get(rewardType)
+                    );
+                    break;
+            }
         }
     }
 
