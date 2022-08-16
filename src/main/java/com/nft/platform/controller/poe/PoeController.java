@@ -1,9 +1,9 @@
 package com.nft.platform.controller.poe;
 
+import com.nft.platform.common.dto.PoeFilterDto;
 import com.nft.platform.common.dto.PoeForUserDto;
 import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.controller.poe.contract.PoeControllerV1Api;
-import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
 import com.nft.platform.dto.poe.response.PoeResponseDto;
 import com.nft.platform.service.poe.PoeService;
@@ -19,10 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.nft.platform.util.security.RoleConstants.ROLE_ADMIN_CELEBRITY;
-import static com.nft.platform.util.security.RoleConstants.ROLE_ADMIN_PLATFORM;
-import static com.nft.platform.util.security.RoleConstants.ROLE_TECH_TOKEN;
-import static com.nft.platform.util.security.RoleConstants.ROLE_USER;
+import static com.nft.platform.util.security.RoleConstants.*;
 import static java.util.Optional.ofNullable;
 
 @RestController

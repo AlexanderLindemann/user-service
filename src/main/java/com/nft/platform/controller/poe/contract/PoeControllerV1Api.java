@@ -1,8 +1,8 @@
 package com.nft.platform.controller.poe.contract;
 
+import com.nft.platform.common.dto.PoeFilterDto;
 import com.nft.platform.common.dto.PoeForUserDto;
 import com.nft.platform.common.enums.PoeAction;
-import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
 import com.nft.platform.dto.poe.response.PoeResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,15 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;

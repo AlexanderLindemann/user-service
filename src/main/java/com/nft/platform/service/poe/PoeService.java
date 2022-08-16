@@ -1,8 +1,8 @@
 package com.nft.platform.service.poe;
 
+import com.nft.platform.common.dto.PoeFilterDto;
 import com.nft.platform.common.dto.PoeForUserDto;
 import com.nft.platform.common.enums.PoeAction;
-import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
 import com.nft.platform.dto.poe.response.PoeResponseDto;
 import org.springframework.data.domain.Page;
