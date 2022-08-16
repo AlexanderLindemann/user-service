@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,10 +30,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.nft.platform.util.security.RoleConstants.ROLE_TECH_TOKEN;
 import static org.springframework.data.domain.Sort.Direction.ASC;
 
 @Tag(name = "Celebrity Api")
@@ -122,6 +125,15 @@ public class CelebrityController {
     @Hidden
     public Set<CelebrityResponseDto> getCelebrities(@RequestParam(name = "celebrityIds") Set<UUID> celebrityIds) {
         return celebrityService.getCelebrities(celebrityIds);
+    }
+
+    @GetMapping(path = "/names/map")
+    @Operation(summary = "Get map of celebrity names by their Ids")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured(ROLE_TECH_TOKEN)
+    @Hidden
+    public Map<UUID, String> getCelebritiesNamesMap(@RequestParam(name = "celebrityIds") Set<UUID> celebrityIds) {
+        return celebrityService.getCelebritiesNamesMap(celebrityIds);
     }
 
     @GetMapping(path = "/active")
