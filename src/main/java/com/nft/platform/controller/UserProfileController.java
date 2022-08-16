@@ -7,9 +7,16 @@ import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserProfileSearchDto;
 import com.nft.platform.dto.request.UserToCelebrityAttachmentRequestDto;
-import com.nft.platform.dto.response.*;
+import com.nft.platform.dto.response.CelebrityResponseDto;
+import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.response.NftOwnerDto;
+import com.nft.platform.dto.response.PoorUserProfileResponseDto;
+import com.nft.platform.dto.response.UserProfileResponseDto;
+import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
+import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.enums.OwnerType;
 import com.nft.platform.service.UserProfileService;
+import com.nft.platform.util.security.SecurityUtil;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -55,6 +62,7 @@ import static java.util.Optional.ofNullable;
 public class UserProfileController {
 
     private final UserProfileService userProfileService;
+    private final SecurityUtil securityUtil;
 
     @GetMapping("/search")
     @Operation(summary = "Search by user profile fields")
@@ -90,6 +98,26 @@ public class UserProfileController {
     public ResponseEntity<CurrentUserProfileWithWalletsResponseDto> findMeByKeycloakId(@RequestParam(required = false) UUID celebrityId) {
         Optional<CurrentUserProfileWithWalletsResponseDto> userProfileResponseDtoO = userProfileService.findCurrentUserProfile(celebrityId);
         return ResponseEntity.of(userProfileResponseDtoO);
+    }
+
+    @GetMapping("/me/celebrities/subscribed")
+    @Operation(summary = "Get Current User subscriptions to celebrities")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_USER, ROLE_MARKETPLACE_USER})
+    public ResponseEntity<List<CelebrityResponseDto>> findMySubscriptions() {
+        return ResponseEntity.of(Optional.of(userProfileService.findAllSubscribedCelebrities(getCurrentUserId())));
+    }
+
+    @GetMapping("/me/celebrities/unsubscribed")
+    @Operation(summary = "Get Current User subscriptions to celebrities")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({ROLE_USER, ROLE_MARKETPLACE_USER})
+    public Page<CelebrityResponseDto> findCelebritiesWithoutMySubscription(@PageableDefault(sort = {"id"}, direction = Sort.Direction.ASC) Pageable pageable) {
+        return userProfileService.findAllUnsubscribedCelebrities(getCurrentUserId(), pageable);
+    }
+
+    private UUID getCurrentUserId() {
+        return UUID.fromString(securityUtil.getCurrentUser().getId());
     }
 
     @GetMapping("/by-kk-id/{id}")

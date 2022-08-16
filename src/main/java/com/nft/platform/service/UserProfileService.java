@@ -10,13 +10,20 @@ import com.nft.platform.dto.request.ProfileWalletRequestDto;
 import com.nft.platform.dto.request.UserProfileFilterDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.request.UserProfileSearchDto;
-import com.nft.platform.dto.response.*;
+import com.nft.platform.dto.response.CelebrityResponseDto;
+import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.response.NftOwnerDto;
+import com.nft.platform.dto.response.PoorUserProfileResponseDto;
+import com.nft.platform.dto.response.UserProfileResponseDto;
+import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
+import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.enums.OwnerType;
 import com.nft.platform.exception.FileUploadException;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.feign.client.FileServiceClient;
+import com.nft.platform.mapper.CelebrityMapper;
 import com.nft.platform.mapper.CurrentUserProfileWithWalletsMapper;
 import com.nft.platform.mapper.EditUserProfileMapper;
 import com.nft.platform.mapper.UserProfileMapper;
@@ -71,6 +78,7 @@ public class UserProfileService {
     private final SecurityUtil securityUtil;
     private final ProfileWalletService profileWalletService;
     private final FileServiceClient fileServiceClient;
+    private final CelebrityMapper celebrityMapper;
 
     @NonNull
     @Transactional(readOnly = true)
@@ -218,6 +226,20 @@ public class UserProfileService {
                 .map(currentUserProfileWithWalletsMapper::toDto)
                 .peek((e) -> e.setRoles(currentUser.getRoles()))
                 .findAny();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CelebrityResponseDto> findAllSubscribedCelebrities(UUID keycloakUserId) {
+        return celebrityRepository.findAllSubscribedCelebrities(keycloakUserId)
+                .stream()
+                .map(celebrityMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CelebrityResponseDto> findAllUnsubscribedCelebrities(UUID keycloakUserId, Pageable pageable) {
+        return celebrityRepository.findAllUnsubscribedCelebrities(keycloakUserId, pageable)
+                .map(celebrityMapper::toDto);
     }
 
     @Transactional(readOnly = true)

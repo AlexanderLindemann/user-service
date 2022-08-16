@@ -12,7 +12,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-
 /**
  * Class required for DBUnit normal working with json and jsonb types.
  * Need to specify this class in dataTypeFactoryClass property of DBUnit
@@ -54,4 +53,3 @@ public class CustomPostgresqlDataTypeFactory extends PostgresqlDataTypeFactory {
         }
     }
 }
-

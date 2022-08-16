@@ -6,7 +6,6 @@
 
     <include file="create/2021-12-24-create-schema-and-uuid.xml" relativeToChangelogFile="true"/>
     <include file="create/2021-12-24-add-user-and-celebrity-and-wallet-table.xml" relativeToChangelogFile="true"/>
-    <include file="sql/test-data/2021-12-29-create-test-celebrity.sql" relativeToChangelogFile="true"/>
     <include file="update/2021-02-01-add-vote-balance-to-user.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-02-17-add-user-profile-fields.xml" relativeToChangelogFile="true"/>
     <include file="update/2022-03-01-add-user-profile-firstname-lastname-nickname.xml" relativeToChangelogFile="true"/>
