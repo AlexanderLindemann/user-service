@@ -27,11 +27,12 @@
         <wiremock.version>2.27.2</wiremock.version>
         <redis-starter.version>1.0-SNAPSHOT</redis-starter.version>
         <shedlock.version>4.33.0</shedlock.version>
-        <common-lib.version>3.6-SNAPSHOT</common-lib.version>
-        <kafka-starter.version>2.0-SNAPSHOT</kafka-starter.version>
+        <common-lib.version>3.7-SNAPSHOT</common-lib.version>
+        <kafka-starter.version>2.1-SNAPSHOT</kafka-starter.version>
         <audit.starter.version>2.0-SNAPSHOT</audit.starter.version>
         <challenge-service-api-contracts.version>1.0.0-SNAPSHOT</challenge-service-api-contracts.version>
         <platform-activity-service-api-contracts.version>1.0.0-SNAPSHOT</platform-activity-service-api-contracts.version>
+        <dbrider.version>1.32.3</dbrider.version>
     </properties>
     <dependencies>
         <!-- NFT -->
@@ -81,7 +82,6 @@
             <artifactId>commons-dbcp2</artifactId>
             <version>${commons-dbcp2.version}</version>
         </dependency>
-
 
 
         <!-- Spring -->
@@ -149,6 +149,17 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>3.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.database-rider</groupId>
+            <artifactId>rider-junit5</artifactId>
+            <version>${dbrider.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
 

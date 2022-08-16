@@ -1,3 +1,13 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQL94Dialect
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+    open-in-view: false
 feign:
   some-sample-service:
     # The automatically generated (for now by wiremock) url

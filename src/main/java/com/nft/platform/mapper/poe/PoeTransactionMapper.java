@@ -2,6 +2,7 @@ package com.nft.platform.mapper.poe;
 
 import com.nft.platform.challengeservice.api.event.KafkaChallengeCompletedEvent;
 import com.nft.platform.common.event.LikeAddedEvent;
+import com.nft.platform.common.event.PreNftEvent;
 import com.nft.platform.common.event.QuizCompletedEvent;
 import com.nft.platform.common.event.VoteCreatedEvent;
 import com.nft.platform.common.event.WheelRewardKafkaEvent;
@@ -48,4 +49,5 @@ public interface PoeTransactionMapper {
 
     PoeTransactionRequestDto toRequestDto(WheelRewardKafkaEvent event);
 
+    PoeTransactionRequestDto toRequestDto(PreNftEvent event);
 }

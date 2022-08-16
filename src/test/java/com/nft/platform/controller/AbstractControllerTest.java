@@ -29,6 +29,6 @@ public abstract class AbstractControllerTest {
                 .build();
     }
 
-    abstract String getBasePath();
+    protected abstract String getBasePath();
 
 }
