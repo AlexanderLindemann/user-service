@@ -2,6 +2,7 @@ package com.nft.platform.service.poe.impl;
 
 import com.nft.platform.common.dto.PoeForUserDto;
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.common.util.EnumUtil;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.poe.request.PoeFilterDto;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
@@ -13,6 +14,7 @@ import com.nft.platform.repository.spec.PoeSpecifications;
 import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.service.poe.PoeService;
 import com.nft.platform.util.CommonUtils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;

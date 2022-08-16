@@ -49,4 +49,5 @@
     <include file="update/2022-06-28-correct_data_type_for_json.sql" relativeToChangelogFile="true"/>
     <include file="update/2022_07_07_additional_fields_fro_celebrity.sql" relativeToChangelogFile="true"/>
     <include file="update/0001-2022-07-22-add_app_screen_column.sql" relativeToChangelogFile="true"/>
+    <include file="update/2022_08_12-repopulate_poe.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

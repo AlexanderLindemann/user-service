@@ -2,6 +2,7 @@ package com.nft.platform.service;
 
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
+import com.nft.platform.domain.view.CelebrityView;
 import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -195,6 +197,15 @@ public class CelebrityService {
         return celebrityRepository.findAllById(celebrityIds).stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toSet());
+    }
+
+    @Transactional(readOnly = true)
+    public Map<UUID, String> getCelebritiesNamesMap(Set<UUID> celebrityIds) {
+        if (celebrityIds.isEmpty()) {
+            return new HashMap<>();
+        }
+        return celebrityRepository.findByIdIn(celebrityIds)
+                .collect(Collectors.toMap(CelebrityView::getId, CelebrityView::getName));
     }
 
     @Transactional(readOnly = true)

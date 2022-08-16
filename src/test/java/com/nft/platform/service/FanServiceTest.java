@@ -1,5 +1,6 @@
 package com.nft.platform.service;
 
+import com.nft.platform.AbstractIntegrationTest;
 import com.nft.platform.dto.CelebrityFanDto;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,9 +12,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-public class FanServiceTest {
+public class FanServiceTest extends AbstractIntegrationTest {
 
     @Test
     public void testCreateTopFansForEmptyList() {
