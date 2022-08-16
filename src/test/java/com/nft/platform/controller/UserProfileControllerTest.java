@@ -5,7 +5,7 @@ import com.nft.platform.common.util.JsonUtil;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.PoorUserProfileResponseDto;
 import com.nft.platform.service.UserProfileService;
-import com.nft.platform.util.AbstractIntegrationTest;
+import com.nft.platform.AbstractIntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

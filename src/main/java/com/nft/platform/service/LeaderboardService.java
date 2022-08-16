@@ -3,9 +3,11 @@ package com.nft.platform.service;
 import com.nft.platform.domain.LeaderboardRow;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.enums.LeaderboardGroup;
+import com.nft.platform.dto.response.LeaderboardByIdResponseDto;
 import com.nft.platform.dto.response.LeaderboardPositionDto;
 import com.nft.platform.dto.response.LeaderboardUserDto;
 import com.nft.platform.dto.response.LeaderboardV2ResponseDto;
+import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.repository.UserProfileRepository;
 import com.nft.platform.util.LeaderboardQueryUtils;
@@ -163,6 +165,7 @@ public class LeaderboardService {
                 .map(this::mapResultOfLeaderboardQueryToLeaderboardRow)
                 .collect(Collectors.toList());
     }
+
 
     private LeaderboardRow mapResultOfLeaderboardQueryToLeaderboardRow(Object[] result) {
         int rowNumber = (int) result[0];
@@ -469,5 +472,56 @@ public class LeaderboardService {
     private boolean isNeedDisplayNickName(UserProfile userProfile) {
         return userProfile.isInvisibleName()
                 || (userProfile.getFirstName() == null && userProfile.getLastName() == null);
+    }
+
+
+    /**
+     * Getting data from the leaderboard for the user and the current user by uuid
+     *
+     * @param uuid - user UUID
+     * @return - a {@link LeaderboardByIdResponseDto} object.
+     */
+    public LeaderboardByIdResponseDto getLeaderboardByIdResponseDto(UUID uuid) {
+        return LeaderboardByIdResponseDto.builder()
+                .otherUser(getLeaderboardPositionDtoById(uuid))
+                .currentUser(getAuthorizedLeaderboardPositionDto())
+                .build();
+    }
+
+    private LeaderboardPositionDto getAuthorizedLeaderboardPositionDto() {
+        KeycloakUserProfile currentUserOrNull = securityUtil.getCurrentUserOrNull();
+        if (currentUserOrNull != null) {
+            UUID currentUserUuid = UUID.fromString(currentUserOrNull.getId());
+            return getLeaderboardPositionDtoById(currentUserUuid);
+        }
+        return null;
+    }
+
+    private LeaderboardPositionDto getLeaderboardPositionDtoById(UUID uuid) {
+        Optional<Object[]> findUser = entityManager
+                .createNativeQuery(LeaderboardQueryUtils.FIND_LEADERBOARD_BY_ID)
+                .setParameter("keycloak_user_id", uuid)
+                .getResultList()
+                .stream()
+                .findFirst();
+        return findUser
+                .map(user -> {
+                    LeaderboardRow leaderboardRow = mapResultOfLeaderboardQueryToLeaderboardRow(user);
+                    return userProfileRepository.findByKeycloakUserId(uuid)
+                            .map(userProfile -> mapResultToLeaderboardPositionDto(uuid, leaderboardRow, userProfile))
+                            .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, uuid));
+                })
+                .orElseThrow(() -> new ItemNotFoundException(LeaderboardRow.class, uuid));
+    }
+
+    private LeaderboardPositionDto mapResultToLeaderboardPositionDto(UUID uuid, LeaderboardRow leaderboardRow, UserProfile userProfile) {
+        return LeaderboardPositionDto.builder()
+                .position(leaderboardRow.getRowNumber())
+                .pointsBalance(leaderboardRow.getPoints())
+                .userDto(LeaderboardUserDto.builder()
+                        .keycloakUserId(uuid)
+                        .username(calculateDisplayedUserNameInLeaderboard(userProfile))
+                        .imageUrl(userProfile.getImageUrl()).build())
+                .build();
     }
 }

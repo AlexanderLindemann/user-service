@@ -174,4 +174,10 @@ public class LeaderboardQueryUtils {
             + "     FROM all_pos "
             + "     WHERE period_id = (SELECT id FROM period WHERE status = 'ACTIVE') "
             + "     ORDER BY row_number";
+
+    public static final String FIND_LEADERBOARD_BY_ID = ""
+            + "SELECT cast(row_number as int), cast(keycloak_user_id as varchar), points, null AS user_group "
+            + "FROM leaderboard_numbers "
+            + "WHERE keycloak_user_id = :keycloak_user_id "
+            + "AND period_id = (SELECT id FROM period WHERE status = 'ACTIVE')";
 }
