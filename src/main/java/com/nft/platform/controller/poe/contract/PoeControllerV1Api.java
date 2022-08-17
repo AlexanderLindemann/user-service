@@ -47,10 +47,10 @@ public interface PoeControllerV1Api {
     @ResponseStatus(HttpStatus.OK)
     List<PoeResponseDto> getPoesList(@ParameterObject PoeFilterDto filter);
 
-    @GetMapping("/list/for-user")
+    @PostMapping("/list/for-user")
     @Operation(summary = "Get list of Poe for user")
     @ResponseStatus(HttpStatus.OK)
-    List<PoeForUserDto> getPoesListForUser(@ParameterObject PoeFilterDto filter,
+    List<PoeForUserDto> getPoesListForUser(@RequestBody PoeFilterDto filter,
                                            @RequestParam UUID userId,
                                            @RequestParam UUID celebrityId);
 
