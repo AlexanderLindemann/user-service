@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static io.netty.util.internal.StringUtil.EMPTY_STRING;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -215,7 +216,7 @@ public class CelebrityService {
             return new HashMap<>();
         }
         return celebrityRepository.findByIdIn(celebrityIds)
-                .collect(Collectors.toMap(CelebrityView::getId, CelebrityView::getName));
+                .collect(Collectors.toMap(CelebrityView::getId, view -> view.getNickName() == null ? EMPTY_STRING : view.getNickName()));
     }
 
     @Transactional(readOnly = true)

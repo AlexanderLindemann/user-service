@@ -6,5 +6,5 @@ public interface CelebrityView {
 
     UUID getId();
 
-    String getName();
+    String getNickName();
 }
