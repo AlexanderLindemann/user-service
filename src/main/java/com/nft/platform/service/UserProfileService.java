@@ -242,7 +242,7 @@ public class UserProfileService {
                 .map(celebrityMapper::toDto);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public Optional<UserProfileWithCelebrityIdsResponseDto> findCurrentAdminProfile() {
         UUID keycloakUserId = UUID.fromString(securityUtil.getCurrentUser().getId());
         return findUserProfileByKeycloakId(keycloakUserId);
