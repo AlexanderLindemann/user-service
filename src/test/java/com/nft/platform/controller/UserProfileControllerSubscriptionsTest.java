@@ -51,7 +51,7 @@ public class UserProfileControllerSubscriptionsTest extends AbstractIntegrationT
     @WithMockKeycloakToken(id = USER_ID, roles = {ROLE_USER})
     public void testGetNotSubscribedСelebrities() throws Exception {
         mockMvc.perform(get(BASE_PATH + "/me/celebrities/unsubscribed"))
-                .andExpect(jsonPath("$.content[0].name").value("TECH_CELEB"))
+                .andExpect(jsonPath("$.content[0].name").value("Mikky"))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
 

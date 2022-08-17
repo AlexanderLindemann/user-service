@@ -31,11 +31,11 @@ public interface CelebrityRepository extends JpaRepository<Celebrity, UUID> {
 
     Stream<CelebrityView> findByIdIn(Set<UUID> celebrityIds);
 
-    @Query(value = "SELECT cb FROM Celebrity cb WHERE cb.id NOT IN (" +
+    @Query(value = "SELECT cb FROM Celebrity cb WHERE cb.id <> :techCelebrityId AND cb.id NOT IN (" +
             "SELECT pw.celebrity.id FROM ProfileWallet pw WHERE pw.userProfile.keycloakUserId = :keycloakUserId)")
-    Page<Celebrity> findAllUnsubscribedCelebrities(UUID keycloakUserId, Pageable pageable);
+    Page<Celebrity> findAllUnsubscribedCelebrities(UUID keycloakUserId, Pageable pageable, UUID techCelebrityId);
 
-    @Query(value = "SELECT cb FROM Celebrity cb WHERE cb.id IN (" +
+    @Query(value = "SELECT cb FROM Celebrity cb WHERE cb.id <> :techCelebrityId AND cb.id IN (" +
             "SELECT pw.celebrity.id FROM ProfileWallet pw WHERE pw.userProfile.keycloakUserId = :keycloakUserId)")
-    List<Celebrity> findAllSubscribedCelebrities(UUID keycloakUserId);
+    List<Celebrity> findAllSubscribedCelebrities(UUID keycloakUserId, UUID techCelebrityId);
 }

@@ -230,7 +230,7 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public List<CelebrityResponseDto> findAllSubscribedCelebrities(UUID keycloakUserId) {
-        return celebrityRepository.findAllSubscribedCelebrities(keycloakUserId)
+        return celebrityRepository.findAllSubscribedCelebrities(keycloakUserId, TECH_CELEBRITY_ID)
                 .stream()
                 .map(celebrityMapper::toDto)
                 .collect(Collectors.toList());
@@ -238,7 +238,7 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public Page<CelebrityResponseDto> findAllUnsubscribedCelebrities(UUID keycloakUserId, Pageable pageable) {
-        return celebrityRepository.findAllUnsubscribedCelebrities(keycloakUserId, pageable)
+        return celebrityRepository.findAllUnsubscribedCelebrities(keycloakUserId, pageable, TECH_CELEBRITY_ID)
                 .map(celebrityMapper::toDto);
     }
 
