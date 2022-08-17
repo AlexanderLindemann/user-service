@@ -5,7 +5,14 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.view.CelebrityView;
 import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.request.CelebrityUpdateRequestDto;
-import com.nft.platform.dto.response.*;
+import com.nft.platform.dto.response.CelebrityResponseDto;
+import com.nft.platform.dto.response.CelebrityShowcaseResponseDto;
+import com.nft.platform.dto.response.CelebrityThemeResponseDto;
+import com.nft.platform.dto.response.CelebrityUpdateResponseDto;
+import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
+import com.nft.platform.dto.response.LinkCelebrityResponseDto;
+import com.nft.platform.dto.response.NftCountResponseDto;
+import com.nft.platform.dto.response.ShowcaseResponseDto;
 import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.feign.client.NftServiceApiClient;
@@ -76,7 +83,7 @@ public class CelebrityService {
 
 
     @NonNull
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<CelebrityResponseDto> getCelebrityPage(@NonNull Pageable pageable) {
         Page<Celebrity> allCelebrity = celebrityRepository.findAllByActiveTrue(pageable);
         Page<CelebrityResponseDto> celebrityResponseDtos = allCelebrity.map(mapper::toDto);

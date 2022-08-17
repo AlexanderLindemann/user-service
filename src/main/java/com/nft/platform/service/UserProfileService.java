@@ -248,9 +248,21 @@ public class UserProfileService {
         return findUserProfileByKeycloakId(keycloakUserId);
     }
 
+    /**
+     * Returns an user's profile and creates subscription to {@link com.nft.platform.consts.Consts#TECH_CELEBRITY_ID} if
+     * the user doesn't have subscriptions at all.
+     * @param keycloakId keycloakUserId from auth token
+     * @return instance of {@link UserProfileWithCelebrityIdsResponseDto}
+     */
     @Transactional(readOnly = true)
     public Optional<UserProfileWithCelebrityIdsResponseDto> findUserProfileByKeycloakId(UUID keycloakId) {
         return userProfileRepository.findByKeycloakUserIdWithCelebrities(keycloakId)
+                .map(profile -> {
+                    if (profile.getProfileWallets().isEmpty()) {
+                        profile.setProfileWallets(Set.of(attachUserToCelebrity(keycloakId, TECH_CELEBRITY_ID)));
+                    }
+                    return profile;
+                })
                 .map(mapperWithCelebrityIds::toDto);
     }
 
