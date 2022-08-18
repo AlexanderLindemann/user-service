@@ -33,6 +33,7 @@ public class UserProfileControllerSubscriptionsTest extends AbstractIntegrationT
         Assert.assertEquals(1, celebrities.size());
         var c = celebrities.get(0);
         Assert.assertEquals("Cyrille", c.getName());
+        Assert.assertTrue(c.isSubscribed());
     }
 
     @Test
@@ -52,6 +53,7 @@ public class UserProfileControllerSubscriptionsTest extends AbstractIntegrationT
     public void testGetNotSubscribedСelebrities() throws Exception {
         mockMvc.perform(get(BASE_PATH + "/me/celebrities/unsubscribed"))
                 .andExpect(jsonPath("$.content[0].name").value("Mikky"))
+                .andExpect(jsonPath("$.content[0].subscribed").value("false"))
                 .andExpect(jsonPath("$.totalElements").value(1));
     }
 

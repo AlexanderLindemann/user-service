@@ -233,13 +233,18 @@ public class UserProfileService {
         return celebrityRepository.findAllSubscribedCelebrities(keycloakUserId, TECH_CELEBRITY_ID)
                 .stream()
                 .map(celebrityMapper::toDto)
+                .peek(celebrity -> celebrity.setSubscribed(true))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public Page<CelebrityResponseDto> findAllUnsubscribedCelebrities(UUID keycloakUserId, Pageable pageable) {
         return celebrityRepository.findAllUnsubscribedCelebrities(keycloakUserId, pageable, TECH_CELEBRITY_ID)
-                .map(celebrityMapper::toDto);
+                .map(celebrityMapper::toDto)
+                .map(celebrity -> {
+                    celebrity.setSubscribed(false);
+                    return celebrity;
+                });
     }
 
     @Transactional
