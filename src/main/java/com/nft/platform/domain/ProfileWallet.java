@@ -17,7 +17,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-
 import java.util.UUID;
 
 
@@ -30,8 +29,8 @@ import java.util.UUID;
                 "            FROM ProfileWallet up " +
                 "            JOIN FETCH up.celebrity " +
                 "            JOIN FETCH up.userProfile " +
-                "            WHERE up.subscriber = true " +
-                "            AND up.celebrity.id = :celebrityId")
+
+                "            WHERE up.celebrity.id = :celebrityId")
 })
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "celebrity"})
