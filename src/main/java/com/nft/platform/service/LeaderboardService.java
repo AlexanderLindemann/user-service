@@ -3,8 +3,10 @@ package com.nft.platform.service;
 import com.nft.platform.domain.LeaderboardRow;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.enums.LeaderboardGroup;
+import com.nft.platform.dto.response.LeaderboardByIdDto;
 import com.nft.platform.dto.response.LeaderboardByIdResponseDto;
 import com.nft.platform.dto.response.LeaderboardPositionDto;
+import com.nft.platform.dto.response.LeaderboardUserByIdDto;
 import com.nft.platform.dto.response.LeaderboardUserDto;
 import com.nft.platform.dto.response.LeaderboardV2ResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
@@ -165,6 +167,8 @@ public class LeaderboardService {
                 .map(this::mapResultOfLeaderboardQueryToLeaderboardRow)
                 .collect(Collectors.toList());
     }
+
+
 
 
     private LeaderboardRow mapResultOfLeaderboardQueryToLeaderboardRow(Object[] result) {
@@ -483,21 +487,33 @@ public class LeaderboardService {
      */
     public LeaderboardByIdResponseDto getLeaderboardByIdResponseDto(UUID uuid) {
         return LeaderboardByIdResponseDto.builder()
-                .otherUser(getLeaderboardPositionDtoById(uuid))
+                .otherUser(getLeaderboardByIdDto(uuid,findLeaderboardByIdAndMapToLeaderboardRow(uuid)))
                 .currentUser(getAuthorizedLeaderboardPositionDto())
                 .build();
     }
 
-    private LeaderboardPositionDto getAuthorizedLeaderboardPositionDto() {
+
+    /**
+     * Getting a position with the leaderboard of an authorized user, if he is not there, then it is necessary to display his profile.
+     * To do this, we catch the exception that he is not found in the leaderboard and look for his profile in the database
+     * @return  a {@link LeaderboardByIdDto} object.
+     */
+    private LeaderboardByIdDto getAuthorizedLeaderboardPositionDto() {
         KeycloakUserProfile currentUserOrNull = securityUtil.getCurrentUserOrNull();
         if (currentUserOrNull != null) {
             UUID currentUserUuid = UUID.fromString(currentUserOrNull.getId());
-            return getLeaderboardPositionDtoById(currentUserUuid);
+            LeaderboardRow leaderboardByIdAndMapToLeaderboardRow;
+            try {
+                leaderboardByIdAndMapToLeaderboardRow = findLeaderboardByIdAndMapToLeaderboardRow(currentUserUuid);
+            } catch (ItemNotFoundException e) {
+                leaderboardByIdAndMapToLeaderboardRow = LeaderboardRow.builder().points(0).build();
+            }
+            return getLeaderboardByIdDto(currentUserUuid, leaderboardByIdAndMapToLeaderboardRow);
         }
         return null;
     }
 
-    private LeaderboardPositionDto getLeaderboardPositionDtoById(UUID uuid) {
+    private LeaderboardRow findLeaderboardByIdAndMapToLeaderboardRow(UUID uuid) {
         Optional<Object[]> findUser = entityManager
                 .createNativeQuery(LeaderboardQueryUtils.FIND_LEADERBOARD_BY_ID)
                 .setParameter("keycloak_user_id", uuid)
@@ -505,23 +521,21 @@ public class LeaderboardService {
                 .stream()
                 .findFirst();
         return findUser
-                .map(user -> {
-                    LeaderboardRow leaderboardRow = mapResultOfLeaderboardQueryToLeaderboardRow(user);
-                    return userProfileRepository.findByKeycloakUserId(uuid)
-                            .map(userProfile -> mapResultToLeaderboardPositionDto(uuid, leaderboardRow, userProfile))
-                            .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, uuid));
-                })
+                .map(this::mapResultOfLeaderboardQueryToLeaderboardRow)
                 .orElseThrow(() -> new ItemNotFoundException(LeaderboardRow.class, uuid));
     }
 
-    private LeaderboardPositionDto mapResultToLeaderboardPositionDto(UUID uuid, LeaderboardRow leaderboardRow, UserProfile userProfile) {
-        return LeaderboardPositionDto.builder()
+    private LeaderboardByIdDto getLeaderboardByIdDto(UUID uuid, LeaderboardRow leaderboardRow) {
+        return userProfileRepository.findLeaderboardUserByIdDtoByKeycloakUserId(uuid)
+                .map(userProfile -> mapResultToLeaderboardPositionDto(leaderboardRow, userProfile))
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, uuid));
+    }
+
+    private LeaderboardByIdDto mapResultToLeaderboardPositionDto(LeaderboardRow leaderboardRow, LeaderboardUserByIdDto userProfile) {
+        return LeaderboardByIdDto.builder()
                 .position(leaderboardRow.getRowNumber())
                 .pointsBalance(leaderboardRow.getPoints())
-                .userDto(LeaderboardUserDto.builder()
-                        .keycloakUserId(uuid)
-                        .username(calculateDisplayedUserNameInLeaderboard(userProfile))
-                        .imageUrl(userProfile.getImageUrl()).build())
+                .user(userProfile)
                 .build();
     }
 }

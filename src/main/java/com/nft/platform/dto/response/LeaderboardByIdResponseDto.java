@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,6 +13,6 @@ import lombok.experimental.SuperBuilder;
 @Builder
 public class LeaderboardByIdResponseDto {
 
-    private LeaderboardPositionDto otherUser;
-    private LeaderboardPositionDto currentUser;
+    private LeaderboardByIdDto otherUser;
+    private LeaderboardByIdDto currentUser;
 }

@@ -10,8 +10,8 @@ import java.util.UUID;
 @Builder
 public class LeaderboardRow {
 
-    private int rowNumber;
+    private Integer rowNumber;
     private UUID keycloakUserId;
-    private int points;
+    private Integer points;
     private LeaderboardGroup userGroup;
 }

@@ -47,10 +47,9 @@ class GetLeaderboardDraftsTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.otherUser.position").value(responseObject[0]))
                 .andExpect(jsonPath("$.otherUser.pointsBalance").value(responseObject[2]))
-                .andExpect(jsonPath("$.otherUser.userDto.keycloakUserId").value(responseObject[1]))
-                .andExpect(jsonPath("$.otherUser.userDto.keycloakUserId").value(responseObject[1]))
-                .andExpect(jsonPath("$.otherUser.userDto.username").value(expectedContent.getUsername()))
-                .andExpect(jsonPath("$.otherUser.userDto.imageUrl").value(expectedContent.getImageUrl()));
+                .andExpect(jsonPath("$.otherUser.user.keycloakUserId").value(responseObject[1]))
+                .andExpect(jsonPath("$.otherUser.user.username").value(expectedContent.getUsername()))
+                .andExpect(jsonPath("$.otherUser.user.imageUrl").value(expectedContent.getImageUrl()));
     }
 
     private void mockEntityManager(List<Object[]> responseList) {

@@ -1,6 +1,7 @@
 package com.nft.platform.repository;
 
 import com.nft.platform.domain.UserProfile;
+import com.nft.platform.dto.response.LeaderboardUserByIdDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -30,6 +31,10 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
     Optional<UserProfile> findByKeycloakIdWithCryptoWallets(UUID keycloakUserId);
 
     Optional<UserProfile> findByKeycloakUserId(UUID keycloakUserId);
+
+    @Query("select new com.nft.platform.dto.response.LeaderboardUserByIdDto(u.keycloakUserId, u.username, u.imageUrl,u.invisibleName) from UserProfile u where u.keycloakUserId = ?1")
+    Optional<LeaderboardUserByIdDto> findLeaderboardUserByIdDtoByKeycloakUserId(UUID keycloakUserId);
+
 
     List<UserProfile> findByKeycloakUserIdIn(Collection<UUID> keycloakUserIds);
 
