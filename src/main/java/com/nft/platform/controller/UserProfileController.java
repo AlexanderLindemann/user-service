@@ -1,5 +1,6 @@
 package com.nft.platform.controller;
 
+import com.nft.platform.common.dto.ContentAuthorDto;
 import com.nft.platform.dto.request.EditUserProfileRequestDto;
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
@@ -48,12 +49,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import static com.nft.platform.util.security.RoleConstants.*;
 import static java.util.Optional.ofNullable;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Tag(name = "User Profile Api")
 @RestController
@@ -276,5 +279,14 @@ public class UserProfileController {
     public ResponseEntity<?> attachUserToCelebrity(@RequestBody UserToCelebrityAttachmentRequestDto body) {
        userProfileService.attachCurrentUserToCelebrity(body.getCelebrityId());
        return ResponseEntity.ok().build();
+    }
+
+    @Hidden
+    @GetMapping(value = "/authors/map", produces = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Get map of content authors by their Keycloak ids")
+    @Secured(ROLE_TECH_TOKEN)
+    @ResponseStatus(HttpStatus.OK)
+    public Map<UUID, ContentAuthorDto> getContentAuthorsMap(@RequestParam Set<UUID> authorKeycloakIds) {
+        return userProfileService.getContentAuthorsMapByKeycloakIdIn(authorKeycloakIds);
     }
 }

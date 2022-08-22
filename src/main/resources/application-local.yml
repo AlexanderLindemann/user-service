@@ -1,17 +1,27 @@
+spring:
+  jpa:
+    show-sql: true
+  application:
+    name: user-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/users
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: false
 nft:
   logging:
     logstash:
       enabled: false
     useJsonFormat: false
-spring:
-  jpa:
-    show-sql: true
 
 server:
   port: 8081
 
 logging:
   level:
+    org.apache.kafka: error
     com.nft: DEBUG
 
 redis:

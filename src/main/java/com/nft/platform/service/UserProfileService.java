@@ -1,5 +1,6 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.dto.ContentAuthorDto;
 import com.nft.platform.common.enums.FileType;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
@@ -46,18 +47,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.nft.platform.consts.Consts.TECH_CELEBRITY_ID;
 import static java.util.Objects.isNull;
+import static org.springframework.data.util.Pair.toMap;
 
 @Service
 @Slf4j
@@ -256,6 +262,7 @@ public class UserProfileService {
     /**
      * Returns an user's profile and creates subscription to {@link com.nft.platform.consts.Consts#TECH_CELEBRITY_ID} if
      * the user doesn't have subscriptions at all.
+     *
      * @param keycloakId keycloakUserId from auth token
      * @return instance of {@link UserProfileWithCelebrityIdsResponseDto}
      */
@@ -403,8 +410,8 @@ public class UserProfileService {
         switch (type) {
             case CELEBRITY:
                 Celebrity celebrity = celebrityRepository
-                    .findById(userId)
-                    .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId));
+                        .findById(userId)
+                        .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, userId));
                 fullName = celebrity.getName() + (Objects.nonNull(celebrity.getLastName()) ? (" " + celebrity.getLastName()) : "");
                 break;
             case FANAT:
@@ -417,7 +424,7 @@ public class UserProfileService {
         return NftOwnerDto.builder()
                 .name(fullName)
                 .avatars(userProfileRepository.findImageIdsByUserIds(userIds))
-            .build();
+                .build();
     }
 
     @Transactional
@@ -466,5 +473,14 @@ public class UserProfileService {
 
     public Set<String> getUsersAvatars(List<UUID> userIds) {
         return userProfileRepository.findImageIdsByUserIds(userIds);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<UUID, ContentAuthorDto> getContentAuthorsMapByKeycloakIdIn(Set<UUID> authorKeycloakIds) {
+        if (CollectionUtils.isEmpty(authorKeycloakIds)) {
+            return Collections.emptyMap();
+        }
+        return userProfileRepository.findContentAuthorsByKeycloakIdIn(authorKeycloakIds)
+                .collect(Collectors.toMap(ContentAuthorDto::getKeycloakId, Function.identity()));
     }
 }
