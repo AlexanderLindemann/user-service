@@ -80,7 +80,7 @@ public class PoeTransactionController {
         return poeTransactionService.findLastPoeHistory(celebrityId);
     }
 
-    @GetMapping("/action-poe")
+    @GetMapping("/rewards")
     @Operation(summary = "Get action poe")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_TECH_TOKEN})
