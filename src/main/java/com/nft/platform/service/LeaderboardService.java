@@ -452,6 +452,8 @@ public class LeaderboardService {
                                     "Leaderboard member with keycloakUserId=" + keycloakUserId + " not found",
                                     HttpStatus.INTERNAL_SERVER_ERROR)
                             );
+                    position.getUserDto().setKeycloakUserId(null);
+                    position.getUserDto().setUserId(userProfile.getId());
                     position.getUserDto().setUsername(calculateDisplayedUserNameInLeaderboard(userProfile));
                     position.getUserDto().setImageUrl(userProfile.getImageUrl());
                 }
@@ -487,7 +489,7 @@ public class LeaderboardService {
      */
     public LeaderboardByIdResponseDto getLeaderboardByIdResponseDto(UUID uuid) {
         return LeaderboardByIdResponseDto.builder()
-                .otherUser(getLeaderboardByIdDto(uuid,findLeaderboardByIdAndMapToLeaderboardRow(uuid)))
+                .otherUser(getLeaderboardByIdDto(uuid, findLeaderboardByIdAndMapToLeaderboardRow(uuid)))
                 .currentUser(getAuthorizedLeaderboardPositionDto())
                 .build();
     }
@@ -496,7 +498,8 @@ public class LeaderboardService {
     /**
      * Getting a position with the leaderboard of an authorized user, if he is not there, then it is necessary to display his profile.
      * To do this, we catch the exception that he is not found in the leaderboard and look for his profile in the database
-     * @return  a {@link LeaderboardByIdDto} object.
+     *
+     * @return a {@link LeaderboardByIdDto} object.
      */
     private LeaderboardByIdDto getAuthorizedLeaderboardPositionDto() {
         KeycloakUserProfile currentUserOrNull = securityUtil.getCurrentUserOrNull();
