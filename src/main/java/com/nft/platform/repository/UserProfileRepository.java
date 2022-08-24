@@ -2,6 +2,7 @@ package com.nft.platform.repository;
 
 import com.nft.platform.common.dto.ContentAuthorDto;
 import com.nft.platform.domain.UserProfile;
+import com.nft.platform.domain.view.ModeratorView;
 import com.nft.platform.dto.response.LeaderboardUserByIdDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -61,4 +62,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
             "up.imageUrl, up.invisibleName) FROM UserProfile up " +
             "WHERE up.keycloakUserId in ?1")
     Stream<ContentAuthorDto> findContentAuthorsByKeycloakIdIn(Collection<UUID> authorKeycloakIds);
+
+    @Query("SELECT up.keycloakUserId, up.firstName, up.lastName FROM UserProfile up " +
+            "WHERE up.keycloakUserId in ?1")
+    Stream<ModeratorView> findModeratorsByKeycloakIdIn(Set<UUID> moderatorKeycloakIds);
 }

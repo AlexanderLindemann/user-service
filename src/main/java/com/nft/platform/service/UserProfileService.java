@@ -5,6 +5,7 @@ import com.nft.platform.common.enums.FileType;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
+import com.nft.platform.domain.view.ModeratorView;
 import com.nft.platform.dto.request.EditUserProfileRequestDto;
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
@@ -482,5 +483,12 @@ public class UserProfileService {
         }
         return userProfileRepository.findContentAuthorsByKeycloakIdIn(authorKeycloakIds)
                 .collect(Collectors.toMap(ContentAuthorDto::getKeycloakId, Function.identity()));
+    }
+
+    @Transactional(readOnly = true)
+    public Map<UUID, String> getModeratorNamesMapByKeycloakIds(@NotNull Set<UUID> moderatorKeycloakIds) {
+        return userProfileRepository.findModeratorsByKeycloakIdIn(moderatorKeycloakIds)
+                .collect(Collectors.toMap(ModeratorView::getKeycloakUserId,
+                        view -> String.format("%s %s", view.getFirstName(), view.getLastName()).trim()));
     }
 }

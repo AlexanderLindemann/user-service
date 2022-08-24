@@ -289,4 +289,13 @@ public class UserProfileController {
     public Map<UUID, ContentAuthorDto> getContentAuthorsMap(@RequestParam Set<UUID> authorKeycloakIds) {
         return userProfileService.getContentAuthorsMapByKeycloakIdIn(authorKeycloakIds);
     }
+
+    @GetMapping("/moderators/names/map")
+    @Operation(summary = "Get moderator names map by their Keycloak ids")
+    @Hidden
+    @Secured(ROLE_TECH_TOKEN)
+    @ResponseStatus(HttpStatus.OK)
+    public Map<UUID, String> getModeratorNamesByKeycloakIds(@RequestParam Set<UUID> moderatorKeycloakIds) {
+        return userProfileService.getModeratorNamesMapByKeycloakIds(moderatorKeycloakIds);
+    }
 }
