@@ -1,6 +1,7 @@
 package com.nft.platform.controller;
 
 import com.nft.platform.common.dto.ContentAuthorDto;
+import com.nft.platform.common.dto.UserProfileResponseDto;
 import com.nft.platform.dto.request.EditUserProfileRequestDto;
 import com.nft.platform.dto.request.KeycloakUserIdWithCelebrityIdDto;
 import com.nft.platform.dto.request.ProfileWalletRequestDto;
@@ -12,7 +13,6 @@ import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.PoorUserProfileResponseDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.enums.OwnerType;

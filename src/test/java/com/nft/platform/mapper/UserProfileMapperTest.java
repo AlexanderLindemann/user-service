@@ -1,8 +1,8 @@
 package com.nft.platform.mapper;
 
+import com.nft.platform.common.dto.UserProfileResponseDto;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.request.UserProfileRequestDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,6 +1,6 @@
 package com.nft.platform.dto.request;
 
-import com.nft.platform.dto.MinimizedAbstractUserProfileDto;
+import com.nft.platform.common.dto.MinimizedAbstractUserProfileDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

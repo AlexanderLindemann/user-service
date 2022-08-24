@@ -1,14 +1,13 @@
 package com.nft.platform.mapper;
 
+import com.nft.platform.common.dto.UserProfileResponseDto;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.dto.poe.response.UserLeaderboardResponseDto;
 import com.nft.platform.dto.request.UserProfileRequestDto;
 import com.nft.platform.dto.response.PoorUserProfileResponseDto;
 import com.nft.platform.dto.response.ProfileWalletResponseDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletResponseDto;
-import liquibase.pro.packaged.M;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

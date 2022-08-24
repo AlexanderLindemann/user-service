@@ -1,8 +1,6 @@
 package com.nft.platform.dto.response;
 
-import com.nft.platform.dto.MinimizedAbstractUserProfileDto;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 

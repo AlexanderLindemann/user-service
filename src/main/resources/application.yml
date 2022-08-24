@@ -60,6 +60,8 @@ spring:
         topic: token-management-service
       content-service:
         topic: content-service
+      nft-service:
+        topic: nft-service
 
 redis:
   enabled: true

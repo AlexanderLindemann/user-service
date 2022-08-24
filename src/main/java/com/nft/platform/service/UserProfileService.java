@@ -1,6 +1,7 @@
 package com.nft.platform.service;
 
 import com.nft.platform.common.dto.ContentAuthorDto;
+import com.nft.platform.common.dto.UserProfileResponseDto;
 import com.nft.platform.common.enums.FileType;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
@@ -16,7 +17,6 @@ import com.nft.platform.dto.response.CelebrityResponseDto;
 import com.nft.platform.dto.response.CurrentUserProfileWithWalletsResponseDto;
 import com.nft.platform.dto.response.NftOwnerDto;
 import com.nft.platform.dto.response.PoorUserProfileResponseDto;
-import com.nft.platform.dto.response.UserProfileResponseDto;
 import com.nft.platform.dto.response.UserProfileWithCelebrityIdsResponseDto;
 import com.nft.platform.dto.response.UserProfileWithWalletsResponseDto;
 import com.nft.platform.enums.OwnerType;
@@ -64,7 +64,6 @@ import java.util.stream.Collectors;
 
 import static com.nft.platform.consts.Consts.TECH_CELEBRITY_ID;
 import static java.util.Objects.isNull;
-import static org.springframework.data.util.Pair.toMap;
 
 @Service
 @Slf4j

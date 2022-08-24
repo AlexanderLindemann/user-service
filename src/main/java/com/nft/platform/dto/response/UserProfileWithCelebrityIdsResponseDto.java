@@ -1,5 +1,6 @@
 package com.nft.platform.dto.response;
 
+import com.nft.platform.common.dto.UserProfileResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
