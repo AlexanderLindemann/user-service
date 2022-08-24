@@ -57,9 +57,9 @@ public class UserProfileControllerSubscriptionsTest extends AbstractIntegrationT
     public void testGetNotSubscribedСelebrities() throws Exception {
         mockMvc.perform(get(BASE_PATH + "/me/celebrities/unsubscribed"))
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.content[0].name").value("Mikky"))
+                .andExpect(jsonPath("$.content[0].name").value("Vlado"))
                 .andExpect(jsonPath("$.content[0].subscribed").value("false"))
-                .andExpect(jsonPath("$.totalElements").value(1));
+                .andExpect(jsonPath("$.totalElements").value(2));
     }
 
     @Test

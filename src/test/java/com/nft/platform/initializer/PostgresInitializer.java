@@ -1,7 +1,9 @@
 package com.nft.platform.initializer;
 
 import com.nft.platform.util.TestUtil;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -15,10 +17,10 @@ public class PostgresInitializer implements ApplicationContextInitializer<Config
     private static final DockerImageName IMAGE_NAME = TestUtil.getTesContainersDockerImage("postgres:11-alpine").asCompatibleSubstituteFor("postgres");
 
     public static final PostgreSQLContainer<?> PG_CONTAINER = new PostgreSQLContainer<>(IMAGE_NAME)
-            .withDatabaseName(NAME)
-            .withUsername(NAME)
-            .withPassword(NAME)
-            .withReuse(false);
+        .withDatabaseName(NAME)
+        .withUsername(NAME)
+        .withPassword(NAME)
+        .withReuse(false);
 
     static {
         log.info("Starting postgres testcontainers initializer...");
@@ -37,4 +39,5 @@ public class PostgresInitializer implements ApplicationContextInitializer<Config
                 "spring.datasource.password=" + PG_CONTAINER.getPassword()
         ).applyTo(configurableApplicationContext.getEnvironment());
     }
+
 }

@@ -17,12 +17,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import java.util.UUID;
 
 
 @AllArgsConstructor
 @Builder
 @Data
+@Table(name = "profile_wallet")
 @Entity
 @NamedQueries({
         @NamedQuery(name = "ProfileWallet.findAllCelebrityFans", query = "SELECT up " +

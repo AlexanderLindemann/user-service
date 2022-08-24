@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 )
 @ActiveProfiles("test")
 @SpringBootTest
-public class AbstractIntegrationTest {
+public abstract class AbstractIntegrationTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired

@@ -25,7 +25,7 @@ public class CelebritiesControllerTest extends AbstractIntegrationTest {
     public void testGetCelebritiesPage() throws Exception {
         mockMvc.perform(get(BASE_PATH))
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.content[0].id").value("d212e77f-3057-4db5-80f2-14d52d3dae35"));
+                .andExpect(jsonPath("$.content[0].id").value("25839f9e-a084-482c-82b7-8defe5fb6b62"));
     }
 
     @Test
@@ -33,6 +33,6 @@ public class CelebritiesControllerTest extends AbstractIntegrationTest {
     public void testGetCelebritiesPageWithoutSubscriptions() throws Exception {
         mockMvc.perform(get(BASE_PATH))
                 .andExpect(status().is(HttpStatus.OK.value()))
-                .andExpect(jsonPath("$.content[0].id").value("d212e77f-3057-4db5-80f2-14d52d3dae35"));
+                .andExpect(jsonPath("$.content[0].id").value("25839f9e-a084-482c-82b7-8defe5fb6b62"));
     }
 }

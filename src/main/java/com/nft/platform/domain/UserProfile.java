@@ -26,6 +26,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Table(name = "user_profile")
 public class UserProfile extends BaseEntity {
 
     @Id

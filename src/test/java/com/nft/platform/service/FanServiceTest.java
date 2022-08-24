@@ -2,21 +2,21 @@ package com.nft.platform.service;
 
 import com.nft.platform.AbstractIntegrationTest;
 import com.nft.platform.dto.CelebrityFanDto;
-import org.junit.Assert;
+
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class FanServiceTest extends AbstractIntegrationTest {
 
     @Test
     public void testCreateTopFansForEmptyList() {
-        Assert.assertNotNull(FanService.createTopFansDto(Collections.emptyList(), 1, 1));
+        assertNotNull(FanService.createTopFansDto(Collections.emptyList(), 1, 1));
     }
 
     @Test
@@ -35,8 +35,9 @@ public class FanServiceTest extends AbstractIntegrationTest {
         );
 
         var res = FanService.createTopFansDto(testFans, 2, 2);
-        Assert.assertEquals("FIRST", res.getFans().get(0).getAvatar());
-        Assert.assertEquals("SECOND", res.getFans().get(1).getAvatar());
-        Assert.assertEquals(BigDecimal.valueOf(150), res.getFansSum().getToken());
+        assertEquals("FIRST", res.getFans().get(0).getAvatar());
+        assertEquals("SECOND", res.getFans().get(1).getAvatar());
+        assertEquals(BigDecimal.valueOf(150), res.getFansSum().getToken());
     }
+
 }

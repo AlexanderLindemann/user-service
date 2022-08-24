@@ -6,8 +6,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        physical_naming_strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     show-sql: true
     open-in-view: false
+  kafka:
+    consumer:
+      enabled: false
+    producer:
+      enabled: false
+
 feign:
   some-sample-service:
     # The automatically generated (for now by wiremock) url
