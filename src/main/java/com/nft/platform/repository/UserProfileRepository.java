@@ -63,7 +63,5 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
             "WHERE up.keycloakUserId in ?1")
     Stream<ContentAuthorDto> findContentAuthorsByKeycloakIdIn(Collection<UUID> authorKeycloakIds);
 
-    @Query("SELECT up.keycloakUserId, up.firstName, up.lastName FROM UserProfile up " +
-            "WHERE up.keycloakUserId in ?1")
-    Stream<ModeratorView> findModeratorsByKeycloakIdIn(Set<UUID> moderatorKeycloakIds);
+    <T> Stream<T> findByKeycloakUserIdIn(Set<UUID> keycloakIds, Class<T> targetClass);
 }

@@ -486,8 +486,7 @@ public class UserProfileService {
 
     @Transactional(readOnly = true)
     public Map<UUID, String> getModeratorNamesMapByKeycloakIds(@NotNull Set<UUID> moderatorKeycloakIds) {
-        return userProfileRepository.findModeratorsByKeycloakIdIn(moderatorKeycloakIds)
-                .collect(Collectors.toMap(ModeratorView::getKeycloakUserId,
-                        view -> String.format("%s %s", view.getFirstName(), view.getLastName()).trim()));
+        return userProfileRepository.findByKeycloakUserIdIn(moderatorKeycloakIds, ModeratorView.class)
+                .collect(Collectors.toMap(ModeratorView::getKeycloakUserId, ModeratorView::getFullName));
     }
 }
