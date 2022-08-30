@@ -141,4 +141,11 @@ public class CelebrityController {
         return celebrityService.getActiveCelebrityIds();
     }
 
+    @Operation(summary = "Does celebrity exist by id")
+    @GetMapping(path = "/existence")
+    @Secured(ROLE_TECH_TOKEN)
+    @ResponseStatus(HttpStatus.OK)
+    public boolean existsById(@RequestParam UUID celebrityId) {
+        return celebrityService.doesActiveCelebrityExistById(celebrityId);
+    }
 }

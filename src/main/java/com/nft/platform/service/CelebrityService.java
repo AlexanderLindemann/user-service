@@ -177,7 +177,6 @@ public class CelebrityService {
         return celebrities;
     }
 
-
     public CelebrityThemeResponseDto uploadCelebrityTheme(UUID celebrityId, String celebrityTheme) {
         Celebrity celebrity = celebrityRepository.findById(celebrityId)
                 .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, celebrityId));
@@ -211,5 +210,9 @@ public class CelebrityService {
         return celebrityRepository.findAllByActiveIsTrue().stream()
                 .map(Celebrity::getId)
                 .collect(toList());
+    }
+
+    public boolean doesActiveCelebrityExistById(@NonNull UUID celebrityId) {
+        return celebrityRepository.existsByIdAndActiveTrue(celebrityId);
     }
 }

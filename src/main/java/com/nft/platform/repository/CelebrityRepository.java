@@ -38,4 +38,6 @@ public interface CelebrityRepository extends JpaRepository<Celebrity, UUID> {
     @Query(value = "SELECT cb FROM Celebrity cb WHERE cb.id <> :techCelebrityId AND cb.id IN (" +
             "SELECT pw.celebrity.id FROM ProfileWallet pw WHERE pw.userProfile.keycloakUserId = :keycloakUserId)")
     List<Celebrity> findAllSubscribedCelebrities(UUID keycloakUserId, UUID techCelebrityId);
+
+    boolean existsByIdAndActiveTrue(UUID id);
 }
