@@ -100,7 +100,7 @@ public class UserProfileService {
     }
 
     public List<UserProfileResponseDto> search(UserProfileSearchDto params) {
-        return userProfileRepository.findUserProfileBy(params.getName(), params.getEmail(), params.getPhone())
+        return userProfileRepository.findUserProfileBy(StringUtils.toRootLowerCase(params.getName()), StringUtils.toRootLowerCase(params.getEmail()), params.getPhone())
                 .stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());

@@ -2,7 +2,6 @@ package com.nft.platform.repository;
 
 import com.nft.platform.common.dto.ContentAuthorDto;
 import com.nft.platform.domain.UserProfile;
-import com.nft.platform.domain.view.ModeratorView;
 import com.nft.platform.dto.response.LeaderboardUserByIdDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -54,8 +53,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
     @Query("SELECT DISTINCT up.imageUrl FROM UserProfile up WHERE up.keycloakUserId IN (:userIds)")
     Set<String> findImageIdsByUserIds(List<UUID> userIds);
 
-    @Query("SELECT up FROM UserProfile up WHERE (up.username = :name AND :name IS NOT NULL ) " +
-            "OR (up.email = :email AND :email IS NOT NULL) OR (up.phone = :phone AND :phone IS NOT NULL)")
+    @Query("SELECT up FROM UserProfile up WHERE (LOWER(up.username) = :name AND :name IS NOT NULL ) " +
+            "OR (LOWER(up.email) = :email AND :email IS NOT NULL) OR (up.phone = :phone AND :phone IS NOT NULL)")
     Collection<UserProfile> findUserProfileBy(String name, String email, String phone);
 
     @Query("SELECT new com.nft.platform.common.dto.ContentAuthorDto(up.keycloakUserId, up.firstName, up.lastName, up.nickname, " +

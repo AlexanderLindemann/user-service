@@ -8,7 +8,7 @@ VALUES('99e135e0-8f82-4cc4-bd6a-78ce349e72f5'::uuid, 'https://nft-platform.s3.eu
 
 INSERT INTO user_profile
 (id, image_url, keycloak_user_id, phone, is_verified_phone, is_invisible_name, is_two_factor_auth, google_id, facebook_id, twitter_id, description, site, created_at, updated_at, created_by, updated_by, username, email, first_name, last_name, nickname, is_invisible_email, is_invisible_phone, image_promo_banner_url)
-VALUES('0c43b79e-a81b-4936-bf99-b39a115f8ed4'::uuid, NULL, '7649b847-3bb4-458a-9c9c-064e65b0f427'::uuid, NULL, false, false, false, NULL, NULL, NULL, NULL, NULL, '2022-07-27 09:20:16.331', '2022-07-27 09:20:16.331', 'aef6b231-5753-4a0a-b678-f2c1b92620fc', 'aef6b231-5753-4a0a-b678-f2c1b92620fc', 'auth@gmail.com', 'auth@gmail.com', NULL, NULL, NULL, false, false, NULL);
+VALUES('0c43b79e-a81b-4936-bf99-b39a115f8ed4'::uuid, NULL, '7649b847-3bb4-458a-9c9c-064e65b0f427'::uuid, '9198746734', false, false, false, NULL, NULL, NULL, NULL, NULL, '2022-07-27 09:20:16.331', '2022-07-27 09:20:16.331', 'aef6b231-5753-4a0a-b678-f2c1b92620fc', 'aef6b231-5753-4a0a-b678-f2c1b92620fc', 'auth@gmail.com', 'auth@gmail.com', NULL, NULL, NULL, false, false, NULL);
 
 INSERT INTO user_profile
 (id, image_url, keycloak_user_id, phone, is_verified_phone, is_invisible_name, is_two_factor_auth, google_id, facebook_id, twitter_id, description, site, created_at, updated_at, created_by, updated_by, username, email, first_name, last_name, nickname, is_invisible_email, is_invisible_phone, image_promo_banner_url)
