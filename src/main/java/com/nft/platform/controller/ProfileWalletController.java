@@ -1,10 +1,10 @@
 package com.nft.platform.controller;
 
 import com.nft.platform.common.dto.PeriodResponseDto;
+import com.nft.platform.common.dto.UserVoteReductionDto;
 import com.nft.platform.dto.enums.PeriodStatus;
-import com.nft.platform.dto.request.*;
 import com.nft.platform.dto.request.SubscriptionRequestDto;
-import com.nft.platform.dto.request.UserVoteReductionDto;
+import com.nft.platform.dto.request.UserRewardIncreaseDto;
 import com.nft.platform.service.PeriodService;
 import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.util.security.RoleConstants;
@@ -82,6 +82,17 @@ public class ProfileWalletController {
         return profileWalletService.findAvailableVotes(keycloakUserId, celebrityId);
     }
 
+    @GetMapping("/nft-vote-balance")
+    @Operation(summary = "Find User available Nft Votes by Celebrity")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public long findAvailableNftVotes(
+            @RequestParam UUID keycloakUserId,
+            @RequestParam UUID celebrityId
+    ) {
+        return profileWalletService.findAvailableNftVotes(keycloakUserId, celebrityId);
+    }
+
     @PostMapping("/wheel-balance/decrement")
     @Operation(summary = "Decrement Wheel Balance")
     @ResponseStatus(HttpStatus.OK)
@@ -100,6 +111,16 @@ public class ProfileWalletController {
             @Valid @RequestBody UserVoteReductionDto requestDto
     ) {
         profileWalletService.decrementVoteBalance(requestDto);
+    }
+
+    @PostMapping("/nft-vote-balance/decrement")
+    @Operation(summary = "Decrement Vote Balance")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_TECH_TOKEN})
+    public void decrementNftVoteBalance(
+            @Valid @RequestBody UserVoteReductionDto requestDto
+    ) {
+        profileWalletService.decrementNftVoteBalance(requestDto);
     }
 
     @PostMapping("/coins-addition")

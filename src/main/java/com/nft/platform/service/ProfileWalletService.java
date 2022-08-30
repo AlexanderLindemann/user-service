@@ -1,5 +1,6 @@
 package com.nft.platform.service;
 
+import com.nft.platform.common.dto.UserVoteReductionDto;
 import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
@@ -17,7 +18,6 @@ import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.request.SubscriptionRequestDto;
 import com.nft.platform.dto.request.UserRewardIncreaseDto;
-import com.nft.platform.dto.request.UserVoteReductionDto;
 import com.nft.platform.event.FirstAppOpenOnPeriodEvent;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
 import com.nft.platform.exception.BadRequestException;
@@ -165,6 +165,12 @@ public class ProfileWalletService {
         return calculateAvailableBalance(profileWallet, BundleType.VOTE, profileWallet.getVoteBalance());
     }
 
+    @Transactional(readOnly = true)
+    public long findAvailableNftVotes(UUID keycloakUserId, UUID celebrityId) {
+        ProfileWallet profileWallet = getProfileWallet(keycloakUserId, celebrityId);
+        return calculateAvailableBalance(profileWallet, BundleType.NFT_VOTE, profileWallet.getNftVotesBalance());
+    }
+
     private long calculateAvailableBalance(ProfileWallet profileWallet, BundleType bundleType, int balance) {
         int priceOfOneLot = findPriceOfOneLot(bundleType);
         return balance + calculateAvailableBalanceForCoins(profileWallet.getCoinBalance(), priceOfOneLot);
@@ -211,6 +217,28 @@ public class ProfileWalletService {
                 .type(BundleType.VOTE)
                 .eventType(EventType.VOTE_TRANSACTION_CREATED)
             .build()
+        );
+    }
+
+    @Transactional
+    public void decrementNftVoteBalance(UserVoteReductionDto requestDto) {
+        ProfileWallet profileWallet = getProfileWallet(requestDto.getKeycloakUserId(), requestDto.getCelebrityId());
+        int voteBalance = profileWallet.getNftVotesBalance();
+        if (voteBalance >= requestDto.getAmount()) {
+            profileWallet.setNftVotesBalance(voteBalance - requestDto.getAmount());
+        } else {
+            profileWallet.setNftVotesBalance(0);
+            handleLotsForCoins(profileWallet, BundleType.NFT_VOTE, voteBalance, requestDto);
+        }
+        profileWalletRepository.save(profileWallet);
+        applicationEventPublisher.publishEvent(
+                VoteTransactionEvent.builder()
+                        .celebrityId(requestDto.getCelebrityId())
+                        .userId(requestDto.getKeycloakUserId())
+                        .expenses(requestDto.getAmount())
+                        .type(BundleType.NFT_VOTE)
+                        .eventType(EventType.VOTE_TRANSACTION_CREATED)
+                        .build()
         );
     }
 
