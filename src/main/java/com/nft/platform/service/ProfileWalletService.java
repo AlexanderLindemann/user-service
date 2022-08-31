@@ -1,6 +1,7 @@
 package com.nft.platform.service;
 
 import com.nft.platform.common.dto.UserVoteReductionDto;
+import com.nft.platform.common.enums.ActivityType;
 import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
@@ -42,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
+
+import static com.nft.platform.common.enums.ActivityType.WHEEL;
 
 @Service
 @Slf4j
@@ -306,7 +309,7 @@ public class ProfileWalletService {
                         throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet coin balance.", "Something went wrong with updating.");
                     } else {
                         applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, rewardAmount, 0, 0, 0, null, null, false)
+                            formRewardTransactionEvent(responseDto, rewardAmount, 0, 0, 0, null, null, false, WHEEL)
                         );
                     }
                     break;
@@ -315,7 +318,7 @@ public class ProfileWalletService {
                         throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet coin balance.", "Something went wrong with updating.");
                     } else {
                         applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, 0, 0, 0, 0, null, null, true)
+                            formRewardTransactionEvent(responseDto, 0, 0, 0, 0, null, null, true, WHEEL)
                         );
                     }
                     break;
@@ -324,7 +327,7 @@ public class ProfileWalletService {
                         throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet coin balance.", "Something went wrong with updating.");
                     } else {
                         applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, 0,0,0, rewardAmount,null,null,false)
+                            formRewardTransactionEvent(responseDto, 0,0,0, rewardAmount,null,null,false, WHEEL)
                         );
                     }
                     break;
@@ -333,7 +336,7 @@ public class ProfileWalletService {
                         throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet coin balance.", "Something went wrong with updating.");
                     } else {
                         applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, 0, 0, rewardAmount, 0, null, null, false)
+                            formRewardTransactionEvent(responseDto, 0, 0, rewardAmount, 0, null, null, false, WHEEL)
                         );
                     }
                     break;
@@ -349,10 +352,12 @@ public class ProfileWalletService {
         Integer nftVotes,
         UUID nft,
         UUID collectible,
-        Boolean goldStatus
+        Boolean goldStatus,
+        ActivityType activityType
     ) {
         return RewardTransactionEvent.builder()
             .actionId(responseDto.getActionId())
+            .activityType(activityType)
             .celebrityId(responseDto.getCelebrityId())
             .userId(responseDto.getUserId())
             .periodId(responseDto.getPeriodId())
