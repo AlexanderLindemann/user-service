@@ -16,10 +16,10 @@ spring:
       enabled: false
 
 feign:
-  some-sample-service:
+  nft-service-api:
     # The automatically generated (for now by wiremock) url
     url: ${nft.tests.mock.url}
-    path: /service-context-path
+    path:
 
 nft:
   logging:

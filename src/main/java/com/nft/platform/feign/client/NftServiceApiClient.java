@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @FeignClient(
@@ -21,4 +22,8 @@ public interface NftServiceApiClient {
 
     @GetMapping(path = "/api/v1/nfts/nftCount")
     List<NftCountResponseDto> getNftCount(@RequestParam("celebrityIds") List<UUID> celebrityIds);
+
+    @GetMapping(path = "api/v1/nfts/top-celebrity-ids-by-nft-count")
+    Map<UUID, Integer> getTopCelebrityIdsByNftCount(@RequestParam int limit);
+
 }

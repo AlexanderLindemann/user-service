@@ -103,8 +103,8 @@ public class CelebrityController {
     @GetMapping(path = "/popular")
     @Operation(summary = "Get popular celebrities")
     @ResponseStatus(HttpStatus.OK)
-    public Page<CelebrityResponseDto> getPopular(@RequestParam(defaultValue = "", required = false) String searchName, @PageableDefault(direction = ASC) Pageable pageable) {
-        return celebrityService.getPopular(searchName, pageable);
+    public List<CelebrityResponseDto> getPopular() {
+        return celebrityService.getPopular();
     }
 
     @PutMapping("/{id}/theme")

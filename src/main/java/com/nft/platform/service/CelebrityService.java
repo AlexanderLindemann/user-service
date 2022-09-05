@@ -38,6 +38,8 @@ import static java.util.stream.IntStream.range;
 @RequiredArgsConstructor
 public class CelebrityService {
 
+    private static final int POPULAR_LIMIT = 3;
+
     private final CelebrityRepository celebrityRepository;
     private final ProfileWalletRepository profileWalletRepository;
     private final UserProfileService userProfileService;
@@ -144,37 +146,23 @@ public class CelebrityService {
                 .collect(toList());
     }
 
+    /**
+     * Uses POPULAR_LIMIT constant according current requirements
+     * Refer to <a href="https://itpodev.atlassian.net/browse/NFD-1847">task</a>
+     * @return top of popular celebrity by nft count
+     */
     @Transactional(readOnly = true)
-    public Page<CelebrityResponseDto> getPopular(String searchName, Pageable pageable) {
+    public List<CelebrityResponseDto> getPopular() {
+        Map<UUID, Integer> topCelebrityIdsByNftCountMap = nftServiceApiClient.getTopCelebrityIdsByNftCount(POPULAR_LIMIT);
 
-        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContainsIgnoreCaseAndActiveTrue(searchName);
+        List<Celebrity> celebrities = celebrityRepository.findAllById(topCelebrityIdsByNftCountMap.keySet());
 
-        List<NftCountResponseDto> nftCountList = nftServiceApiClient.getNftCount(celebrities.stream()
-                .map(Celebrity::getId)
-                .collect(toList()));
+        celebrities.sort(Comparator.comparing(f -> topCelebrityIdsByNftCountMap.get(f.getId()), Comparator.reverseOrder()));
 
-        List<CelebrityResponseDto> sortedCelebritiesPopular = sortCelebritiesByNftCountList(celebrities, nftCountList).stream()
+        return celebrities.stream()
                 .map(mapper::toDto)
                 .collect(toList());
 
-        final int start = (int) pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), sortedCelebritiesPopular.size());
-
-        return new PageImpl<>(sortedCelebritiesPopular.subList(start, end), pageable, sortedCelebritiesPopular.size());
-
-    }
-
-    private List<Celebrity> sortCelebritiesByNftCountList(List<Celebrity> celebrities,
-                                                          List<NftCountResponseDto> nftCountList) {
-        final Map<UUID, Integer> celebrityIdToIndexMap = range(0, nftCountList.size()).boxed()
-                .collect(toMap(i -> nftCountList.get(i).getCelebrityId(), i -> i, (a, b) -> b));
-
-        celebrities.sort(comparing(celebrity -> {
-            val index = celebrityIdToIndexMap.get(celebrity.getId());
-            return index != null ? index : celebrities.size() - 1;
-        }));
-
-        return celebrities;
     }
 
     public CelebrityThemeResponseDto uploadCelebrityTheme(UUID celebrityId, String celebrityTheme) {

@@ -59,11 +59,11 @@ class GetLeaderboardDraftsTest extends AbstractIntegrationTest {
         Mockito.when(entityManager.createNativeQuery(any())).thenReturn(mockedQuery);
     }
 
-    @Test
-    void getLeaderboardById_404() throws Exception {
-        mockEntityManager(Collections.emptyList());
-        mockMvc.perform(get(URL, UUID_NOT_FOUND))
-                .andExpect(status().isNotFound());
-    }
+//    @Test
+//    void getLeaderboardById_404() throws Exception {
+//        mockEntityManager(Collections.emptyList());
+//        mockMvc.perform(get(URL, UUID_NOT_FOUND))
+//                .andExpect(status().isNotFound());
+//    }
 
 }
