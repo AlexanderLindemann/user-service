@@ -27,7 +27,7 @@
         <wiremock.version>2.27.2</wiremock.version>
         <redis-starter.version>1.0-SNAPSHOT</redis-starter.version>
         <shedlock.version>4.33.0</shedlock.version>
-        <common-lib.version>4.3-SNAPSHOT</common-lib.version>
+        <common-lib.version>4.5-SNAPSHOT</common-lib.version>
         <kafka-starter.version>2.1-SNAPSHOT</kafka-starter.version>
         <audit.starter.version>2.0-SNAPSHOT</audit.starter.version>
         <challenge-service-api-contracts.version>1.0.0-SNAPSHOT</challenge-service-api-contracts.version>

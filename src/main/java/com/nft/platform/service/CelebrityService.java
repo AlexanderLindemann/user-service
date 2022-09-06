@@ -3,6 +3,7 @@ package com.nft.platform.service;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.view.CelebrityView;
+import com.nft.platform.dto.poe.request.CelebrityFilterRequestDto;
 import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.request.CelebrityUpdateRequestDto;
 import com.nft.platform.dto.response.*;
@@ -12,15 +13,16 @@ import com.nft.platform.feign.client.NftServiceApiClient;
 import com.nft.platform.mapper.CelebrityMapper;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
+import com.nft.platform.repository.spec.CelebritySpecifications;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.IntStream.range;
 
 @Service
 @Slf4j
@@ -74,8 +73,10 @@ public class CelebrityService {
 
     @NonNull
     @Transactional
-    public Page<CelebrityResponseDto> getCelebrityPage(@NonNull Pageable pageable) {
-        Page<Celebrity> allCelebrity = celebrityRepository.findAllByActiveTrue(pageable);
+    public Page<CelebrityResponseDto> getCelebrityPage(CelebrityFilterRequestDto filterDto, @NonNull Pageable pageable) {
+        Specification<Celebrity> spec = CelebritySpecifications.celebrityFilterSpecification(filterDto)
+                .and(CelebritySpecifications.celebrityActiveTrueSpecification());
+        val allCelebrity = celebrityRepository.findAll(spec, pageable);
         Page<CelebrityResponseDto> celebrityResponseDtos = allCelebrity.map(mapper::toDto);
         if (Objects.nonNull(securityUtil.getCurrentUserOrNull())) {
             Optional<CurrentUserProfileWithWalletsResponseDto> currentUserProfile = userProfileService.findCurrentUserProfile(null);
@@ -149,6 +150,7 @@ public class CelebrityService {
     /**
      * Uses POPULAR_LIMIT constant according current requirements
      * Refer to <a href="https://itpodev.atlassian.net/browse/NFD-1847">task</a>
+     *
      * @return top of popular celebrity by nft count
      */
     @Transactional(readOnly = true)
