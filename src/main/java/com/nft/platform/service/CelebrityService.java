@@ -3,6 +3,7 @@ package com.nft.platform.service;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.view.CelebrityView;
+import com.nft.platform.dto.poe.request.CelebrityFilterRequestDto;
 import com.nft.platform.dto.request.CelebrityRequestDto;
 import com.nft.platform.dto.request.CelebrityUpdateRequestDto;
 import com.nft.platform.dto.response.*;
@@ -12,15 +13,16 @@ import com.nft.platform.feign.client.NftServiceApiClient;
 import com.nft.platform.mapper.CelebrityMapper;
 import com.nft.platform.repository.CelebrityRepository;
 import com.nft.platform.repository.ProfileWalletRepository;
+import com.nft.platform.repository.spec.CelebritySpecifications;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,15 +30,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.netty.util.internal.StringUtil.EMPTY_STRING;
-import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.IntStream.range;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CelebrityService {
+
+    private static final int POPULAR_LIMIT = 3;
 
     private final CelebrityRepository celebrityRepository;
     private final ProfileWalletRepository profileWalletRepository;
@@ -72,8 +73,10 @@ public class CelebrityService {
 
     @NonNull
     @Transactional
-    public Page<CelebrityResponseDto> getCelebrityPage(@NonNull Pageable pageable) {
-        Page<Celebrity> allCelebrity = celebrityRepository.findAllByActiveTrue(pageable);
+    public Page<CelebrityResponseDto> getCelebrityPage(CelebrityFilterRequestDto filterDto, @NonNull Pageable pageable) {
+        Specification<Celebrity> spec = CelebritySpecifications.celebrityFilterSpecification(filterDto)
+                .and(CelebritySpecifications.celebrityActiveTrueSpecification());
+        val allCelebrity = celebrityRepository.findAll(spec, pageable);
         Page<CelebrityResponseDto> celebrityResponseDtos = allCelebrity.map(mapper::toDto);
         if (Objects.nonNull(securityUtil.getCurrentUserOrNull())) {
             Optional<CurrentUserProfileWithWalletsResponseDto> currentUserProfile = userProfileService.findCurrentUserProfile(null);
@@ -144,37 +147,24 @@ public class CelebrityService {
                 .collect(toList());
     }
 
+    /**
+     * Uses POPULAR_LIMIT constant according current requirements
+     * Refer to <a href="https://itpodev.atlassian.net/browse/NFD-1847">task</a>
+     *
+     * @return top of popular celebrity by nft count
+     */
     @Transactional(readOnly = true)
-    public Page<CelebrityResponseDto> getPopular(String searchName, Pageable pageable) {
+    public List<CelebrityResponseDto> getPopular() {
+        Map<UUID, Integer> topCelebrityIdsByNftCountMap = nftServiceApiClient.getTopCelebrityIdsByNftCount(POPULAR_LIMIT);
 
-        List<Celebrity> celebrities = celebrityRepository.findCelebritiesByNameContainsIgnoreCaseAndActiveTrue(searchName);
+        List<Celebrity> celebrities = celebrityRepository.findAllById(topCelebrityIdsByNftCountMap.keySet());
 
-        List<NftCountResponseDto> nftCountList = nftServiceApiClient.getNftCount(celebrities.stream()
-                .map(Celebrity::getId)
-                .collect(toList()));
+        celebrities.sort(Comparator.comparing(f -> topCelebrityIdsByNftCountMap.get(f.getId()), Comparator.reverseOrder()));
 
-        List<CelebrityResponseDto> sortedCelebritiesPopular = sortCelebritiesByNftCountList(celebrities, nftCountList).stream()
+        return celebrities.stream()
                 .map(mapper::toDto)
                 .collect(toList());
 
-        final int start = (int) pageable.getOffset();
-        final int end = Math.min((start + pageable.getPageSize()), sortedCelebritiesPopular.size());
-
-        return new PageImpl<>(sortedCelebritiesPopular.subList(start, end), pageable, sortedCelebritiesPopular.size());
-
-    }
-
-    private List<Celebrity> sortCelebritiesByNftCountList(List<Celebrity> celebrities,
-                                                          List<NftCountResponseDto> nftCountList) {
-        final Map<UUID, Integer> celebrityIdToIndexMap = range(0, nftCountList.size()).boxed()
-                .collect(toMap(i -> nftCountList.get(i).getCelebrityId(), i -> i, (a, b) -> b));
-
-        celebrities.sort(comparing(celebrity -> {
-            val index = celebrityIdToIndexMap.get(celebrity.getId());
-            return index != null ? index : celebrities.size() - 1;
-        }));
-
-        return celebrities;
     }
 
     public CelebrityThemeResponseDto uploadCelebrityTheme(UUID celebrityId, String celebrityTheme) {

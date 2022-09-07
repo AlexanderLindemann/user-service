@@ -6,6 +6,7 @@ import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -14,16 +15,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public interface CelebrityRepository extends JpaRepository<Celebrity, UUID> {
-    Optional<Celebrity> findByName(@NonNull String name);
+public interface CelebrityRepository extends JpaRepository<Celebrity, UUID>, JpaSpecificationExecutor<Celebrity> {
 
     Optional<Celebrity> findByIdAndActiveTrue(UUID id);
 
-    Page<Celebrity> findAllByActiveTrue(Pageable pageable);
-
     boolean existsByNameIgnoreCase(@NonNull String name);
-
-    List<Celebrity> findCelebritiesByNameContainsIgnoreCaseAndActiveTrue(@NonNull String searchName);
 
     Optional<Celebrity> findById(UUID id);
 

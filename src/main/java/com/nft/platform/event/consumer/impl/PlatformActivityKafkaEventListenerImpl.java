@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @OnKafkaConsumerEnabled
 public class PlatformActivityKafkaEventListenerImpl {
+
     private final ProfileWalletService profileWalletService;
     private final PoeTransactionService poeTransactionService;
     private final PoeTransactionMapper poeTransactionMapper;
