@@ -34,9 +34,11 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
 
     Optional<UserProfile> findByKeycloakUserId(UUID keycloakUserId);
 
-    @Query("select new com.nft.platform.dto.response.LeaderboardUserByIdDto(u.keycloakUserId, u.username, u.imageUrl,u.invisibleName) from UserProfile u where u.keycloakUserId = ?1")
+    @Query("select new com.nft.platform.dto.response.LeaderboardUserByIdDto(u.id, u.username, u.imageUrl,u.invisibleName) from UserProfile u where u.keycloakUserId = ?1")
     Optional<LeaderboardUserByIdDto> findLeaderboardUserByIdDtoByKeycloakUserId(UUID keycloakUserId);
 
+    @Query("select new com.nft.platform.dto.response.LeaderboardUserByIdDto(u.id, u.username, u.imageUrl,u.invisibleName) from UserProfile u where u.id = ?1")
+    Optional<LeaderboardUserByIdDto> findLeaderboardUserByUserId(UUID uuid);
 
     List<UserProfile> findByKeycloakUserIdIn(Collection<UUID> keycloakUserIds);
 

@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class LeaderboardUserByIdDto {
 
-    private UUID keycloakUserId;
+    private UUID userId;
     private String username;
     private String imageUrl;
     private boolean anonymous;

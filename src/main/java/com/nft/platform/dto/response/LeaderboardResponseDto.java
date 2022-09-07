@@ -8,18 +8,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
+
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Setter
-@Getter
-public class LeaderboardPositionDto {
+public class LeaderboardResponseDto {
 
-    private LeaderboardGroup cohort;
-    private int position;
-    private int pointsBalance;
-    private boolean currentUser;
-    private LeaderboardUserDto userDto;
+    private List<LeaderboardPositionDto> firstBlock ;
 
+    private List<LeaderboardPositionDto> secondBlock ;
+
+    private List<LeaderboardPositionDto> thirdBlock;
+
+    private LeaderboardGroup myCohort;
+
+    private int myCohortRating;
+
+    private int myCohortUsersCount;
 }

@@ -2,6 +2,7 @@ package com.nft.platform.exception;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,5 +43,19 @@ public class RestControllerAdviceExceptionHandler {
                 .status(status)
                 .body(exceptionDto)
                 ;
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ExceptionDto> handleRuntimeException(RuntimeException ex) {
+        log.error("Caught runtime exception {}", ex.toString());
+        String message = NestedExceptionUtils.getMostSpecificCause(ex).getMessage();
+        ExceptionDto exceptionDto = ExceptionDto.builder()
+                .message(message)
+                .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
+
+        return ResponseEntity
+                .status(500)
+                .body(exceptionDto);
     }
 }
