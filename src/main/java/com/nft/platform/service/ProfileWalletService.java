@@ -92,8 +92,7 @@ public class ProfileWalletService {
 
     @Transactional(readOnly = true)
     public boolean isUserSubscriber(UUID keycloakUserId, UUID celebrityId) {
-        ProfileWallet profileWallet = getProfileWallet(keycloakUserId, celebrityId);
-        return profileWallet.isSubscriber();
+        return profileWalletRepository.findIfUserSubscriberByKeycloakUserIdAndCelebrityId(keycloakUserId, celebrityId);
     }
 
     @Transactional

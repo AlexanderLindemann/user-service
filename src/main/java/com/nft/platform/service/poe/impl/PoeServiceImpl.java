@@ -65,13 +65,11 @@ public class PoeServiceImpl implements PoeService {
     @Override
     @Transactional(readOnly = true)
     public List<PoeForUserDto> getPoesListForUser(PoeFilterDto filter, UUID userId, UUID celebrityId) {
-        Specification<Poe> spec = PoeSpecifications.from(filter);
-        val poes = poeRepository.findAll(spec);
-        profileWalletService.isUserSubscriber(userId, celebrityId);
-        boolean subscriber = profileWalletService.isUserSubscriber(userId, celebrityId);
-        return poes.stream()
-                .map(poe -> mapPoeToPoeForUserDto(poe, subscriber))
-                .collect(Collectors.toList());
+        return poeRepository
+            .findAll(PoeSpecifications.from(filter))
+            .stream()
+            .map(poe -> mapPoeToPoeForUserDto(poe, profileWalletService.isUserSubscriber(userId, celebrityId)))
+            .collect(Collectors.toList());
     }
 
     @Override
