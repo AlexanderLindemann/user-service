@@ -1,7 +1,7 @@
 package com.nft.platform.event.consumer.impl;
 
 import com.nft.platform.annotation.OnKafkaConsumerEnabled;
-import com.nft.platform.common.event.LikeAddedEvent;
+import com.nft.platform.common.event.FeedAddedEvent;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.mapper.poe.PoeTransactionMapper;
 import com.nft.platform.service.poe.PoeTransactionService;
@@ -20,7 +20,7 @@ public class FeedKafkaEventListenerImpl {
     private final PoeTransactionMapper poeTransactionMapper;
 
     @KafkaListener(topics = "${spring.kafka.consumer.feed-service.topic}")
-    public void receive(LikeAddedEvent event) {
+    public void receive(FeedAddedEvent event) {
         log.info("Feed service event received: {}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
         poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
