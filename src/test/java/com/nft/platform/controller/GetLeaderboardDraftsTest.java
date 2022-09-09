@@ -2,10 +2,14 @@ package com.nft.platform.controller;
 
 import com.nft.platform.AbstractIntegrationTest;
 import com.nft.platform.dto.enums.LeaderboardGroup;
+import com.nft.platform.dto.response.LeaderboardPositionDto;
 import com.nft.platform.keycloak.WithMockKeycloakToken;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.jdbc.Sql;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static com.nft.platform.util.security.RoleConstants.ROLE_USER;
@@ -57,6 +61,7 @@ class GetLeaderboardDraftsTest extends AbstractIntegrationTest {
 
     @Test
     void getAllLeaderIfCurrentUnauthorized_200() throws Exception {
+        List<LeaderboardPositionDto> secondAndThirdBlock = new ArrayList<>();
         mockMvc.perform(get(LEADERBOARD_ALL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstBlock[0].cohort").value(LeaderboardGroup.TOP_10.toString()))
@@ -65,8 +70,8 @@ class GetLeaderboardDraftsTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.firstBlock[0].pointsBalance").value(1700000))
                 .andExpect(jsonPath("$.firstBlock[0].userDto.userId").value("79c6cdd0-4c60-4f54-9c76-ef955e2927ff"))
                 .andExpect(jsonPath("$.firstBlock.size()").value(5))
-                .andExpect(jsonPath("$.secondBlock").doesNotExist())
-                .andExpect(jsonPath("$.thirdBlock").doesNotExist())
+                .andExpect(jsonPath("$.secondBlock").value(secondAndThirdBlock))
+                .andExpect(jsonPath("$.thirdBlock").value(secondAndThirdBlock))
                 .andExpect(jsonPath("$.myCohort").doesNotExist())
                 .andExpect(jsonPath("$.myCohortRating").value(0))
                 .andExpect(jsonPath("$.myCohortUsersCount").value(0));

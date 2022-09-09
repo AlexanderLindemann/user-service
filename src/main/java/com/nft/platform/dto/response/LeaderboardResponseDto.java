@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,11 +20,14 @@ import java.util.List;
 @Builder
 public class LeaderboardResponseDto {
 
-    private List<LeaderboardPositionDto> firstBlock ;
+    @Builder.Default
+    private List<LeaderboardPositionDto> firstBlock = new ArrayList<>();
 
-    private List<LeaderboardPositionDto> secondBlock ;
+    @Builder.Default
+    private List<LeaderboardPositionDto> secondBlock = new ArrayList<>();
 
-    private List<LeaderboardPositionDto> thirdBlock;
+    @Builder.Default
+    private List<LeaderboardPositionDto> thirdBlock = new ArrayList<>();
 
     private LeaderboardGroup myCohort;
 
