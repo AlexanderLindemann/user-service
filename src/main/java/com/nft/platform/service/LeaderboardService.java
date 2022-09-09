@@ -15,10 +15,12 @@ import com.nft.platform.repository.UserProfileRepository;
 import com.nft.platform.util.security.KeycloakUserProfile;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
+@Slf4j
 public class LeaderboardService {
 
     public static final int AMOUNT_COHORTS = 5;
@@ -49,6 +52,7 @@ public class LeaderboardService {
      * @return - a {@link LeaderboardByIdResponseDto} object.
      */
     public LeaderboardByIdResponseDto getLeaderboardByIdResponseDto(UUID uuid) {
+        log.debug("getting leaderboard by ResponseDto, userId = {}", uuid);
         return LeaderboardByIdResponseDto.builder()
                 .otherUser(getLeaderboardByUserIdAndMapToLeaderboard(uuid))
                 .currentUser(getCurrentUserLeaderboardPositionDto())
@@ -57,6 +61,7 @@ public class LeaderboardService {
 
 
     private LeaderboardByIdDto getLeaderboardByUserIdAndMapToLeaderboard(UUID userId) {
+        log.debug("getting leaderboard by userId and map to leaderboard, userId = {}", userId);
         return leaderboardRepository.findLeaderboardByUserId(userId)
                 .stream()
                 .findFirst()
@@ -65,6 +70,7 @@ public class LeaderboardService {
     }
 
     private LeaderboardByIdDto getLeaderboardByKeycloakUserIdAndMapToLeaderboard(UUID keycloakUserId) {
+        log.debug("getting leaderboard by keycloakUserId and map to leaderboard, keycloakUserId = {}", keycloakUserId);
         return leaderboardRepository.findLeaderboardByKeycloakUserId(keycloakUserId)
                 .stream()
                 .findFirst()
@@ -73,6 +79,7 @@ public class LeaderboardService {
     }
 
     private LeaderboardByIdDto mapResultOfLeaderboardQueryToLeaderboardByIdDto(Object[] result) {
+        log.debug("mapping result of leaderboard query to LeaderboardByIdDt");
         return LeaderboardByIdDto.builder()
                 .position(Integer.parseInt(String.valueOf(result[0])))
                 .pointsBalance(Integer.parseInt(String.valueOf(result[1])))
@@ -93,6 +100,7 @@ public class LeaderboardService {
      * @return a {@link LeaderboardByIdDto} object.
      */
     private LeaderboardByIdDto getCurrentUserLeaderboardPositionDto() {
+        log.debug("getting current user LeaderboardPositionDto");
         KeycloakUserProfile currentUserOrNull = securityUtil.getCurrentUserOrNull();
         if (Objects.nonNull(currentUserOrNull)) {
             return getLeaderboardByKeycloakUserIdAndMapToLeaderboard(UUID.fromString(currentUserOrNull.getId()));
@@ -102,12 +110,14 @@ public class LeaderboardService {
 
 
     private LeaderboardByIdDto getLeaderboardByKeycloakUserIdIfUserNotFoundLeaderboard(UUID keycloakUserId) {
+        log.debug("getting leaderboard by keycloakUserId if user not found Leaderboard, keycloakUserId = {}", keycloakUserId);
         return userProfileRepository.findLeaderboardUserByIdDtoByKeycloakUserId(keycloakUserId)
                 .map(buildLeaderBoardFunction())
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
     }
 
     private LeaderboardByIdDto getLeaderboardByUserIdIfUserNotFoundLeaderboard(UUID userId) {
+        log.debug("getting LeaderboardByUserId if user not found Leaderboard, userId = {}", userId);
         return userProfileRepository.findLeaderboardUserByUserId(userId)
                 .map(buildLeaderBoardFunction())
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, userId));
@@ -155,10 +165,12 @@ public class LeaderboardService {
 
     /**
      * if unauthorized, then return the first 6 records of the top 10% in the first block
+     *
      * @param allLeaderboardList - all Leaderboard from the database
      * @return a {@link List<LeaderboardResponseDto>}
      */
     private LeaderboardResponseDto calculateLeaderboardForUnauthorized(List<LeaderboardDto> allLeaderboardList) {
+        log.debug("calculate leaderboard is user unauthorized, Leaderboard size = {}", allLeaderboardList.size());
         return LeaderboardResponseDto.builder()
                 .firstBlock(allLeaderboardList.stream()
                         .filter(leaderboard -> LeaderboardGroup.TOP_10 == leaderboard.getUserGroup())
@@ -169,6 +181,7 @@ public class LeaderboardService {
     }
 
     private LeaderboardResponseDto calculateLeaderboardIfCurrentUserNotNull(List<LeaderboardDto> allLeaderboardList, LeaderboardDto currentUser) {
+        log.debug("calculate leaderboard is user not null, Leaderboard size = {} , currentUser = {}", allLeaderboardList.size(), currentUser.toString());
         LeaderboardResponseDto leaderboardV2ResponseDtoNew = null;
         switch (currentUser.getUserGroup()) {
             case TOP_10:
@@ -189,6 +202,7 @@ public class LeaderboardService {
 
     private LeaderboardResponseDto calculateLeaderboardIfUserInTop304050NonTop(List<LeaderboardDto> allLeaderboardList,
                                                                                LeaderboardDto currentUser) {
+        log.debug("calculate leaderboard if user in top 304050NonTop, Leaderboard size = {} , currentUser = {}", allLeaderboardList.size(), currentUser.toString());
         TreeMap<Integer, LeaderboardDto> leaderboardFirstBlockMap = new TreeMap<>();
         TreeMap<Integer, LeaderboardDto> leaderboardSecondBlockMap = new TreeMap<>();
         TreeMap<Integer, LeaderboardDto> leaderboardThirdBlockMap = new TreeMap<>();
@@ -216,13 +230,14 @@ public class LeaderboardService {
                 leaderboardThirdBlockMap.putIfAbsent(positionThirdBlock, leaderboardDto);
             }
         }
-        return setSecondAndThirdBlockAndGetLeaderboardV2ResponseDto(currentUser, leaderboardFirstBlockMap, leaderboardSecondBlockMap, leaderboardThirdBlockMap);
+        return setSecondAndThirdBlockAndGetLeaderboardResponseDto(currentUser, leaderboardFirstBlockMap, leaderboardSecondBlockMap, leaderboardThirdBlockMap);
     }
 
-    private LeaderboardResponseDto setSecondAndThirdBlockAndGetLeaderboardV2ResponseDto(LeaderboardDto currentUser,
-                                                                                        TreeMap<Integer, LeaderboardDto> leaderboardFirstBlock,
-                                                                                        TreeMap<Integer, LeaderboardDto> leaderboardSecondBlock,
-                                                                                        TreeMap<Integer, LeaderboardDto> leaderboardThirdBlock) {
+    private LeaderboardResponseDto setSecondAndThirdBlockAndGetLeaderboardResponseDto(LeaderboardDto currentUser,
+                                                                                      TreeMap<Integer, LeaderboardDto> leaderboardFirstBlock,
+                                                                                      TreeMap<Integer, LeaderboardDto> leaderboardSecondBlock,
+                                                                                      TreeMap<Integer, LeaderboardDto> leaderboardThirdBlock) {
+        log.debug("set second and third block and getting LeaderboardResponseDto , currentUser = {}", currentUser.toString());
         List<LeaderboardPositionDto> secondBlock = new ArrayList<>();
         secondBlock.add(mapLeaderboardRowToDto(leaderboardSecondBlock.lastEntry().getValue(), currentUser));
 
@@ -240,14 +255,15 @@ public class LeaderboardService {
             thirdBlock.add(mapLeaderboardRowToDto(currentUser, currentUser));
             thirdBlock.add(mapLeaderboardRowToDto(leaderboardThirdBlock.get(currentUser.getPositionInCohort() + 1), currentUser));
         }
-        return mapLeaderboardV2ResponseDtoNew(currentUser, leaderboardFirstBlock, leaderboardThirdBlock, secondBlock, thirdBlock);
+        return mapLeaderboardResponseDto(currentUser, leaderboardFirstBlock, leaderboardThirdBlock, secondBlock, thirdBlock);
     }
 
-    private LeaderboardResponseDto mapLeaderboardV2ResponseDtoNew(LeaderboardDto currentUserRow,
-                                                                  TreeMap<Integer, LeaderboardDto> leaderboardFirstBlockMap,
-                                                                  TreeMap<Integer, LeaderboardDto> leaderboardThirdBlock,
-                                                                  List<LeaderboardPositionDto> secondBlock,
-                                                                  List<LeaderboardPositionDto> thirdBlock) {
+    private LeaderboardResponseDto mapLeaderboardResponseDto(LeaderboardDto currentUserRow,
+                                                             TreeMap<Integer, LeaderboardDto> leaderboardFirstBlockMap,
+                                                             TreeMap<Integer, LeaderboardDto> leaderboardThirdBlock,
+                                                             List<LeaderboardPositionDto> secondBlock,
+                                                             List<LeaderboardPositionDto> thirdBlock) {
+        log.debug("mapping LeaderboardResponseDto");
         return LeaderboardResponseDto.builder()
                 .firstBlock(getFirstBlock(leaderboardFirstBlockMap, currentUserRow))
                 .secondBlock(secondBlock)
@@ -259,6 +275,7 @@ public class LeaderboardService {
 
 
     private LeaderboardResponseDto calculateLeaderboardIfUserInTop20(List<LeaderboardDto> allLeaderboardList, LeaderboardDto currentUser) {
+        log.debug("calculate leaderboard if user in top 20, Leaderboard size = {} , currentUser = {}", allLeaderboardList.size(), currentUser.toString());
         TreeMap<Integer, LeaderboardDto> leaderboardFirstBlockMap = new TreeMap<>();
         TreeMap<Integer, LeaderboardDto> leaderboardThirdBlockMap = new TreeMap<>();
         int positionFirstBlock = 0;
@@ -273,17 +290,19 @@ public class LeaderboardService {
                 leaderboardThirdBlockMap.putIfAbsent(positionThirdBlock, leaderboardDto);
             }
         }
-        return setSecondAndThirdBlockAndGetLeaderboardV2ResponseDto(currentUser, leaderboardFirstBlockMap, leaderboardFirstBlockMap, leaderboardThirdBlockMap);
+        return setSecondAndThirdBlockAndGetLeaderboardResponseDto(currentUser, leaderboardFirstBlockMap, leaderboardFirstBlockMap, leaderboardThirdBlockMap);
     }
 
     private List<LeaderboardPositionDto> getFirstBlock(Map<Integer, LeaderboardDto> leaderboardMap, LeaderboardDto currentUserRow) {
-        return List.of(mapLeaderboardRowToDto(leaderboardMap.get(1), currentUserRow),
+        log.debug("getting first block, leaderboardMap size = {} , currentUser = {}", leaderboardMap.size(), currentUserRow.toString());
+        return Arrays.asList(mapLeaderboardRowToDto(leaderboardMap.get(1), currentUserRow),
                 mapLeaderboardRowToDto(leaderboardMap.get(2), currentUserRow),
                 mapLeaderboardRowToDto(leaderboardMap.get(3), currentUserRow));
     }
 
 
     public LeaderboardResponseDto calculateLeaderboardIfUserInTop10(List<LeaderboardDto> allLeaderboardList, LeaderboardDto currentUser) {
+        log.debug("calculate leaderboard if user in top 10, Leaderboard size = {} , currentUser = {}", allLeaderboardList.size(), currentUser.toString());
         TreeMap<Integer, LeaderboardDto> leaderboardTop10Map = new TreeMap<>();
         int positionFirstBlock = 0;
         for (int i = 0; i <= allLeaderboardList.size() / 2; i++) {
@@ -309,7 +328,7 @@ public class LeaderboardService {
                 thirdBlock.add(mapLeaderboardRowToDto(leaderboardTop10Map.get(currentUser.getPositionInCohort() + 1), currentUser));
             }
         }
-        return mapLeaderboardV2ResponseDtoNew(currentUser, leaderboardTop10Map, leaderboardTop10Map, null, thirdBlock);
+        return mapLeaderboardResponseDto(currentUser, leaderboardTop10Map, leaderboardTop10Map, null, thirdBlock);
     }
 
 
@@ -317,6 +336,7 @@ public class LeaderboardService {
         if (row == null) {
             return null;
         }
+        log.debug("mapping LeaderboardRow to dto, row = {}", row);
         return LeaderboardPositionDto.builder()
                 .position(row.getRowNumber())
                 .cohort(row.getUserGroup())
@@ -326,7 +346,8 @@ public class LeaderboardService {
                 .build();
     }
 
-    private LeaderboardDto mapResultOfLeaderboardQueryToLeaderboardRow(Object[] result) {
+    private LeaderboardDto mapResultOfLeaderboardQueryToLeaderboardDto(Object[] result) {
+        log.debug("mapping result of leaderboard query to LeaderboardDto");
         return LeaderboardDto.builder()
                 .rowNumber(Integer.parseInt(String.valueOf(result[0])))
                 .keycloakUserId(UUID.fromString((String) result[1]))
@@ -341,9 +362,10 @@ public class LeaderboardService {
     }
 
     public List<LeaderboardDto> getAllLeaderboard() {
+        log.debug("getting all leaderboard from database");
         List<Object[]> allLeaderboardObjects = leaderboardRepository.findAllLeaderboard();
         return allLeaderboardObjects.stream()
-                .map(this::mapResultOfLeaderboardQueryToLeaderboardRow)
+                .map(this::mapResultOfLeaderboardQueryToLeaderboardDto)
                 .collect(Collectors.toList());
 
     }
@@ -351,10 +373,12 @@ public class LeaderboardService {
 
     /**
      * Distribution of users by cohorts if the number of users with POE is less than 12
+     *
      * @param allLeaderboardList - all Leaderboard from the database
      * @return a {@link List<LeaderboardDto>}
      */
     public List<LeaderboardDto> calculateAndSetCohortsWhenLess11(List<LeaderboardDto> allLeaderboardList) {
+        log.debug("calculate and set cohorts when less 11, Leaderboard size = {}", allLeaderboardList.size());
         int sizeTop50 = (int) (allLeaderboardList.size() * 0.5);
         for (int i = 0; i < sizeTop50; i++) {
             LeaderboardGroup leaderboardGroup = LeaderboardGroup.findByNumber(i);
@@ -365,10 +389,12 @@ public class LeaderboardService {
 
     /**
      * Distribution of users by cohorts, if the number of users with POE is more than 12
+     *
      * @param allLeaderboardList - all Leaderboard from the database
      * @return a {@link List<LeaderboardDto>}
      */
     public List<LeaderboardDto> calculateAndSetCohortsWhenMore11(List<LeaderboardDto> allLeaderboardList) {
+        log.debug("calculate and set cohorts more less 11, Leaderboard size = {}", allLeaderboardList.size());
         int sizeTop50 = (int) (allLeaderboardList.size() * 0.5);
         int euclideanDiv = sizeTop50 % AMOUNT_COHORTS;
         int sets = sizeTop50 / AMOUNT_COHORTS;

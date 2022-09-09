@@ -41,8 +41,7 @@ public class LeaderboardController {
             @ApiResponse(responseCode = "200", description = "Successful operation.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = LeaderboardResponseDto.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionDto.class)))})
     public ResponseEntity<LeaderboardResponseDto> getLeaderboard() {
-        LeaderboardResponseDto leaderboardV2ResponseDtoNew = leaderboardService.getLeaderboardResponseDto();
-        return ResponseEntity.ok(leaderboardV2ResponseDtoNew);
+        return ResponseEntity.ok(leaderboardService.getLeaderboardResponseDto());
     }
 
     @GetMapping("/{userId}")
