@@ -63,6 +63,11 @@ spring:
       nft-service:
         topic: nft-service
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
 redis:
   enabled: true
   address: 127.0.0.1:6379
@@ -105,6 +110,10 @@ rest:
 
 server:
   port: 8080
+
+uploading:
+  file:
+    min-allowed-file-size: 1000000
 
 feign:
   nft-admin-auth:

@@ -25,6 +25,7 @@ import com.nft.platform.exception.ItemConflictException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.feign.client.FileServiceClient;
+import com.nft.platform.mapper.Base64ToMultipartFileMapper;
 import com.nft.platform.mapper.CelebrityMapper;
 import com.nft.platform.mapper.CurrentUserProfileWithWalletsMapper;
 import com.nft.platform.mapper.EditUserProfileMapper;
@@ -36,10 +37,13 @@ import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
 import com.nft.platform.repository.spec.UserProfileSpecifications;
 import com.nft.platform.util.security.SecurityUtil;
+
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.commons.lang3.StringUtils;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +56,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +77,9 @@ public class UserProfileService {
 
     @Value("${nft.celebrity.default-uuid}")
     private String defaultCelebrity;
+
+    @Value("${uploading.file.min-allowed-file-size}")
+    private String MINIMAL_ALLOWED_FILE_SIZE;
 
     private final UserProfileRepository userProfileRepository;
     private final CelebrityRepository celebrityRepository;
@@ -306,7 +314,11 @@ public class UserProfileService {
         UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
         String oldUrl = profile.getImageUrl();
-        // trying upload new image
+
+        if (file.getSize() > Integer.parseInt(MINIMAL_ALLOWED_FILE_SIZE)) {
+            file = Base64ToMultipartFileMapper.compressUploadedImage(file);
+        }
+
         String url = replaceUserProfileImage(file, oldUrl, FileType.AVATAR);
         profile.setImageUrl(url);
         userProfileRepository.save(profile);
@@ -489,4 +501,5 @@ public class UserProfileService {
         return userProfileRepository.findByKeycloakUserIdIn(moderatorKeycloakIds, ModeratorView.class)
                 .collect(Collectors.toMap(ModeratorView::getKeycloakUserId, ModeratorView::getFullName));
     }
+
 }
