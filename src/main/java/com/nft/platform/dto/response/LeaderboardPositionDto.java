@@ -3,20 +3,23 @@ package com.nft.platform.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nft.platform.dto.enums.LeaderboardGroup;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.Setter;
 
-@SuperBuilder
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
+@Setter
+@Getter
 public class LeaderboardPositionDto {
 
     private LeaderboardGroup cohort;
-    private long position;
+    private int position;
     private int pointsBalance;
     private boolean currentUser;
     private LeaderboardUserDto userDto;
+
 }

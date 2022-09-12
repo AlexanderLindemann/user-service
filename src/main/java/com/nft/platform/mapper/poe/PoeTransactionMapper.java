@@ -38,7 +38,7 @@ public interface PoeTransactionMapper {
     PoeTransactionRequestDto toRequestDto(NftAddedEvent nftAddedEvent);
 
     @Mapping(source = "feedId", target = "actionId")
-    PoeTransactionRequestDto toRequestDto(LikeAddedEvent likeAddedEvent);
+    PoeTransactionRequestDto toRequestDto(FeedAddedEvent feedAddedEvent);
 
     @Mapping(source = "challengeId", target = "actionId")
     PoeTransactionRequestDto toRequestDto(KafkaChallengeCompletedEvent challengeCompletedEvent);
