@@ -148,7 +148,7 @@ nft:
     clearcronExpression: "0 0 2 * * *"
     olderThanDays: 2
   celebrity:
-    default-uuid: "d212e77f-3057-4db5-80f2-14d52d4dae35"
+    default-uuid: "00000000-0000-0000-0000-000000000000"
 
 management:
   endpoints:
