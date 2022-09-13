@@ -21,6 +21,10 @@ feign:
     url: ${nft.tests.mock.url}
     path:
 
+  nft-solana-adapter:
+    url: ${nft.tests.mock.url}
+    path:
+
 nft:
   logging:
     logstash:

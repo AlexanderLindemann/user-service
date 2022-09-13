@@ -28,5 +28,11 @@ public interface CryptoWalletRepository extends JpaRepository<CryptoWallet, UUID
     @Query("update CryptoWallet cw set cw.defaultWallet = :isDefault where cw.id in (:cwIds)")
     int setCryptoWalletsDefaultByIds(@Param("isDefault") boolean isDefault, @Param("cwIds") List<UUID> cwIds);
 
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE CryptoWallet cw SET cw.defaultWallet = TRUE WHERE cw.id = :id AND cw.userProfile.id = (SELECT up.id FROM UserProfile up WHERE up.keycloakUserId = :keycloakUserId)")
+    int setCryptoWalletDefaultTrue(UUID id, UUID keycloakUserId);
 
+    @Modifying
+    @Query("UPDATE CryptoWallet cw SET cw.defaultWallet = FALSE WHERE cw.id <> :id AND cw.userProfile.id = (SELECT up.id FROM UserProfile up WHERE up.keycloakUserId = :keycloakUserId)")
+    int setCryptoWalletsDefaultFalseExcludeId(UUID id, UUID keycloakUserId);
 }

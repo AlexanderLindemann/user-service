@@ -11,10 +11,13 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.nft.platform.common.util.JsonUtil;
+import com.nft.platform.event.handler.TmpFanTokenDistributionEventHandler;
+import com.nft.platform.feign.client.SolanaAdapterClient;
 import com.nft.platform.initializer.PostgresInitializer;
 import com.nft.platform.initializer.WiremockServerInitializer;
 import com.nft.platform.service.CelebrityService;
 import lombok.SneakyThrows;
+import com.nft.platform.feign.client.dto.WalletInfoResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -58,6 +61,10 @@ public abstract class AbstractIntegrationTest {
     protected WireMockServer wireMockServer;
     @SpyBean
     protected CelebrityService celebrityService;
+    @SpyBean
+    protected TmpFanTokenDistributionEventHandler tmpFanTokenDistributionEventHandler;
+    @SpyBean
+    protected SolanaAdapterClient solanaAdapterClient;
 
     @SneakyThrows
     protected DocumentContext parseResponse(String body) {
@@ -77,6 +84,18 @@ public abstract class AbstractIntegrationTest {
                             .withStatus(HttpStatus.OK.value())
                             .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                             .withBody(JsonUtil.toJsonString(topCelebrityByNftCountMap))));
+        }
+
+    }
+
+    protected static class SolanaAdapterMocks {
+
+        public static void setGetWalletInfo(WireMockServer wireMockServer, boolean isOk) {
+            wireMockServer.stubFor(WireMock.get(WireMock.urlPathMatching("/api/solana/info/.*"))
+                .willReturn(WireMock.aResponse()
+                    .withStatus(HttpStatus.OK.value())
+                    .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .withBody(JsonUtil.toJsonString(WalletInfoResponseDto.builder().isSolana(isOk).build()))));
         }
 
     }

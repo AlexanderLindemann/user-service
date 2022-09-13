@@ -10,17 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.AssertTrue;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +28,7 @@ public class CryptoWalletController {
     @GetMapping("/by-user-profile/{userProfileId}")
     @Operation(summary = "Get All Crypto Wallets By User Profile Id")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_USER, RoleConstants.ROLE_TECH_TOKEN})
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
     public List<CryptoWalletResponseDto> getCryptoWalletsByProfileId(@PathVariable("userProfileId") UUID userProfileId) {
         return cryptoWalletService.getAllByUserProfileId(userProfileId);
     }
@@ -43,9 +36,17 @@ public class CryptoWalletController {
     @GetMapping("/by-user-keycloak/{userKeycloakId}")
     @Operation(summary = "Get All Crypto Wallets By User Keycloak Id")
     @ResponseStatus(HttpStatus.OK)
-    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_USER, RoleConstants.ROLE_TECH_TOKEN})
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_TECH_TOKEN})
     public List<CryptoWalletResponseDto> getCryptoWalletsByKeycloakId(@PathVariable("userKeycloakId") UUID userKeycloakId) {
         return cryptoWalletService.getAllByUserKeycloakId(userKeycloakId);
+    }
+
+    @GetMapping
+    @Operation(summary = "Get All current user's Crypto Wallets")
+    @ResponseStatus(HttpStatus.OK)
+    @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_ADMIN_PLATFORM, RoleConstants.ROLE_USER})
+    public List<CryptoWalletResponseDto> getCurrentUserCryptoWallets() {
+        return cryptoWalletService.getCurrentUserCryptoWallets();
     }
 
     @PostMapping
@@ -57,8 +58,8 @@ public class CryptoWalletController {
         return cryptoWalletService.createWallet(cryptoWalletRequestDto);
     }
 
-    @PutMapping("/makeDefault/{id}")
-    @Operation(summary = "Make Crypto Wallet as Default")
+    @PutMapping("/{id}/default")
+    @Operation(summary = "Make Crypto Wallet default")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_ADMIN_CELEBRITY, RoleConstants.ROLE_USER, RoleConstants.ROLE_TECH_TOKEN})
     public CryptoWalletResponseDto makeDefaultWallet(@Parameter(name = "id", description = "Crypto Wallet Id") @PathVariable("id") UUID walletId) {

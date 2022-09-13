@@ -64,6 +64,15 @@ public class CryptoWalletService {
                 .stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<CryptoWalletResponseDto> getCurrentUserCryptoWallets() {
+        UUID currentKeycloakUserId = securityUtil.getCurrentUserId();
+        return cryptoWalletRepository.findAllByUserProfileKeycloakUserIdOrderByCreatedAt(currentKeycloakUserId)
+                .stream()
+                .map(mapper::toDtoForUser)
+                .collect(Collectors.toList());
+    }
+
     @NonNull
     @Transactional
     public CryptoWalletResponseDto createWallet(@NonNull CryptoWalletRequestDto requestDto) {
@@ -108,22 +117,15 @@ public class CryptoWalletService {
     public CryptoWalletResponseDto makeDefaultWallet(@NonNull UUID id) {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
-        CryptoWallet wallet = cryptoWalletRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException(CryptoWallet.class, id));
 
-        UserProfile userProfile = wallet.getUserProfile();
-        if (!userProfile.getKeycloakUserId().equals(keycloakUserId)) {
-            log.error("Failed Updating: Wallet = {} belongs to other user", wallet.getId());
-            throw new BadRequestException(CryptoWallet.class, wallet.getId(), "update", " belongs to other user");
+        int updatedRowCount = cryptoWalletRepository.setCryptoWalletDefaultTrue(id, keycloakUserId);
+        if (updatedRowCount != 1) {
+            throw new ItemNotFoundException(CryptoWallet.class, id);
         }
 
-        List<CryptoWallet> existedWallets = cryptoWalletRepository.findAllByUserProfileIdOrderByCreatedAt(userProfile.getId());
-        List<UUID> ids = existedWallets.stream().map(CryptoWallet::getId).filter(wid -> !wid.equals(id)).collect(Collectors.toList());
-        cryptoWalletRepository.setCryptoWalletsDefaultByIds(false, ids);
+        cryptoWalletRepository.setCryptoWalletsDefaultFalseExcludeId(id, keycloakUserId);
 
-        wallet.setDefaultWallet(Boolean.TRUE);
-        wallet = cryptoWalletRepository.save(wallet);
-        return mapper.toDto(wallet);
+        return mapper.toDto(cryptoWalletRepository.getById(id));
     }
 
     private void checkCryptoWalletBeforeAdd(@NonNull CryptoWalletRequestDto requestDto, boolean isForCreate, UUID idIfUpdate) {
