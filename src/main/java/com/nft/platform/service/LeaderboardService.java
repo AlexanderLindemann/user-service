@@ -18,9 +18,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -239,8 +240,9 @@ public class LeaderboardService {
                                                                                       TreeMap<Integer, LeaderboardDto> leaderboardThirdBlock) {
         log.debug("set second and third block and getting LeaderboardResponseDto , currentUser = {}", currentUser.toString());
         List<LeaderboardPositionDto> secondBlock = new ArrayList<>();
-        secondBlock.add(mapLeaderboardRowToDto(leaderboardSecondBlock.lastEntry().getValue(), currentUser));
-
+        if (!CollectionUtils.isEmpty(leaderboardSecondBlock)) {
+            secondBlock.add(mapLeaderboardRowToDto(leaderboardSecondBlock.lastEntry().getValue(), currentUser));
+        }
         List<LeaderboardPositionDto> thirdBlock = new ArrayList<>();
         int lastUser = leaderboardThirdBlock.lastEntry().getKey();
         if (currentUser.getPositionInCohort() == 1) {
@@ -263,6 +265,8 @@ public class LeaderboardService {
                                                              TreeMap<Integer, LeaderboardDto> leaderboardThirdBlock,
                                                              List<LeaderboardPositionDto> secondBlock,
                                                              List<LeaderboardPositionDto> thirdBlock) {
+        secondBlock.removeIf(Objects::isNull);
+        thirdBlock.removeIf(Objects::isNull);
         log.debug("mapping LeaderboardResponseDto");
         return LeaderboardResponseDto.builder()
                 .firstBlock(getFirstBlock(leaderboardFirstBlockMap, currentUserRow))
@@ -295,9 +299,10 @@ public class LeaderboardService {
 
     private List<LeaderboardPositionDto> getFirstBlock(Map<Integer, LeaderboardDto> leaderboardMap, LeaderboardDto currentUserRow) {
         log.debug("getting first block, leaderboardMap size = {} , currentUser = {}", leaderboardMap.size(), currentUserRow.toString());
-        return Arrays.asList(mapLeaderboardRowToDto(leaderboardMap.get(1), currentUserRow),
-                mapLeaderboardRowToDto(leaderboardMap.get(2), currentUserRow),
-                mapLeaderboardRowToDto(leaderboardMap.get(3), currentUserRow));
+        return leaderboardMap.values().stream()
+                .map(leaderboardDto -> mapLeaderboardRowToDto(leaderboardDto, currentUserRow))
+                .limit(3)
+                .collect(Collectors.toList());
     }
 
 
@@ -328,7 +333,7 @@ public class LeaderboardService {
                 thirdBlock.add(mapLeaderboardRowToDto(leaderboardTop10Map.get(currentUser.getPositionInCohort() + 1), currentUser));
             }
         }
-        return mapLeaderboardResponseDto(currentUser, leaderboardTop10Map, leaderboardTop10Map, null, thirdBlock);
+        return mapLeaderboardResponseDto(currentUser, leaderboardTop10Map, leaderboardTop10Map, Collections.emptyList(), thirdBlock);
     }
 
 

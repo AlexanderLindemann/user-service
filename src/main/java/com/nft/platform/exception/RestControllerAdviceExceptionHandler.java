@@ -2,9 +2,11 @@ package com.nft.platform.exception;
 
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -24,8 +26,7 @@ public class RestControllerAdviceExceptionHandler {
 
         return ResponseEntity
                 .status(ex.getHttpStatus())
-                .body(exceptionDto)
-                ;
+                .body(exceptionDto);
     }
 
     @ExceptionHandler(FeignException.class)
@@ -40,7 +41,21 @@ public class RestControllerAdviceExceptionHandler {
 
         return ResponseEntity
                 .status(status)
-                .body(exceptionDto)
-                ;
+                .body(exceptionDto);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ExceptionDto> handleAccessDeniedException(AccessDeniedException ex) {
+        log.error("Caught feign exception {}", ex.toString());
+
+        String message = NestedExceptionUtils.getMostSpecificCause(ex).getMessage();
+        ExceptionDto exceptionDto = ExceptionDto.builder()
+                .message(message)
+                .httpStatus(HttpStatus.UNAUTHORIZED)
+                .build();
+
+        return ResponseEntity
+                .status(401)
+                .body(exceptionDto);
     }
 }
