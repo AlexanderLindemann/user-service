@@ -1,21 +1,27 @@
 package com.nft.platform.domain;
 
+import com.nft.platform.common.enums.CelebrityThemeType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -97,5 +103,9 @@ public class Celebrity extends BaseEntity {
 
     @Column(name = "active")
     private boolean active;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "theme_type")
+    private CelebrityThemeType themeType;
 
 }

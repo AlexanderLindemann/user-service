@@ -1,7 +1,10 @@
 package com.nft.platform.dto.response;
 
+import com.nft.platform.common.enums.CelebrityThemeType;
 import com.nft.platform.dto.AbstractCelebrityDto;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -27,4 +30,8 @@ public class CelebrityResponseDto extends AbstractCelebrityDto {
 
     @Schema(description = "User is subscriber", required = true)
     private boolean isSubscribed = false;
+
+    @Schema(description = "Celebrity type")
+    private CelebrityThemeType themeType;
+
 }
