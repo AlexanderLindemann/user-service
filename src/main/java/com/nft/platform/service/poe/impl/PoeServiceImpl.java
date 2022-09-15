@@ -2,10 +2,10 @@ package com.nft.platform.service.poe.impl;
 
 import com.nft.platform.common.dto.PoeFilterDto;
 import com.nft.platform.common.dto.PoeForUserDto;
+import com.nft.platform.common.dto.PoeResponseDto;
 import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
-import com.nft.platform.dto.poe.response.PoeResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.mapper.IMapper;
 import com.nft.platform.repository.poe.PoeRepository;
@@ -66,10 +66,10 @@ public class PoeServiceImpl implements PoeService {
     @Transactional(readOnly = true)
     public List<PoeForUserDto> getPoesListForUser(PoeFilterDto filter, UUID userId, UUID celebrityId) {
         return poeRepository
-            .findAll(PoeSpecifications.from(filter))
-            .stream()
-            .map(poe -> mapPoeToPoeForUserDto(poe, profileWalletService.isUserSubscriber(userId, celebrityId)))
-            .collect(Collectors.toList());
+                .findAll(PoeSpecifications.from(filter))
+                .stream()
+                .map(poe -> mapPoeToPoeForUserDto(poe, profileWalletService.isUserSubscriber(userId, celebrityId)))
+                .collect(Collectors.toList());
     }
 
     @Override

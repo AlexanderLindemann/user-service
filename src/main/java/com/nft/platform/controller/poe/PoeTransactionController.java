@@ -17,16 +17,11 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Tag(name = "Poe transactions Api")
@@ -84,7 +79,7 @@ public class PoeTransactionController {
     @Operation(summary = "Get action poe")
     @ResponseStatus(HttpStatus.OK)
     @Secured({RoleConstants.ROLE_TECH_TOKEN})
-    public List<RewardResponseDto> getActionReward(@RequestParam(name = "actionIds") List<UUID> actionIds, @RequestParam UUID clientId) {
-        return poeTransactionService.getActionReward(actionIds, clientId);
+    public List<RewardResponseDto> getActionReward(@RequestParam(name = "actionIds") List<UUID> actionIds, @RequestParam UUID clientId, @RequestParam Set<UUID> celebrityId) {
+        return poeTransactionService.getActionReward(actionIds, clientId, celebrityId);
     }
 }

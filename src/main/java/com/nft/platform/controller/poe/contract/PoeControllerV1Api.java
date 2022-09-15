@@ -2,9 +2,9 @@ package com.nft.platform.controller.poe.contract;
 
 import com.nft.platform.common.dto.PoeFilterDto;
 import com.nft.platform.common.dto.PoeForUserDto;
+import com.nft.platform.common.dto.PoeResponseDto;
 import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.dto.poe.request.PoeRequestDto;
-import com.nft.platform.dto.poe.response.PoeResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

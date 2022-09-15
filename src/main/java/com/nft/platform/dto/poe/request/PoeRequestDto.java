@@ -1,7 +1,7 @@
 package com.nft.platform.dto.poe.request;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.nft.platform.dto.poe.AbstractPoeDto;
+import com.nft.platform.common.dto.AbstractPoeDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

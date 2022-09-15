@@ -13,12 +13,7 @@ import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.poe.request.LeaderboardRequestDto;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
-import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
-import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
-import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
-import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
-import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
-import com.nft.platform.dto.poe.response.UserIdActivityBalancePositionResponseDto;
+import com.nft.platform.dto.poe.response.*;
 import com.nft.platform.exception.InvalidPoeTransactionException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
@@ -39,7 +34,6 @@ import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -51,16 +45,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,8 +53,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PoeTransactionService {
 
-    @Value("${nft.celebrity.default-uuid}")
-    private String defaultCelebrity;
     private final PeriodRepository periodRepository;
     private final UserProfileRepository userProfileRepository;
     private final PoeTransactionRepository poeTransactionRepository;
@@ -258,7 +241,7 @@ public class PoeTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<RewardResponseDto> getActionReward(List<UUID> actionIds, UUID clientId) {
+    public List<RewardResponseDto> getActionReward(List<UUID> actionIds, UUID clientId, Set<UUID> celebrityId) {
         List<PoeAction> poeActionList = getPoeActions();
         List<RewardResponseDto> rewardList = new ArrayList<>();
         List<Poe> actionPoe = poeRepository.findAll().stream()
@@ -270,7 +253,7 @@ public class PoeTransactionService {
         actionIds.forEach(id -> PoeTransactionMap.put(id, getListActionRewards(id, byActionIdInPoeInAndUserId)));
         for (UUID action : actionIds) {
             setReceivedRewards(rewardList, PoeTransactionMap, action);
-            setUnclaimedRewards(clientId, rewardList, action);
+            setUnclaimedRewards(clientId, rewardList, action, celebrityId);
         }
         return rewardList;
     }
@@ -278,8 +261,8 @@ public class PoeTransactionService {
     /**
      * Checks if user already has a once-per-period poe transaction in specific period.
      *
-     * @param periodId - period UUID
-     * @param userId - user UUID
+     * @param periodId  - period UUID
+     * @param userId    - user UUID
      * @param poeAction - poe action
      * @return - whether if poe action is invalid for specific period
      */
@@ -290,38 +273,44 @@ public class PoeTransactionService {
         return false;
     }
 
-    private void setUnclaimedRewards(UUID clientId, List<RewardResponseDto> rewardList, UUID feedId) {
+    private void setUnclaimedRewards(UUID clientId, List<RewardResponseDto> rewardList, UUID actionId, Set<UUID> celebrityIds) {
         List<PoeAction> poeActionList = getPoeActions();
-        boolean userSubscriber = profileWalletService.isUserSubscriber(clientId, UUID.fromString(defaultCelebrity));
+        Map<UUID, Boolean> userSubscriberMao = new HashMap<>();
+        celebrityIds.forEach(celebrityId ->
+                userSubscriberMao.put(celebrityId, profileWalletService.isUserSubscriber(clientId, celebrityId)));
         Map<PoeAction, Poe> actionPoeMap = poeRepository.findAll().stream().collect(Collectors.toMap(Poe::getCode, poe -> poe));
-        for (PoeAction poeAction : poeActionList) {
-            if (rewardList.stream()
-                    .noneMatch(reward -> reward.getPoeAction().equals(poeAction) && reward.getActionId().equals(feedId))) {
-                if (userSubscriber) {
-                    Poe poe = actionPoeMap.get(poeAction);
-                    if (Objects.nonNull(poe)) {
-                        rewardList.add(RewardResponseDto.builder()
-                                .actionId(feedId)
-                                .isReceived(false)
-                                .poeAction(poeAction)
-                                .coins(CommonUtils.toPrimitive(poe.getCoinsReward()) + CommonUtils.toPrimitive(poe.getCoinsRewardSub()))
-                                .poe(CommonUtils.toPrimitive(poe.getPointsReward()) + CommonUtils.toPrimitive(poe.getPointsRewardSub()))
-                                .build());
-                    }
-                } else {
-                    Poe poe = actionPoeMap.get(poeAction);
-                    if (Objects.nonNull(poe)) {
-                        rewardList.add(RewardResponseDto.builder()
-                                .actionId(feedId)
-                                .isReceived(false)
-                                .poeAction(poeAction)
-                                .coins(CommonUtils.toPrimitive(poe.getCoinsReward()))
-                                .poe(CommonUtils.toPrimitive(poe.getPointsReward()))
-                                .build());
+        celebrityIds.forEach(celebrityId -> {
+            boolean userSubscriber = userSubscriberMao.get(celebrityId);
+            for (PoeAction poeAction : poeActionList) {
+                if (rewardList.stream()
+                        .noneMatch(reward -> reward.getPoeAction().equals(poeAction) && reward.getActionId().equals(actionId))) {
+                    if (userSubscriber) {
+                        Poe poe = actionPoeMap.get(poeAction);
+                        if (Objects.nonNull(poe)) {
+                            rewardList.add(RewardResponseDto.builder()
+                                    .actionId(actionId)
+                                    .isReceived(false)
+                                    .poeAction(poeAction)
+                                    .coins(CommonUtils.toPrimitive(poe.getCoinsReward()) + CommonUtils.toPrimitive(poe.getCoinsRewardSub()))
+                                    .poe(CommonUtils.toPrimitive(poe.getPointsReward()) + CommonUtils.toPrimitive(poe.getPointsRewardSub()))
+                                    .build());
+                        }
+                    } else {
+                        Poe poe = actionPoeMap.get(poeAction);
+                        if (Objects.nonNull(poe)) {
+                            rewardList.add(RewardResponseDto.builder()
+                                    .actionId(actionId)
+                                    .isReceived(false)
+                                    .poeAction(poeAction)
+                                    .coins(CommonUtils.toPrimitive(poe.getCoinsReward()))
+                                    .poe(CommonUtils.toPrimitive(poe.getPointsReward()))
+                                    .build());
+                        }
                     }
                 }
             }
-        }
+        });
+
     }
 
     private List<PoeAction> getPoeActions() {
