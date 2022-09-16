@@ -42,7 +42,7 @@ public interface PoeControllerV1Api {
                                      @ParameterObject Pageable pageable
     );
 
-    @GetMapping("/list")
+    @PostMapping("/list/filter")
     @Operation(summary = "Get Page of Poe by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)
     List<PoeResponseDto> getPoesList(@RequestBody PoeFilterDto filter);
