@@ -92,8 +92,7 @@ public class CryptoWalletService {
         // checking wallet
         checkCryptoWalletBeforeAdd(requestDto, Boolean.TRUE, null);
 
-        CryptoWallet wallet = new CryptoWallet();
-        wallet = mapper.toEntity(requestDto, wallet);
+        CryptoWallet  wallet = mapper.toEntity(requestDto);
         Set<CryptoWallet> existedWallets = userProfile.getCryptoWallets();
         if (CollectionUtils.isEmpty(existedWallets)) {
             // if it is first wallet = default
