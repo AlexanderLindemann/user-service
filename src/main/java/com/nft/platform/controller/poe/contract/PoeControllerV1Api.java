@@ -45,7 +45,7 @@ public interface PoeControllerV1Api {
     @GetMapping("/list")
     @Operation(summary = "Get Page of Poe by Page number and Page size")
     @ResponseStatus(HttpStatus.OK)
-    List<PoeResponseDto> getPoesList(@ParameterObject PoeFilterDto filter);
+    List<PoeResponseDto> getPoesList(@RequestBody PoeFilterDto filter);
 
     @PostMapping("/list/for-user")
     @Operation(summary = "Get list of Poe for user")
