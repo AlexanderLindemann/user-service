@@ -22,8 +22,10 @@ public interface ProfileWalletRepository extends JpaRepository<ProfileWallet, UU
             "and pW.celebrity.id = :celebrityId")
     Optional<ProfileWallet> findByKeycloakUserIdAndCelebrityId(@NonNull UUID keycloakUserId, @NonNull UUID celebrityId);
 
-    @Query(value = "SELECT pw.subscriber FROM ProfileWallet pw WHERE pw.userProfile.keycloakUserId = :keycloakUserId AND pw.celebrity.id = :celebrityId")
-    boolean findIfUserSubscriberByKeycloakUserIdAndCelebrityId(@NonNull UUID keycloakUserId, @NonNull UUID celebrityId);
+    @Query(value = "SELECT pw.subscriber " +
+            "FROM ProfileWallet pw " +
+            "WHERE pw.userProfile.keycloakUserId = :keycloakUserId AND pw.celebrity.id = :celebrityId")
+    Boolean findIfUserSubscriberByKeycloakUserIdAndCelebrityId(@NonNull UUID keycloakUserId, @NonNull UUID celebrityId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query(value = "SELECT pW " +
