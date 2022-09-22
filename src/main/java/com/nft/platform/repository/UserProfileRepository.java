@@ -65,4 +65,8 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, UUID>,
     Stream<ContentAuthorDto> findContentAuthorsByKeycloakIdIn(Collection<UUID> authorKeycloakIds);
 
     <T> Stream<T> findByKeycloakUserIdIn(Set<UUID> keycloakIds, Class<T> targetClass);
+
+    @Query(value = "SELECT up.keycloakUserId FROM UserProfile up " +
+            "WHERE up.id = ?1")
+    Optional<UUID> exchangeUserIdForKeycloakUserId(UUID userId);
 }

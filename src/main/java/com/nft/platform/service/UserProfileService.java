@@ -502,4 +502,9 @@ public class UserProfileService {
                 .collect(Collectors.toMap(ModeratorView::getKeycloakUserId, ModeratorView::getFullName));
     }
 
+    public UUID exchangeUserIdForKeycloakId(@NonNull UUID userId) {
+        return userProfileRepository.exchangeUserIdForKeycloakUserId(userId)
+                .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, userId));
+    }
+
 }

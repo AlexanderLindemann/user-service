@@ -298,4 +298,13 @@ public class UserProfileController {
     public Map<UUID, String> getModeratorNamesByKeycloakIds(@RequestParam Set<UUID> moderatorKeycloakIds) {
         return userProfileService.getModeratorNamesMapByKeycloakIds(moderatorKeycloakIds);
     }
+
+    @GetMapping("/id-exchange")
+    @Operation(summary = "Get user's Keycloak Id by User Id (DB primary key)")
+    @Hidden
+    @Secured(ROLE_TECH_TOKEN)
+    @ResponseStatus(HttpStatus.OK)
+    public UUID exchangeUserIdForKeycloakId(@RequestParam UUID userId) {
+        return userProfileService.exchangeUserIdForKeycloakId(userId);
+    }
 }
