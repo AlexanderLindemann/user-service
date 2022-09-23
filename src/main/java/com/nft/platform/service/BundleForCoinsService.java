@@ -11,13 +11,11 @@ import com.nft.platform.dto.response.BundleForCoinsResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.BundleForCoinsMapper;
-import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.BundleForCoinsRepository;
+import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.util.security.SecurityUtil;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
@@ -47,6 +45,7 @@ public class BundleForCoinsService {
 
     @Transactional
     public void buyBundleForCoins(PurchaseForCoinsRequestDto requestDto) {
+
         UUID keycloakUserId = securityUtil.getCurrentUserId();
         UUID celebrityId = UUID.fromString(defaultCelebrity);
         ProfileWallet profileWallet = profileWalletService.getProfileWalletForUpdate(keycloakUserId, celebrityId);
@@ -68,14 +67,14 @@ public class BundleForCoinsService {
         profileWallet.setCoinBalance(profileWallet.getCoinBalance() - coins);
         profileWalletRepository.save(profileWallet);
         applicationEventPublisher.publishEvent(
-            BundleTransactionEvent.builder()
-                .celebrityId(celebrityId)
-                .userId(keycloakUserId)
-                .bundleId(bundle.getId())
-                .cost(bundle.getCoins())
-                .quantity(bundle.getBundleSize())
-                .eventType(EventType.BUNDLE_TRANSACTION_CREATED)
-            .build()
+                BundleTransactionEvent.builder()
+                        .celebrityId(celebrityId)
+                        .userId(keycloakUserId)
+                        .bundleId(bundle.getId())
+                        .cost(bundle.getCoins())
+                        .quantity(bundle.getBundleSize())
+                        .eventType(EventType.BUNDLE_TRANSACTION_CREATED)
+                        .build()
         );
     }
 

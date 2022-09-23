@@ -57,6 +57,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotNull;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -310,15 +311,16 @@ public class UserProfileService {
     public String uploadUserProfileImageForCurrent(@NotNull MultipartFile file) {
         var currentUser = securityUtil.getCurrentUser();
         UUID keycloakUserId = UUID.fromString(currentUser.getId());
-
         UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
         String oldUrl = profile.getImageUrl();
-
         if (file.getSize() > Integer.parseInt(MINIMAL_ALLOWED_FILE_SIZE)) {
-            file = Base64ToMultipartFileMapper.compressUploadedImage(file);
+            try {
+                file = Base64ToMultipartFileMapper.compressUploadedImage(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-
         String url = replaceUserProfileImage(file, oldUrl, FileType.AVATAR);
         profile.setImageUrl(url);
         userProfileRepository.save(profile);
