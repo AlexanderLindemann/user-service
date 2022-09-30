@@ -1,5 +1,6 @@
 package com.nft.platform.dto.request;
 
+import com.nft.platform.common.enums.CelebrityThemeType;
 import com.nft.platform.dto.AbstractCelebrityDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -21,4 +22,7 @@ public class CelebrityRequestDto extends AbstractCelebrityDto {
 
     @Schema(description = "Celebrity categories", required = true)
     private List<UUID> category;
+
+    @Schema(description = "Celebrity type")
+    private CelebrityThemeType themeType;
 }
