@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -47,10 +48,10 @@ public interface PoeControllerV1Api {
     @ResponseStatus(HttpStatus.OK)
     List<PoeResponseDto> getPoesList(@RequestBody PoeFilterDto filter);
 
-    @PostMapping("/list/for-user")
+    @GetMapping("/list/for-user")
     @Operation(summary = "Get list of Poe for user")
     @ResponseStatus(HttpStatus.OK)
-    List<PoeForUserDto> getPoesListForUser(@RequestBody PoeFilterDto filter,
+    List<PoeForUserDto> getPoesListForUser(@SpringQueryMap PoeFilterDto filter,
                                            @RequestParam UUID userId,
                                            @RequestParam UUID celebrityId);
 
