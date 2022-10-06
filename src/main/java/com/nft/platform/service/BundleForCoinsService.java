@@ -16,7 +16,6 @@ import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -33,9 +32,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BundleForCoinsService {
 
-    @Value("${nft.celebrity.default-uuid}")
-    private String defaultCelebrity;
-
     private final ApplicationEventPublisher applicationEventPublisher;
     private final BundleForCoinsMapper bundleForCoinsMapper;
     private final BundleForCoinsRepository bundleForCoinsRepository;
@@ -45,9 +41,8 @@ public class BundleForCoinsService {
 
     @Transactional
     public void buyBundleForCoins(PurchaseForCoinsRequestDto requestDto) {
-
         UUID keycloakUserId = securityUtil.getCurrentUserId();
-        UUID celebrityId = UUID.fromString(defaultCelebrity);
+        UUID celebrityId = requestDto.getCelebrityId();
         ProfileWallet profileWallet = profileWalletService.getProfileWalletForUpdate(keycloakUserId, celebrityId);
         BundleForCoins bundle = bundleForCoinsRepository.findById(requestDto.getBundleForCoinsId())
                 .orElseThrow(() -> new ItemNotFoundException(BundleForCoins.class, requestDto.getBundleForCoinsId()));

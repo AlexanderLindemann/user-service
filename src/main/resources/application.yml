@@ -102,7 +102,7 @@ security:
 # key for JWT token decoding
         key-value: |-
           -----BEGIN PUBLIC KEY-----
-          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqX9FCU+uiDbTxWc4pY3rH34k1KTdHF9FoEUSZfr/VX+8r6KPnuJShVXj247/X68b3kl+mwrr8j89eROS4w09yU4tqEkB1/QBy7lpckFKdQlJ5OawAzVC642qcIV2o7PpJdyhAjEdAi4G5CmNGnuA0Jpq9qxeNWTse15BQ/30ATPdHccdthO97rpe15K5q2nqTDTJ6QN6PLYIBMMCMqKHSs6t6FRUvPqe8SL9Pk7z/Tptyc4FB2A7uJvoFGa7rwa9jVIC434w/2u1O2clQDNMfcvdycqvk+16fZqYAENw0oY2KhGtrOPfjoUOjdRG+77EmYGgTLi0BHX+PIZJZz3PNQIDAQAB
+          JWT_TOKEN_KEY_PLACEHOLDER
           -----END PUBLIC KEY-----
       token-info-uri: ${rest.security.issuer-uri}/protocol/openid-connect/token/introspect
       user-info-uri: ${rest.security.issuer-uri}/protocol/openid-connect/userinfo

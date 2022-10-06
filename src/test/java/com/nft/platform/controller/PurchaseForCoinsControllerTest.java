@@ -40,7 +40,7 @@ class PurchaseForCoinsControllerTest extends AbstractIntegrationTest {
     @WithMockKeycloakToken(id = USER_ID, roles = {ROLE_USER})
     public void testByBundleForCoins() throws Exception {
         var bundle = bundleForCoinsRepository.findByTypeAndBundleSize(BundleType.NFT_VOTE, 1).orElseThrow();
-        var body = new PurchaseForCoinsRequestDto(bundle.getId());
+        var body = new PurchaseForCoinsRequestDto(bundle.getId(), TECH_CELEB_ID);
         var walletBeforePurchase = profileWalletRepository.findByKeycloakUserIdAndCelebrityId(USER_UID, TECH_CELEB_ID).orElseThrow();
 
         mockMvc.perform(post(BASE_PATH + "/buy")

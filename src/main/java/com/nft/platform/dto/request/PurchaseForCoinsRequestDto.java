@@ -16,4 +16,6 @@ public class PurchaseForCoinsRequestDto {
     @Schema(required = true)
     private UUID bundleForCoinsId;
 
+    @Schema(required = true)
+    private UUID celebrityId;
 }
