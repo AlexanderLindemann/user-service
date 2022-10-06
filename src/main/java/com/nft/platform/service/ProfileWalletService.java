@@ -4,9 +4,7 @@ import com.nft.platform.common.dto.UserVoteReductionDto;
 import com.nft.platform.common.enums.BundleType;
 import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
-import com.nft.platform.common.enums.RewardType;
 import com.nft.platform.common.event.VoteTransactionEvent;
-import com.nft.platform.common.event.WheelRewardKafkaEvent;
 import com.nft.platform.domain.BundleForCoins;
 import com.nft.platform.domain.Celebrity;
 import com.nft.platform.domain.Period;
@@ -14,12 +12,9 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.dto.enums.PeriodStatus;
-import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.dto.request.SubscriptionRequestDto;
-import com.nft.platform.dto.request.UserRewardIncreaseDto;
 import com.nft.platform.event.FirstAppOpenOnPeriodEvent;
 import com.nft.platform.event.ProfileWalletCreatedEvent;
-import com.nft.platform.exception.BadRequestException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.redis.starter.service.SyncService;
@@ -41,9 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import static com.nft.platform.common.enums.ActivityType.WHEEL;
-import static com.nft.platform.event.producer.impl.IncomeHistoryTransactionEventProducerImpl.formRewardTransactionEvent;
 
 @Service
 @Slf4j
@@ -274,74 +266,4 @@ public class ProfileWalletService {
     private long calculateAvailableBalanceForCoins(long coinBalance, int priceOfOneLot) {
         return coinBalance / priceOfOneLot;
     }
-
-    @Transactional
-    public void addCoins(UserRewardIncreaseDto requestDto) {
-        profileWalletRepository.updateProfileWalletCoinBalance(
-                requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
-    }
-
-    @Transactional
-    public void addVotes(UserRewardIncreaseDto requestDto) {
-        profileWalletRepository.updateProfileWalletVoteBalance(
-                requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
-    }
-
-    @Transactional
-    public void addNftVotes(UserRewardIncreaseDto requestDto) {
-        profileWalletRepository.updateProfileWalletNftVoteBalance(
-                requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
-    }
-
-    /**
-     * Send {@link PoeTransactionResponseDto} to Kafka queue in order to fill up database in income-history-service and update {@link ProfileWallet} entity.
-     *
-     * @param event This dto comes from platform-activity-service (kafka topic);
-     * @param responseDto           This dto comes after processing {@link Poe} data for exact user;
-     */
-    @Transactional
-    public void handleWheelReward(WheelRewardKafkaEvent event, PoeTransactionResponseDto responseDto) {
-        for (RewardType rewardType : event.getRewards().keySet()) {
-            Integer rewardAmount = event.getRewards().get(rewardType);
-            switch (rewardType) {
-                case COINS:
-                    if (profileWalletRepository.updateProfileWalletCoinBalance(event.getUserId(), event.getCelebrityId(), rewardAmount) == 0) {
-                        throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet coin balance.", "Something went wrong with updating.");
-                    } else {
-                        applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, rewardAmount, 0, 0, 0, null, null, false, WHEEL)
-                        );
-                    }
-                    break;
-                case GOLD_STATUS:
-                    if (profileWalletRepository.updateProfileWalletSubscription(event.getUserId(), event.getCelebrityId(), true) == 0) {
-                        throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet gold status.", "Something went wrong with updating.");
-                    } else {
-                        applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, 0, 0, 0, 0, null, null, true, WHEEL)
-                        );
-                    }
-                    break;
-                case NFT_VOTES:
-                    if (profileWalletRepository.updateProfileWalletNftVoteBalance(event.getUserId(), event.getCelebrityId(), event.getRewards().get(rewardType)) == 0) {
-                        throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet nft votes balance.", "Something went wrong with updating.");
-                    } else {
-                        applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, 0,0,0, rewardAmount,null,null,false, WHEEL)
-                        );
-                    }
-                    break;
-                case VOTES:
-                    if (profileWalletRepository.updateProfileWalletVoteBalance(event.getUserId(), event.getCelebrityId(), event.getRewards().get(rewardType)) == 0) {
-                        throw new BadRequestException(ProfileWallet.class, "Update ProfileWallet vote balance.", "Something went wrong with updating.");
-                    } else {
-                        applicationEventPublisher.publishEvent(
-                            formRewardTransactionEvent(responseDto, 0, 0, rewardAmount, 0, null, null, false, WHEEL)
-                        );
-                    }
-                    break;
-            }
-        }
-    }
-
 }

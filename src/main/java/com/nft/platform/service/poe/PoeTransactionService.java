@@ -2,9 +2,9 @@ package com.nft.platform.service.poe;
 
 import com.nft.platform.common.dto.RewardResponseDto;
 import com.nft.platform.common.enums.PoeAction;
+import com.nft.platform.common.event.AuthUserAuthorizedEvent;
 import com.nft.platform.common.util.EnumUtil;
 import com.nft.platform.domain.Period;
-import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.domain.UserProfile;
 import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.domain.poe.PoeTransaction;
@@ -13,15 +13,18 @@ import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.poe.request.LeaderboardRequestDto;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
 import com.nft.platform.dto.poe.request.UserBalanceRequestDto;
-import com.nft.platform.dto.poe.response.*;
-import com.nft.platform.exception.InvalidPoeTransactionException;
+import com.nft.platform.dto.poe.response.LeaderboardFullResponseDto;
+import com.nft.platform.dto.poe.response.LeaderboardResponseDto;
+import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
+import com.nft.platform.dto.poe.response.PoeTransactionUserHistoryDto;
+import com.nft.platform.dto.poe.response.UserActivityBalancePositionResponseDto;
+import com.nft.platform.dto.poe.response.UserIdActivityBalancePositionResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.exception.RestException;
 import com.nft.platform.mapper.UserProfileMapper;
 import com.nft.platform.mapper.poe.PoeTransactionMapper;
 import com.nft.platform.mapper.poe.PoeTransactionToUserHistoryMapper;
 import com.nft.platform.repository.PeriodRepository;
-import com.nft.platform.repository.ProfileWalletRepository;
 import com.nft.platform.repository.UserProfileRepository;
 import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.repository.poe.PoeTransactionRepository;
@@ -29,11 +32,13 @@ import com.nft.platform.repository.poe.UserBalance;
 import com.nft.platform.repository.spec.PoeTransactionSpecifications;
 import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.service.UserPointsService;
+import com.nft.platform.service.billing.BillingService;
 import com.nft.platform.util.CommonUtils;
 import com.nft.platform.util.security.SecurityUtil;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,12 +50,19 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Lazy))
 public class PoeTransactionService {
 
     private final PeriodRepository periodRepository;
@@ -58,12 +70,13 @@ public class PoeTransactionService {
     private final PoeTransactionRepository poeTransactionRepository;
     private final UserPointsService userPointsService;
     private final ProfileWalletService profileWalletService;
-    private final ProfileWalletRepository profileWalletRepository;
     private final PoeRepository poeRepository;
     private final PoeTransactionMapper poeTransactionMapper;
     private final UserProfileMapper userProfileMapper;
     private final PoeTransactionToUserHistoryMapper poeTransactionToUserHistoryMapper;
     private final SecurityUtil securityUtil;
+    private final BillingService billingService;
+    private final PoeTransactionFactory poeTransactionFactory;
 
     @Transactional(readOnly = true)
     public List<PoeTransactionUserHistoryDto> findLastPoeHistory(UUID celebrityId) {
@@ -76,48 +89,28 @@ public class PoeTransactionService {
 
     @Transactional
     @Retryable(value = DataIntegrityViolationException.class, backoff = @Backoff(delay = 100, maxDelay = 300))
-    public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto requestDto) {
-        log.info("Try to create PoeTransaction from dto={}", requestDto);
-        PoeAction poeAction = EnumUtil.EVENT_TO_POE_MAP.get(requestDto.getEventType());
-        if (poeAction == null) {
-            throw new ItemNotFoundException(Poe.class, "can not find poe for event=" + requestDto.getEventType());
-        }
-        Poe poe = poeRepository.findByCode(poeAction)
-                .orElseThrow(() -> new ItemNotFoundException(Poe.class, "code=" + poeAction.getActionCode()));
-        var period = periodRepository.findByStatus(PeriodStatus.ACTIVE)
-                .orElseThrow(() -> new ItemNotFoundException(Period.class, "can not find active period"));
-        if (isPoeInvalidForPeriod(period.getId(), requestDto.getUserId(), poeAction)) {
-            throw new InvalidPoeTransactionException(poeAction, requestDto.getUserId(), period.getId());
-        }
-        PoeTransaction poeTransaction = poeTransactionMapper.toEntity(requestDto, new PoeTransaction());
-        poeTransaction.setPeriodId(period.getId());
-        poeTransaction.setPoe(poe);
-        ProfileWallet profileWallet = profileWalletRepository
-                .findByKeycloakUserIdAndCelebrityId(requestDto.getUserId(), requestDto.getCelebrityId())
-                .orElseThrow(() -> new ItemNotFoundException(ProfileWallet.class,
-                        "keycloakUserId=" + requestDto.getUserId() + " celebrityId=" + requestDto.getCelebrityId()));
-        int coinsAward = CommonUtils.toPrimitive(poe.getCoinsReward());
-        int pointsAward = CommonUtils.toPrimitive(poe.getPointsReward());
-        if (profileWallet.isSubscriber()) {
-            coinsAward += CommonUtils.toPrimitive(poe.getCoinsRewardSub());
-            pointsAward += CommonUtils.toPrimitive(poe.getPointsRewardSub());
-        }
-        poeTransaction.setPointsReward(pointsAward * requestDto.getAmount());
-        poeTransaction.setCoinsReward(coinsAward * requestDto.getAmount());
+    public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto request) {
+        log.info("Try to create PoeTransaction from dto={}", request);
+        var transaction = poeTransactionFactory.create(request);
+        execute(transaction, request.getAmount());
+        return poeTransactionMapper.toDto(transaction);
+    }
 
-        if (coinsAward != 0) {
-            profileWalletRepository.updateProfileWalletCoinBalance(requestDto.getUserId(), requestDto.getCelebrityId(), coinsAward);
-        }
-        if (pointsAward != 0) {
-            profileWalletRepository.updateProfileWalletExperienceBalance(requestDto.getUserId(), requestDto.getCelebrityId(), pointsAward);
-        }
-        poeTransactionRepository.save(poeTransaction);
+    @Transactional
+    public void process(AuthUserAuthorizedEvent event) {
+        log.info("Trying create and execute poe transactions for authorization event {}", event);
+        poeTransactionFactory.create(event).forEach(t -> execute(t, 1));
+    }
+
+    private void execute(PoeTransaction transaction, int amount) {
+        billingService.award(transaction, amount);
+        poeTransactionRepository.save(transaction);
         userPointsService.createOrUpdateUserPoints(
-                poeTransaction.getPeriodId(),
-                poeTransaction.getUserId(),
-                poeTransaction.getPointsReward()
+                transaction.getPeriodId(),
+                transaction.getUserId(),
+                transaction.getPointsReward()
         );
-        return poeTransactionMapper.toDto(poeTransaction);
+
     }
 
     @Transactional(readOnly = true)

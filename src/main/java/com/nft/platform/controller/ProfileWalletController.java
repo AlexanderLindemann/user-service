@@ -7,6 +7,7 @@ import com.nft.platform.dto.request.SubscriptionRequestDto;
 import com.nft.platform.dto.request.UserRewardIncreaseDto;
 import com.nft.platform.service.PeriodService;
 import com.nft.platform.service.ProfileWalletService;
+import com.nft.platform.service.billing.BillingService;
 import com.nft.platform.util.security.RoleConstants;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,7 @@ import java.util.UUID;
 public class ProfileWalletController {
 
     private final ProfileWalletService profileWalletService;
+    private final BillingService billingService;
     private final PeriodService periodService;
 
     @GetMapping("/is-subscriber")
@@ -130,7 +132,7 @@ public class ProfileWalletController {
     public void addCoins(
             @Valid @RequestBody UserRewardIncreaseDto requestDto
     ) {
-        profileWalletService.addCoins(requestDto);
+        billingService.addCoins(requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
     }
 
     @PostMapping("/votes-addition")
@@ -140,7 +142,7 @@ public class ProfileWalletController {
     public void addVotes(
             @Valid @RequestBody UserRewardIncreaseDto requestDto
     ) {
-        profileWalletService.addVotes(requestDto);
+        billingService.addVotes(requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
     }
 
     @PostMapping("/nft-votes-addition")
@@ -150,7 +152,7 @@ public class ProfileWalletController {
     public void addNftVotes(
             @Valid @RequestBody UserRewardIncreaseDto requestDto
     ) {
-        profileWalletService.addNftVotes(requestDto);
+        billingService.addNftVotes(requestDto.getKeycloakUserId(), requestDto.getCelebrityId(), requestDto.getAmount());
     }
 
 }

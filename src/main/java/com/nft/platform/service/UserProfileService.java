@@ -108,6 +108,12 @@ public class UserProfileService {
                 .map(mapper::toPoorDto);
     }
 
+    public Optional<UserProfile> findByLogin(@NonNull String login) {
+        return userProfileRepository.findUserProfileBy(StringUtils.toRootLowerCase(login), StringUtils.toRootLowerCase(login),StringUtils.toRootLowerCase(login))
+                .stream()
+                .findFirst();
+    }
+
     public List<UserProfileResponseDto> search(UserProfileSearchDto params) {
         return userProfileRepository.findUserProfileBy(StringUtils.toRootLowerCase(params.getName()), StringUtils.toRootLowerCase(params.getEmail()), params.getPhone())
                 .stream()

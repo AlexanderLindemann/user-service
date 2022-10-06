@@ -8,10 +8,9 @@ import com.nft.platform.domain.ProfileWallet;
 import com.nft.platform.dto.poe.response.PoeTransactionResponseDto;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.repository.ProfileWalletRepository;
-
+import com.nft.platform.service.billing.BillingService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -28,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ProfileWalletServiceTest extends AbstractUnitTest {
 
     @Autowired
-    private ProfileWalletService profileWalletService;
+    private BillingService billingService;
 
     @Autowired
     private ProfileWalletRepository profileWalletRepository;
@@ -73,7 +72,7 @@ public class ProfileWalletServiceTest extends AbstractUnitTest {
 
         UUID profileWalletId = UUID.fromString("62c47f7e-a74f-4d46-81c9-ecf8f60b89d3");
 
-        profileWalletService.handleWheelReward(wheelRewardKafkaEvent, poeTransactionResponseDto);
+        billingService.handleWheelRewards(wheelRewardKafkaEvent, poeTransactionResponseDto);
 
         ProfileWallet profileWallet = profileWalletRepository
             .findById(profileWalletId)
