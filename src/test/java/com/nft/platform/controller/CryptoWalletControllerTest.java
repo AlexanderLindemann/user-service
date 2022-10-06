@@ -53,16 +53,16 @@ public class CryptoWalletControllerTest extends AbstractIntegrationTest {
             .andExpect(status().is(HttpStatus.OK.value()))
             .andExpect(jsonPath("$[0].id").value("5acc121f-add2-4daa-abb9-2ade506ceb51"))
             .andExpect(jsonPath("$[0].defaultWallet").value(false))
-            .andExpect(jsonPath("$[0].externalCryptoWalletId").value("2eM7m...fP1M"))
+            .andExpect(jsonPath("$[0].externalCryptoWalletId").value("2eM7moZpiHVigsZAHaYX9feYGhM4ArPKm8yzCfaBfP1M"))
             .andExpect(jsonPath("$[1].id").value("53ee047d-91bf-4dc6-a9e9-192a40dace5f"))
             .andExpect(jsonPath("$[1].defaultWallet").value(false))
-            .andExpect(jsonPath("$[1].externalCryptoWalletId").value("GoqoZ...N6w9"))
+            .andExpect(jsonPath("$[1].externalCryptoWalletId").value("GoqoZEw24WLHB3GV4zb1t88Hcmt39AwLvSiDTwUUN6w9"))
             .andExpect(jsonPath("$[2].id").value("92280253-ec21-44cc-b36a-8cbbff1fbb10"))
             .andExpect(jsonPath("$[2].defaultWallet").value(false))
-            .andExpect(jsonPath("$[2].externalCryptoWalletId").value("BPQ8m...bu3n"))
+            .andExpect(jsonPath("$[2].externalCryptoWalletId").value("BPQ8mbS8FEA8kwKESeT7UFU39hujVixaRyvr1hqrbu3n"))
             .andExpect(jsonPath("$[3].id").value("851b3618-ffba-4d96-b6d0-7286423b82dd"))
             .andExpect(jsonPath("$[3].defaultWallet").value(true))
-            .andExpect(jsonPath("$[3].externalCryptoWalletId").value("HhDXP...cccN"));
+            .andExpect(jsonPath("$[3].externalCryptoWalletId").value("HhDXPvWqF456fd1GVjUu8VKrVeVkjwnTSnjed3yycccN"));
     }
 
     @Test
@@ -72,16 +72,16 @@ public class CryptoWalletControllerTest extends AbstractIntegrationTest {
             .andExpect(status().is(HttpStatus.OK.value()))
             .andExpect(jsonPath("$[0].id").value("5acc121f-add2-4daa-abb9-2ade506ceb51"))
             .andExpect(jsonPath("$[0].defaultWallet").value(false))
-            .andExpect(jsonPath("$[0].externalCryptoWalletId").value("2eM7m...fP1M"))
+            .andExpect(jsonPath("$[0].externalCryptoWalletId").value("2eM7moZpiHVigsZAHaYX9feYGhM4ArPKm8yzCfaBfP1M"))
             .andExpect(jsonPath("$[1].id").value("53ee047d-91bf-4dc6-a9e9-192a40dace5f"))
             .andExpect(jsonPath("$[1].defaultWallet").value(false))
-            .andExpect(jsonPath("$[1].externalCryptoWalletId").value("GoqoZ...N6w9"))
+            .andExpect(jsonPath("$[1].externalCryptoWalletId").value("GoqoZEw24WLHB3GV4zb1t88Hcmt39AwLvSiDTwUUN6w9"))
             .andExpect(jsonPath("$[2].id").value("92280253-ec21-44cc-b36a-8cbbff1fbb10"))
             .andExpect(jsonPath("$[2].defaultWallet").value(false))
-            .andExpect(jsonPath("$[2].externalCryptoWalletId").value("BPQ8m...bu3n"))
+            .andExpect(jsonPath("$[2].externalCryptoWalletId").value("BPQ8mbS8FEA8kwKESeT7UFU39hujVixaRyvr1hqrbu3n"))
             .andExpect(jsonPath("$[3].id").value("851b3618-ffba-4d96-b6d0-7286423b82dd"))
             .andExpect(jsonPath("$[3].defaultWallet").value(true))
-            .andExpect(jsonPath("$[3].externalCryptoWalletId").value("HhDXP...cccN"));
+            .andExpect(jsonPath("$[3].externalCryptoWalletId").value("HhDXPvWqF456fd1GVjUu8VKrVeVkjwnTSnjed3yycccN"));
     }
 
     // TODO does not work buy some reason;
@@ -102,7 +102,7 @@ public class CryptoWalletControllerTest extends AbstractIntegrationTest {
             .andExpect(status().is(HttpStatus.CREATED.value()))
             .andExpectAll(
                 jsonPath("$.id").exists(),
-                jsonPath("$.externalCryptoWalletId").value("1Boat...tpyT"),
+                jsonPath("$.externalCryptoWalletId").value("1BoatSLRHtKNngkdXEeobR76b53LETtpyT"),
                 jsonPath("$.blockchain").value(Blockchain.SOLANA.toString()),
                 jsonPath("$.defaultWallet").value(false)
             );
