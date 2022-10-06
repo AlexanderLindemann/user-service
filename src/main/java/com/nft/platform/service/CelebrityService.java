@@ -97,16 +97,14 @@ public class CelebrityService {
 
     @NonNull
     @Transactional
-    public CelebrityUpdateResponseDto updateCelebrity(@NonNull UUID id, @NonNull CelebrityUpdateRequestDto requestDto) {
+    public CelebrityUpdateResponseDto updateCelebrity(@NonNull UUID id, @NonNull CelebrityRequestDto requestDto) {
         Celebrity celebrity = celebrityRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(Celebrity.class, id));
-        Object jsonTheme = celebrity.getJsonTheme();
         if (!celebrity.getName().equalsIgnoreCase(requestDto.getName())) {
             log.info("Try update Celebrity name from {} to {}", celebrity.getName(), requestDto.getName());
             throwIfCelebrityNameExists(requestDto);
         }
         celebrity = mapper.toEntity(requestDto, celebrity);
-        celebrity.setJsonTheme(jsonTheme);
         celebrityRepository.save(celebrity);
         return mapper.toUpdateDto(celebrity);
     }

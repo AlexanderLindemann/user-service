@@ -68,7 +68,7 @@ public class CelebrityController {
             @Parameter(name = "id", description = "Celebrity Id")
             @PathVariable("id") UUID celebrityId,
             @Parameter(name = "celebrityRequestDto", description = "Celebrity Request Dto")
-            @Valid @RequestBody CelebrityUpdateRequestDto celebrityRequestDto
+            @Valid @RequestBody CelebrityRequestDto celebrityRequestDto
     ) {
         return celebrityService.updateCelebrity(celebrityId, celebrityRequestDto);
     }

@@ -79,4 +79,7 @@ public class CelebrityUpdateResponseDto {
 
     @Schema(description = "Celebrity application screen.")
     private String appScreen;
+
+    @Schema(description = "Celebrity Theme.")
+    private Object jsonTheme;
 }
