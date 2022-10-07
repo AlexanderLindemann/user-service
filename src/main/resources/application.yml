@@ -35,13 +35,15 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog.xml
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: b-2.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092,b-1.kafkadev.eczamv.c5.kafka.eu-central-1.amazonaws.com:9092
     producer:
-      enabled: false
+      enabled: true
       group:
         id: user-service
       income-history:
         topic: income-history-service
+      notification:
+        topic: notification-service
     consumer:
       enabled: true
       group:

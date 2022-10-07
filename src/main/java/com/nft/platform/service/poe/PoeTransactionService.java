@@ -30,6 +30,7 @@ import com.nft.platform.repository.poe.PoeRepository;
 import com.nft.platform.repository.poe.PoeTransactionRepository;
 import com.nft.platform.repository.poe.UserBalance;
 import com.nft.platform.repository.spec.PoeTransactionSpecifications;
+import com.nft.platform.service.NotificationSenderService;
 import com.nft.platform.service.ProfileWalletService;
 import com.nft.platform.service.UserPointsService;
 import com.nft.platform.service.billing.BillingService;
@@ -77,6 +78,8 @@ public class PoeTransactionService {
     private final SecurityUtil securityUtil;
     private final BillingService billingService;
     private final PoeTransactionFactory poeTransactionFactory;
+    private final NotificationSenderService notificationSenderService;
+
 
     @Transactional(readOnly = true)
     public List<PoeTransactionUserHistoryDto> findLastPoeHistory(UUID celebrityId) {
@@ -93,6 +96,7 @@ public class PoeTransactionService {
         log.info("Try to create PoeTransaction from dto={}", request);
         var transaction = poeTransactionFactory.create(request);
         execute(transaction, request.getAmount());
+        notificationSenderService.sendRewardToNotificationService(request, transaction);
         return poeTransactionMapper.toDto(transaction);
     }
 
@@ -110,7 +114,6 @@ public class PoeTransactionService {
                 transaction.getUserId(),
                 transaction.getPointsReward()
         );
-
     }
 
     @Transactional(readOnly = true)

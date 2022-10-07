@@ -47,5 +47,6 @@ public interface PoeTransactionMapper {
 
     PoeTransactionRequestDto toRequestDto(WheelRewardKafkaEvent event);
 
+    @Mapping(source = "contentId", target = "actionId")
     PoeTransactionRequestDto toRequestDto(PreNftEvent event);
 }
