@@ -43,6 +43,7 @@ env:
   SPRING_KAFKA_CONSUMER_QUIZ_SERVICE_TOPIC: quiz-service
   SPRING_KAFKA_CONSUMER_PLATFORM_ACTIVITY_SERVICE_TOPIC: platform-activity-service
   SPRING_KAFKA_CONSUMER_TOKEN_MANAGEMENT_SERVICE_TOPIC: token-management-service
+  SPRING_KAFKA_CONSUMER_AUTH_SERVICE_TOPICS_AUTHORIZATION: auth-service-authorizations
 
   REDIS_ENABLED: true
   REDIS_ADDRESS: nftdevredis.elesif.clustercfg.memorydb.eu-central-1.amazonaws.com:6379

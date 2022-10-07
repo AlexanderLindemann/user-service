@@ -19,12 +19,12 @@ public class AuthServiceEventKafkaListenerImpl {
 
     @KafkaListener(topics = {"${spring.kafka.consumer.auth-service.topics.authorization}"})
     public void receive(AuthUserAuthorizedEvent event) {
-        log.info("Content service event received: {}", JsonUtil.toJsonString(event));
+        log.info("Auth service event received: {}", JsonUtil.toJsonString(event));
         poeTransactionService.process(event);
     }
 
     @KafkaListener(topics = {"${spring.kafka.consumer.auth-service.topics.registration}"})
     public void receive(AuthUserRegisteredEvent event) {
-        log.info("Content service event received: {}", JsonUtil.toJsonString(event));
+        log.info("Auth service event received: {}", JsonUtil.toJsonString(event));
     }
 }
