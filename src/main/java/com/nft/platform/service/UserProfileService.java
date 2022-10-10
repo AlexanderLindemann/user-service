@@ -109,7 +109,7 @@ public class UserProfileService {
     }
 
     public Optional<UserProfile> findByLogin(@NonNull String login) {
-        return userProfileRepository.findUserProfileBy(StringUtils.toRootLowerCase(login), StringUtils.toRootLowerCase(login),StringUtils.toRootLowerCase(login))
+        return userProfileRepository.findUserProfileBy(StringUtils.toRootLowerCase(login), StringUtils.toRootLowerCase(login), StringUtils.toRootLowerCase(login))
                 .stream()
                 .findFirst();
     }
@@ -320,13 +320,6 @@ public class UserProfileService {
         UserProfile profile = userProfileRepository.findByKeycloakUserId(keycloakUserId)
                 .orElseThrow(() -> new ItemNotFoundException(UserProfile.class, keycloakUserId));
         String oldUrl = profile.getImageUrl();
-        if (file.getSize() > Integer.parseInt(MINIMAL_ALLOWED_FILE_SIZE)) {
-            try {
-                file = Base64ToMultipartFileMapper.compressUploadedImage(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
         String url = replaceUserProfileImage(file, oldUrl, FileType.AVATAR);
         profile.setImageUrl(url);
         userProfileRepository.save(profile);
@@ -336,7 +329,7 @@ public class UserProfileService {
     private String replaceUserProfileImage(@NotNull MultipartFile file, String oldUrl, FileType fileType) {
         String url;
         try {
-            var response = fileServiceClient.fileUpload(fileType, file);
+            var response = fileServiceClient.fileUpload(fileType, file, false);
             if (response.getBody() != null) {
                 url = response.getBody().getUrl();
             } else {

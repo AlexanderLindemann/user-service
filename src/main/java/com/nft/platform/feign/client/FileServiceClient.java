@@ -21,7 +21,7 @@ public interface FileServiceClient {
     String path = "/api/v1/files";
 
     @PostMapping(value = path, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<FileInfoResponseDto> fileUpload(@RequestParam FileType fileType, @RequestPart(value = "file") MultipartFile file);
+    ResponseEntity<FileInfoResponseDto> fileUpload(@RequestParam FileType fileType, @RequestPart(value = "file") MultipartFile file, @RequestParam(value = "isCompress") boolean isCompress);
 
     @DeleteMapping(value = path)
     void deleteFile(@RequestParam("url") String url);
