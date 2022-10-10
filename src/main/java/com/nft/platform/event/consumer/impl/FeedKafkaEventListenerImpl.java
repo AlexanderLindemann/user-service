@@ -23,6 +23,6 @@ public class FeedKafkaEventListenerImpl {
     public void receive(FeedAddedEvent event) {
         log.info("Feed service event received: {}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        poeTransactionService.process(poeTransactionRequestDto);
     }
 }

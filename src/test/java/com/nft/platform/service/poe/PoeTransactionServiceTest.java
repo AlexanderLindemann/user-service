@@ -85,7 +85,7 @@ public class PoeTransactionServiceTest extends AbstractIntegrationTest {
                 .celebrityId(celebrityId)
                 .userId(userId)
                 .build();
-        poeTransactionService.createPoeTransaction(poeTransactionMapper.toRequestDto(event));
+        poeTransactionService.process(poeTransactionMapper.toRequestDto(event));
         var walletAfterEvent = getWallet();
         Assert.assertEquals((long) poe.getCoinsReward(), walletAfterEvent.getCoinBalance() - walletBeforeEvent.getCoinBalance());
         Assert.assertEquals((long) poe.getPointsReward(), walletAfterEvent.getExperienceCount() - walletBeforeEvent.getExperienceCount());

@@ -1,6 +1,7 @@
 package com.nft.platform.service.poe;
 
 import com.nft.platform.common.dto.RewardResponseDto;
+import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.PoeAction;
 import com.nft.platform.common.event.AuthUserAuthorizedEvent;
 import com.nft.platform.common.util.EnumUtil;
@@ -92,21 +93,20 @@ public class PoeTransactionService {
 
     @Transactional
     @Retryable(value = DataIntegrityViolationException.class, backoff = @Backoff(delay = 100, maxDelay = 300))
-    public PoeTransactionResponseDto createPoeTransaction(PoeTransactionRequestDto request) {
+    public PoeTransactionResponseDto process(PoeTransactionRequestDto request) {
         log.info("Try to create PoeTransaction from dto={}", request);
         var transaction = poeTransactionFactory.create(request);
-        execute(transaction, request.getAmount());
-        notificationSenderService.sendRewardToNotificationService(request, transaction);
+        execute(transaction, request.getAmount(), request.getEventType());
         return poeTransactionMapper.toDto(transaction);
     }
 
     @Transactional
     public void process(AuthUserAuthorizedEvent event) {
         log.info("Trying create and execute poe transactions for authorization event {}", event);
-        poeTransactionFactory.create(event).forEach(t -> execute(t, 1));
+        poeTransactionFactory.create(event).forEach(t -> execute(t, 1, event.getEventType()));
     }
 
-    private void execute(PoeTransaction transaction, int amount) {
+    private void execute(PoeTransaction transaction, int amount, EventType eventType) {
         billingService.award(transaction, amount);
         poeTransactionRepository.save(transaction);
         userPointsService.createOrUpdateUserPoints(
@@ -114,6 +114,8 @@ public class PoeTransactionService {
                 transaction.getUserId(),
                 transaction.getPointsReward()
         );
+        notificationSenderService.sendRewardToNotificationService(eventType, transaction);
+
     }
 
     @Transactional(readOnly = true)

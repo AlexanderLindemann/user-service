@@ -21,6 +21,6 @@ public class FirstAppOpenOnPeriodEventHandler {
     public void handle(FirstAppOpenOnPeriodEvent event) {
         log.info("Get event={}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        poeTransactionService.process(poeTransactionRequestDto);
     }
 }

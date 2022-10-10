@@ -26,7 +26,7 @@ public class ChallengeKafkaEventListenerImpl {
     public void receive(KafkaChallengeCompletedEvent event) {
         log.info("Challenge service event received: {}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        PoeTransactionResponseDto responseDto = poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        PoeTransactionResponseDto responseDto = poeTransactionService.process(poeTransactionRequestDto);
         billingService.handleChallengeRewards(event, responseDto);
     }
 

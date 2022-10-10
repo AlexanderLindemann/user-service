@@ -26,7 +26,7 @@ public class PlatformActivityKafkaEventListenerImpl {
     public void receive(WheelRewardKafkaEvent event) {
         log.info("Platform-activity service event received: {}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        PoeTransactionResponseDto responseDto = poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        PoeTransactionResponseDto responseDto = poeTransactionService.process(poeTransactionRequestDto);
         billingService.handleWheelRewards(event, responseDto);
     }
 

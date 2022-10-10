@@ -23,6 +23,6 @@ public class QuizKafkaEventListenerImpl {
     public void receive(QuizCompletedEvent event) {
         log.info("Quiz service event received: {}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        poeTransactionService.process(poeTransactionRequestDto);
     }
 }

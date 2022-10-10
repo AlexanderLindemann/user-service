@@ -21,6 +21,6 @@ public class ProfileWalletCreatedEventHandler {
     public void handle(ProfileWalletCreatedEvent event) {
         log.info("Get event ProfileWalletCreatedEvent={}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        poeTransactionService.process(poeTransactionRequestDto);
     }
 }

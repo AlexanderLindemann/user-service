@@ -3,6 +3,7 @@ package com.nft.platform.service;
 import com.nft.platform.common.dto.RewardDto;
 import com.nft.platform.common.dto.VariablesDto;
 import com.nft.platform.common.enums.ActivityForRewardType;
+import com.nft.platform.common.enums.EventType;
 import com.nft.platform.common.enums.RewardType;
 import com.nft.platform.common.event.NotificationRewardEvent;
 import com.nft.platform.domain.poe.PoeTransaction;
@@ -26,11 +27,11 @@ public class NotificationSenderService {
     private final Environment environment;
     private final NotificationServiceRewardTransactionEventProducer producer;
 
-    public void sendRewardToNotificationService(PoeTransactionRequestDto request, PoeTransaction transaction) {
-        if ((ActivityForRewardType.contains(request.getEventType().name()))) {
+    public void sendRewardToNotificationService(EventType eventType, PoeTransaction transaction) {
+        if ((ActivityForRewardType.contains(eventType.name()))) {
             VariablesDto variables = VariablesDto.builder()
-                    .celebrityId(request.getCelebrityId())
-                    .actionId(request.getActionId())
+                    .celebrityId(transaction.getCelebrityId())
+                    .actionId(transaction.getActionId())
                     .build();
 
             List<RewardDto> reward = new ArrayList<>();
@@ -49,9 +50,9 @@ public class NotificationSenderService {
             }
 
             producer.handle(NotificationRewardEvent.builder()
-                    .type(ActivityForRewardType.valueOf(request.getEventType().name()))
-                    .text(environment.getProperty(request.getEventType().name()))
-                    .userId(request.getUserId())
+                    .type(ActivityForRewardType.valueOf(eventType.name()))
+                    .text(environment.getProperty(eventType.name()))
+                    .userId(transaction.getUserId())
                     .variables(variables)
                     .reward(reward)
                     .build());

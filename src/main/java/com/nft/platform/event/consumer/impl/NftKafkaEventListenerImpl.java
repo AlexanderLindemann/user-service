@@ -23,6 +23,6 @@ public class NftKafkaEventListenerImpl {
     public void receive(NftAddedEvent event) {
         log.info("Nft service event received: {}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        poeTransactionService.process(poeTransactionRequestDto);
     }
 }

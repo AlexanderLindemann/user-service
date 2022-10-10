@@ -23,6 +23,6 @@ public class PollKafkaEventListenerImpl {
     public void receive(VoteCreatedEvent event) {
         log.info("Poll service event received: {}", event);
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        poeTransactionService.process(poeTransactionRequestDto);
     }
 }

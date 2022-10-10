@@ -24,6 +24,6 @@ public class PreNftEventKafkaListenerImpl {
     public void receive(PreNftEvent event) {
         log.info("Content service event received: {}", JsonUtil.toJsonString(event));
         PoeTransactionRequestDto poeTransactionRequestDto = poeTransactionMapper.toRequestDto(event);
-        poeTransactionService.createPoeTransaction(poeTransactionRequestDto);
+        poeTransactionService.process(poeTransactionRequestDto);
     }
 }

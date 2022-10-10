@@ -40,7 +40,7 @@ public class PoeTransactionController {
             @Parameter(name = "poeTransactionRequestDto", description = "Poe Transaction Request Dto")
             @Valid @RequestBody PoeTransactionRequestDto requestDto
     ) {
-        return poeTransactionService.createPoeTransaction(requestDto);
+        return poeTransactionService.process(requestDto);
     }
 
     @GetMapping("/user")
