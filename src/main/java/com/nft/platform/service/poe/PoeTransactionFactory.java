@@ -10,7 +10,6 @@ import com.nft.platform.domain.poe.Poe;
 import com.nft.platform.domain.poe.PoeTransaction;
 import com.nft.platform.dto.enums.PeriodStatus;
 import com.nft.platform.dto.poe.request.PoeTransactionRequestDto;
-import com.nft.platform.exception.InvalidPoeTransactionException;
 import com.nft.platform.exception.ItemNotFoundException;
 import com.nft.platform.mapper.poe.PoeTransactionMapper;
 import com.nft.platform.repository.PeriodRepository;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -47,21 +47,26 @@ public class PoeTransactionFactory {
         }
         return user.getProfileWallets().stream()
                 .map(wallet -> createByAuthEvent(event, user, wallet.getCelebrity().getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .collect(Collectors.toList());
     }
 
-    public PoeTransaction create(PoeTransactionRequestDto request) {
+    public Optional<PoeTransaction> create(PoeTransactionRequestDto request) {
         var eventType = request.getEventType();
         var poe = findPoeByEventType(eventType);
         var currentPeriod = getCurrentPeriodId();
-        validateAlreadyProcessed(currentPeriod, request.getUserId(), getAction(eventType));
+        if (isPoeInvalidForPeriod(currentPeriod, request.getUserId(), getAction(eventType))) {
+            log.error("Cannot create PoeTransaction because of poe was already awarded in current period");
+            return Optional.empty();
+        }
         PoeTransaction poeTransaction = poeTransactionMapper.toEntity(request, new PoeTransaction());
         poeTransaction.setPeriodId(currentPeriod);
         poeTransaction.setPoe(poe);
-        return poeTransaction;
+        return Optional.of(poeTransaction);
     }
 
-    private PoeTransaction createByAuthEvent(AuthUserAuthorizedEvent event, UserProfile user, UUID celebrityId) {
+    private Optional<PoeTransaction> createByAuthEvent(AuthUserAuthorizedEvent event, UserProfile user, UUID celebrityId) {
         return create(PoeTransactionRequestDto.builder()
                 .userId(user.getKeycloakUserId())
                 .amount(1)
@@ -76,12 +81,6 @@ public class PoeTransactionFactory {
             throw new ItemNotFoundException(Poe.class, "can not find poe for event=" + type);
         }
         return action;
-    }
-
-    private void validateAlreadyProcessed(UUID periodId, UUID userId, PoeAction poeAction) {
-        if (isPoeInvalidForPeriod(periodId, userId, poeAction)) {
-            throw new InvalidPoeTransactionException(poeAction, userId, periodId);
-        }
     }
 
     private UUID getCurrentPeriodId() {

@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -93,11 +94,11 @@ public class PoeTransactionService {
 
     @Transactional
     @Retryable(value = DataIntegrityViolationException.class, backoff = @Backoff(delay = 100, maxDelay = 300))
-    public PoeTransactionResponseDto process(PoeTransactionRequestDto request) {
+    public Optional<PoeTransactionResponseDto> process(PoeTransactionRequestDto request) {
         log.info("Try to create PoeTransaction from dto={}", request);
-        var transaction = poeTransactionFactory.create(request);
-        execute(transaction, request.getAmount(), request.getEventType());
-        return poeTransactionMapper.toDto(transaction);
+        return poeTransactionFactory.create(request)
+                .map(t -> execute(t, request.getAmount(), request.getEventType()))
+                .map(poeTransactionMapper::toDto);
     }
 
     @Transactional
@@ -106,7 +107,7 @@ public class PoeTransactionService {
         poeTransactionFactory.create(event).forEach(t -> execute(t, 1, event.getEventType()));
     }
 
-    private void execute(PoeTransaction transaction, int amount, EventType eventType) {
+    private PoeTransaction execute(PoeTransaction transaction, int amount, EventType eventType) {
         billingService.award(transaction, amount);
         poeTransactionRepository.save(transaction);
         userPointsService.createOrUpdateUserPoints(
@@ -115,7 +116,7 @@ public class PoeTransactionService {
                 transaction.getPointsReward()
         );
         notificationSenderService.sendRewardToNotificationService(eventType, transaction);
-
+        return transaction;
     }
 
     @Transactional(readOnly = true)
