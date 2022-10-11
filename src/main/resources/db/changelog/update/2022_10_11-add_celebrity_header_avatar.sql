@@ -1,1 +1,1 @@
-ALTER TABLE celebrity ADD header_avatar VARCHAR(255);
+ALTER TABLE celebrity ADD IF NOT EXISTS header_avatar VARCHAR(255);
