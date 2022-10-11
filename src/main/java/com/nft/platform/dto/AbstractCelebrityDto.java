@@ -85,4 +85,7 @@ public abstract class AbstractCelebrityDto {
     @Schema(description = "Celebrity application screen.")
     private String appScreen;
 
+    @Schema(description = "Celebrity header avatar")
+    private String headerAvatar;
+
 }

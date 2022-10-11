@@ -1,0 +1,1 @@
+ALTER TABLE celebrity ADD header_avatar VARCHAR(255);

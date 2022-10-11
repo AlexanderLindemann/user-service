@@ -108,4 +108,7 @@ public class Celebrity extends BaseEntity {
     @Column(name = "theme_type")
     private CelebrityThemeType themeType;
 
+    @Column(name = "header_avatar")
+    private String headerAvatar;
+
 }

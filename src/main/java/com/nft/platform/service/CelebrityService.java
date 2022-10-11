@@ -61,6 +61,7 @@ public class CelebrityService {
                 return LinkCelebrityResponseDto.builder()
                         .androidLink(celebrity.get().getAndroidLink())
                         .iosLink(celebrity.get().getIosLink())
+                        .headerAvatar(celebrity.get().getHeaderAvatar())
                         .build();
             }
         }
@@ -174,6 +175,7 @@ public class CelebrityService {
         return CelebrityThemeResponseDto.builder()
                 .celebrityId(celebrityId)
                 .theme(celebrityTheme)
+                .headerAvatar(celebrity.getHeaderAvatar())
                 .build();
     }
 

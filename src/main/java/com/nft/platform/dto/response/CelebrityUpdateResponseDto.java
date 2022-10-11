@@ -82,4 +82,7 @@ public class CelebrityUpdateResponseDto {
 
     @Schema(description = "Celebrity Theme.")
     private Object jsonTheme;
+
+    @Schema(description = "Celebrity header avatar")
+    private String headerAvatar;
 }

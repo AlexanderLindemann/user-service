@@ -20,4 +20,7 @@ public class CelebrityThemeResponseDto {
     @Schema(description = "Celebrity Theme", required = true)
     @NotNull
     private String theme;
+
+    @Schema(description = "Celebrity header avatar")
+    private String headerAvatar;
 }

@@ -14,4 +14,5 @@ import lombok.experimental.SuperBuilder;
 public class LinkCelebrityResponseDto {
     private String iosLink;
     private String androidLink;
+    private String headerAvatar;
 }
